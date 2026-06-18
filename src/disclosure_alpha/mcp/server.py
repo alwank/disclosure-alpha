@@ -117,6 +117,50 @@ def score_filing_html_tool(
     return json.dumps(result.to_dict(), indent=2, default=str)
 
 
+@mcp.tool()
+def score_company_filing(
+    ticker: str,
+    fiscal_year: int,
+    form_type: str = "10-K",
+    quarter: str | None = None,
+) -> str:
+    """Score a company filing by ticker and fiscal year (10-K or 10-Q with quarter)."""
+    from disclosure_alpha.pipeline import score_filing_ticker
+
+    result = score_filing_ticker(
+        ticker, fiscal_year, form_type=form_type, quarter=quarter
+    )
+    return json.dumps(result.to_dict(), indent=2, default=str)
+
+
+@mcp.tool()
+def list_company_filings(
+    ticker: str,
+    fiscal_year: int,
+    form_type: str | None = None,
+) -> str:
+    """List available 10-K / 10-Q filings for a ticker and fiscal year."""
+    from disclosure_alpha.edgar.resolver import list_filings
+
+    refs = list_filings(ticker, fiscal_year, form_type=form_type)
+    return json.dumps(
+        [
+            {
+                "ticker": r.ticker,
+                "cik": r.cik,
+                "accession_number": r.accession_number,
+                "form_type": r.form_type,
+                "fiscal_year": r.fiscal_year,
+                "quarter": r.quarter,
+                "filing_date": r.filing_date,
+                "report_date": r.report_date,
+            }
+            for r in refs
+        ],
+        indent=2,
+    )
+
+
 @mcp.resource("disclosure://taxonomy/v1")
 def taxonomy() -> str:
     """Score taxonomy: component weights and version strings."""

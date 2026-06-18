@@ -11,6 +11,7 @@ from disclosure_alpha.pipeline import (
     extract_sections_from_html,
     score_deterministic,
     score_filing_html,
+    score_filing_ticker,
 )
 from disclosure_alpha.section_extractor import (
     ExtractedSection,
@@ -42,6 +43,7 @@ __all__ = [
     "required_sections_present",
     "score_deterministic",
     "score_filing_html",
+    "score_filing_ticker",
 ]
 
 __version__ = "0.1.0"

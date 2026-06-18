@@ -28,6 +28,34 @@ from disclosure_alpha.version import (
     SCORING_MODEL_VERSION,
 )
 
+_VERSIONS = {
+    "parser_version": PARSER_VERSION,
+    "metrics_engine_version": METRICS_ENGINE_VERSION,
+    "scoring_model_version": SCORING_MODEL_VERSION,
+}
+
+
+@dataclass
+class FilingBundle:
+    ref: Any  # FilingRef — lazy import to avoid circular deps
+    html: str
+    prior_html: str | None
+    prior_accession: str | None
+
+
+@dataclass
+class FilingSectionsResult:
+    sections: list[ExtractedSection]
+    filing: dict[str, Any] = field(default_factory=dict)
+    versions: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
+class FilingMetricsResult:
+    metrics: MetricsResult
+    filing: dict[str, Any] = field(default_factory=dict)
+    versions: dict[str, str] = field(default_factory=dict)
+
 
 @dataclass
 class MetricsResult:
@@ -46,9 +74,10 @@ class FilingScoreResult:
     metrics: MetricsResult
     scores: DeterministicAggregationResult
     versions: dict[str, str] = field(default_factory=dict)
+    filing: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        out = {
             "sections": [asdict(s) for s in self.sections],
             "metrics": asdict(self.metrics),
             "scores": {
@@ -62,6 +91,9 @@ class FilingScoreResult:
             },
             "versions": self.versions,
         }
+        if self.filing:
+            out["filing"] = self.filing
+        return out
 
 
 def _metrics_dict(metrics) -> dict[str, float]:
@@ -197,9 +229,176 @@ def score_filing_html(
         sections=sections,
         metrics=metrics,
         scores=scores,
-        versions={
-            "parser_version": PARSER_VERSION,
-            "metrics_engine_version": METRICS_ENGINE_VERSION,
-            "scoring_model_version": SCORING_MODEL_VERSION,
-        },
+        versions=dict(_VERSIONS),
     )
+
+
+def _filing_meta(ref, *, prior_accession: str | None = None) -> dict[str, Any]:
+    return {
+        "ticker": ref.ticker,
+        "cik": ref.cik,
+        "accession_number": ref.accession_number,
+        "form_type": ref.form_type,
+        "fiscal_year": ref.fiscal_year,
+        "quarter": ref.quarter,
+        "filing_date": ref.filing_date,
+        "report_date": ref.report_date,
+        "prior_accession_number": prior_accession,
+    }
+
+
+def _filter_section_dict(d: dict[str, Any], section_names: set[str]) -> dict[str, Any]:
+    return {k: v for k, v in d.items() if k in section_names}
+
+
+def filter_metrics_result(metrics: MetricsResult, section_names: set[str]) -> MetricsResult:
+    return MetricsResult(
+        section_metrics=_filter_section_dict(metrics.section_metrics, section_names),
+        section_diffs=_filter_section_dict(metrics.section_diffs, section_names),
+        section_flags=_filter_section_dict(metrics.section_flags, section_names),
+        section_densities=_filter_section_dict(metrics.section_densities, section_names),
+        language_deltas=_filter_section_dict(metrics.language_deltas, section_names),
+        extraction_confs=metrics.extraction_confs,
+        diff_confs=metrics.diff_confs,
+    )
+
+
+def filter_sections(
+    sections: list[ExtractedSection], section_names: set[str]
+) -> list[ExtractedSection]:
+    return [s for s in sections if s.section_name in section_names]
+
+
+def load_filing_bundle(
+    ticker: str,
+    fiscal_year: int,
+    *,
+    form_type: str = "10-K",
+    quarter: str | None = None,
+    use_cache: bool = True,
+    compare_prior: bool = True,
+) -> FilingBundle:
+    from disclosure_alpha.edgar.resolver import (
+        load_filing_html,
+        resolve_filing,
+        resolve_prior_filing,
+    )
+    from disclosure_alpha.edgar.types import FilingNotFoundError
+
+    ref = resolve_filing(ticker, fiscal_year, form_type, quarter, use_cache=use_cache)
+    html = load_filing_html(ref, use_cache=use_cache)
+
+    prior_html = None
+    prior_accession = None
+    if compare_prior:
+        try:
+            prior_ref = resolve_prior_filing(ref, use_cache=use_cache)
+            if prior_ref:
+                prior_html = load_filing_html(prior_ref, use_cache=use_cache)
+                prior_accession = prior_ref.accession_number
+        except FilingNotFoundError:
+            pass
+
+    return FilingBundle(
+        ref=ref,
+        html=html,
+        prior_html=prior_html,
+        prior_accession=prior_accession,
+    )
+
+
+def sections_filing_ticker(
+    ticker: str,
+    fiscal_year: int,
+    *,
+    form_type: str = "10-K",
+    quarter: str | None = None,
+    use_cache: bool = True,
+    compare_prior: bool = True,
+) -> FilingSectionsResult:
+    bundle = load_filing_bundle(
+        ticker,
+        fiscal_year,
+        form_type=form_type,
+        quarter=quarter,
+        use_cache=use_cache,
+        compare_prior=compare_prior,
+    )
+    sections = extract_sections_from_html(
+        bundle.html,
+        bundle.ref.form_type,
+        cik=bundle.ref.cik,
+        accession_number=bundle.ref.accession_number,
+    )
+    return FilingSectionsResult(
+        sections=sections,
+        filing=_filing_meta(bundle.ref, prior_accession=bundle.prior_accession),
+        versions=dict(_VERSIONS),
+    )
+
+
+def metrics_filing_ticker(
+    ticker: str,
+    fiscal_year: int,
+    *,
+    form_type: str = "10-K",
+    quarter: str | None = None,
+    use_cache: bool = True,
+    compare_prior: bool = True,
+) -> FilingMetricsResult:
+    bundle = load_filing_bundle(
+        ticker,
+        fiscal_year,
+        form_type=form_type,
+        quarter=quarter,
+        use_cache=use_cache,
+        compare_prior=compare_prior,
+    )
+    sections = extract_sections_from_html(
+        bundle.html,
+        bundle.ref.form_type,
+        cik=bundle.ref.cik,
+        accession_number=bundle.ref.accession_number,
+    )
+    prior_sections = None
+    if bundle.prior_html:
+        prior_sections = extract_sections_from_html(
+            bundle.prior_html,
+            bundle.ref.form_type,
+            cik=bundle.ref.cik,
+            accession_number="prior",
+        )
+    metrics = compute_section_metrics(sections, prior_sections)
+    return FilingMetricsResult(
+        metrics=metrics,
+        filing=_filing_meta(bundle.ref, prior_accession=bundle.prior_accession),
+        versions=dict(_VERSIONS),
+    )
+
+
+def score_filing_ticker(
+    ticker: str,
+    fiscal_year: int,
+    *,
+    form_type: str = "10-K",
+    quarter: str | None = None,
+    use_cache: bool = True,
+    compare_prior: bool = True,
+) -> FilingScoreResult:
+    bundle = load_filing_bundle(
+        ticker,
+        fiscal_year,
+        form_type=form_type,
+        quarter=quarter,
+        use_cache=use_cache,
+        compare_prior=compare_prior,
+    )
+    result = score_filing_html(
+        bundle.html,
+        bundle.ref.form_type,
+        prior_html=bundle.prior_html,
+        cik=bundle.ref.cik,
+        accession_number=bundle.ref.accession_number,
+    )
+    result.filing = _filing_meta(bundle.ref, prior_accession=bundle.prior_accession)
+    return result

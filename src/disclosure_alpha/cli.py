@@ -13,6 +13,7 @@ from disclosure_alpha.pipeline import (
     extract_sections_from_html,
     score_deterministic,
     score_filing_html,
+    score_filing_ticker,
 )
 
 
@@ -32,9 +33,13 @@ def main() -> None:
     extract_p.add_argument("--html", required=True, help="Path to HTML file or '-' for stdin")
     extract_p.add_argument("--form", required=True, help="Form type, e.g. 10-K")
 
-    score_p = sub.add_parser("score", help="Full pipeline: HTML → deterministic scores")
-    score_p.add_argument("--html", required=True)
-    score_p.add_argument("--form", required=True)
+    score_p = sub.add_parser("score", help="Full pipeline → deterministic scores")
+    src = score_p.add_mutually_exclusive_group(required=True)
+    src.add_argument("--html", help="Path to HTML file or '-' for stdin")
+    src.add_argument("--ticker", help="Ticker symbol (fetches from SEC EDGAR)")
+    score_p.add_argument("--form", default="10-K", help="Form type: 10-K or 10-Q")
+    score_p.add_argument("--fiscal-year", type=int, help="Fiscal year (with --ticker)")
+    score_p.add_argument("--quarter", choices=["Q1", "Q2", "Q3"], help="Required for 10-Q")
     score_p.add_argument("--prior-html", help="Optional prior filing HTML for diffs")
 
     metrics_p = sub.add_parser("metrics", help="Extract + compute section metrics")
@@ -71,9 +76,19 @@ def main() -> None:
         return
 
     if args.command == "score":
-        html = _load_html(args.html)
-        prior_html = _load_html(args.prior_html) if args.prior_html else None
-        result = score_filing_html(html, args.form, prior_html=prior_html)
+        if args.ticker:
+            if args.fiscal_year is None:
+                score_p.error("--fiscal-year is required with --ticker")
+            result = score_filing_ticker(
+                args.ticker,
+                args.fiscal_year,
+                form_type=args.form,
+                quarter=args.quarter,
+            )
+        else:
+            html = _load_html(args.html)
+            prior_html = _load_html(args.prior_html) if args.prior_html else None
+            result = score_filing_html(html, args.form, prior_html=prior_html)
         print(json.dumps(result.to_dict(), indent=2, default=str))
         return
 

@@ -1,0 +1,18 @@
+{
+  "filing": {
+    "ticker": "NVDA",
+    "cik": "0001045810",
+    "accession_number": "0001045810-25-000023",
+    "form_type": "10-Q"
+  },
+  "labeled": false,
+  "status": "template",
+  "sections": [],
+  "labeling_checklist": [
+    "item_1a_risk_factors",
+    "item_2_mdna",
+    "item_1_legal_proceedings",
+    "item_4_controls"
+  ],
+  "notes": "Download HTML into this directory as {accession}.html before labeling."
+}

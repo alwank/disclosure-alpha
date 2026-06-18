@@ -1,0 +1,57 @@
+{
+  "filing": {
+    "ticker": "TGT",
+    "cik": "0000027419",
+    "accession_number": "0000027419-26-000016",
+    "form_type": "10-K",
+    "filing_date": "2026-03-11"
+  },
+  "labeled": true,
+  "status": "seed",
+  "labeler": "agent-d-bootstrap",
+  "labeled_at": "2026-06-18",
+  "sections": [
+    {
+      "section_name": "item_1c_cybersecurity",
+      "required": true,
+      "start_offset": 87631,
+      "end_offset": 94538,
+      "notes": "Bootstrap from heading_boundary_v1; human should verify boundaries"
+    },
+    {
+      "section_name": "item_1a_risk_factors",
+      "required": true,
+      "start_offset": 94538,
+      "end_offset": 96468,
+      "notes": "Bootstrap from heading_boundary_v1; human should verify boundaries"
+    },
+    {
+      "section_name": "item_3_legal_proceedings",
+      "required": true,
+      "start_offset": 96468,
+      "end_offset": 101389,
+      "notes": "Bootstrap from heading_boundary_v1; human should verify boundaries"
+    },
+    {
+      "section_name": "item_7_mdna",
+      "required": true,
+      "start_offset": 101389,
+      "end_offset": 137908,
+      "notes": "Bootstrap from heading_boundary_v1; human should verify boundaries"
+    },
+    {
+      "section_name": "item_7a_market_risk",
+      "required": true,
+      "start_offset": 137908,
+      "end_offset": 207002,
+      "notes": "Bootstrap from heading_boundary_v1; human should verify boundaries"
+    },
+    {
+      "section_name": "item_9a_controls",
+      "required": true,
+      "start_offset": 207002,
+      "end_offset": 228013,
+      "notes": "Bootstrap from heading_boundary_v1; human should verify boundaries"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+"""In-memory deterministic pipeline: HTML → sections → metrics → scores."""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass, field
+from typing import Any
+
+from disclosure_alpha.confidence import compute_overall_confidence
+from disclosure_alpha.deterministic_scoring import (
+    DeterministicAggregationResult,
+    aggregate_deterministic_matrix,
+)
+from disclosure_alpha.diff_engine import compute_section_diff
+from disclosure_alpha.section_extractor import (
+    ExtractedSection,
+    FilingDocument,
+    extract_sections,
+)
+from disclosure_alpha.text_metrics import (
+    SectionTextInput,
+    compute_density_metrics,
+    compute_text_metrics,
+    detect_section_flags,
+)
+from disclosure_alpha.version import (
+    METRICS_ENGINE_VERSION,
+    PARSER_VERSION,
+    SCORING_MODEL_VERSION,
+)
+
+
+@dataclass
+class MetricsResult:
+    section_metrics: dict[str, dict[str, float]]
+    section_diffs: dict[str, float | None]
+    section_flags: dict[str, dict[str, bool]]
+    section_densities: dict[str, dict[str, float]]
+    language_deltas: dict[str, dict[str, float]]
+    extraction_confs: list[float] = field(default_factory=list)
+    diff_confs: list[float] = field(default_factory=list)
+
+
+@dataclass
+class FilingScoreResult:
+    sections: list[ExtractedSection]
+    metrics: MetricsResult
+    scores: DeterministicAggregationResult
+    versions: dict[str, str] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "sections": [asdict(s) for s in self.sections],
+            "metrics": asdict(self.metrics),
+            "scores": {
+                "overall_disclosure_risk_score": self.scores.overall_disclosure_risk_score,
+                "score_coverage_ratio": self.scores.score_coverage_ratio,
+                "confidence_score": self.scores.confidence_score,
+                "missing_components": self.scores.missing_components,
+                "components": asdict(self.scores.components),
+                "aggregates": asdict(self.scores.aggregates),
+                "provenance": [p.to_dict() for p in self.scores.provenance],
+            },
+            "versions": self.versions,
+        }
+
+
+def _metrics_dict(metrics) -> dict[str, float]:
+    return {
+        "negative_word_ratio": float(metrics.negative_word_ratio or 0),
+        "uncertainty_word_ratio": float(metrics.uncertainty_word_ratio or 0),
+        "litigious_word_ratio": float(metrics.litigious_word_ratio or 0),
+        "modal_word_ratio": float(metrics.modal_word_ratio or 0),
+        "constraining_word_ratio": float(metrics.constraining_word_ratio or 0),
+        "boilerplate_phrase_ratio": float(metrics.boilerplate_phrase_ratio or 0),
+        "numeric_specificity_score": float(metrics.numeric_specificity_score or 0),
+        "company_specificity_score": float(metrics.company_specificity_score or 0),
+        "readability_score": float(metrics.readability_score or 0),
+    }
+
+
+def _prior_by_name(
+    prior_sections: list[ExtractedSection] | None, section_name: str
+) -> ExtractedSection | None:
+    if not prior_sections:
+        return None
+    for section in prior_sections:
+        if section.section_name == section_name:
+            return section
+    return None
+
+
+def extract_sections_from_html(
+    html: str,
+    form_type: str,
+    *,
+    cik: str = "",
+    accession_number: str = "",
+) -> list[ExtractedSection]:
+    return extract_sections(
+        FilingDocument(
+            cik=cik,
+            accession_number=accession_number,
+            form_type=form_type,
+            html=html,
+        )
+    )
+
+
+def compute_section_metrics(
+    sections: list[ExtractedSection],
+    prior_sections: list[ExtractedSection] | None = None,
+) -> MetricsResult:
+    section_metrics: dict[str, dict[str, float]] = {}
+    section_diffs: dict[str, float | None] = {}
+    section_flags: dict[str, dict[str, bool]] = {}
+    section_densities: dict[str, dict[str, float]] = {}
+    language_deltas: dict[str, dict[str, float]] = {}
+    extraction_confs: list[float] = []
+    diff_confs: list[float] = []
+
+    for section in sections:
+        extraction_confs.append(float(section.extraction_confidence or 0.5))
+        text = section.cleaned_text or ""
+        metrics = compute_text_metrics(SectionTextInput(section.section_name, text))
+        section_metrics[section.section_name] = _metrics_dict(metrics)
+        section_flags[section.section_name] = detect_section_flags(text, section.section_name)
+        section_densities[section.section_name] = compute_density_metrics(text, section.section_name)
+
+        prior = _prior_by_name(prior_sections, section.section_name)
+        diff = compute_section_diff(
+            current_text=text,
+            prior_text=prior.cleaned_text if prior else None,
+            current_section_id=section.section_name,
+            prior_section_id=prior.section_name if prior else None,
+        )
+        if diff.disclosure_change_score is not None:
+            section_diffs[section.section_name] = float(diff.disclosure_change_score)
+        if diff.language_deltas:
+            language_deltas[section.section_name] = dict(diff.language_deltas)
+        if diff.confidence_score is not None:
+            diff_confs.append(float(diff.confidence_score))
+
+    return MetricsResult(
+        section_metrics=section_metrics,
+        section_diffs=section_diffs,
+        section_flags=section_flags,
+        section_densities=section_densities,
+        language_deltas=language_deltas,
+        extraction_confs=extraction_confs,
+        diff_confs=diff_confs,
+    )
+
+
+def score_deterministic(metrics: MetricsResult) -> DeterministicAggregationResult:
+    result = aggregate_deterministic_matrix(
+        section_metrics=metrics.section_metrics,
+        section_diffs=metrics.section_diffs,
+        section_flags=metrics.section_flags,
+        language_deltas=metrics.language_deltas,
+        section_densities=metrics.section_densities,
+    )
+    avg_diff_conf = (
+        sum(metrics.diff_confs) / len(metrics.diff_confs) if metrics.diff_confs else None
+    )
+    result.confidence_score = compute_overall_confidence(
+        extraction_confidences=metrics.extraction_confs,
+        llm_confidences=[],
+        coverage_ratio=result.score_coverage_ratio,
+        diff_confidence=avg_diff_conf,
+    )
+    return result
+
+
+def score_filing_html(
+    html: str,
+    form_type: str,
+    *,
+    prior_html: str | None = None,
+    prior_form_type: str | None = None,
+    cik: str = "",
+    accession_number: str = "",
+) -> FilingScoreResult:
+    sections = extract_sections_from_html(
+        html, form_type, cik=cik, accession_number=accession_number
+    )
+    prior_sections = None
+    if prior_html:
+        prior_sections = extract_sections_from_html(
+            prior_html,
+            prior_form_type or form_type,
+            cik=cik,
+            accession_number="prior",
+        )
+    metrics = compute_section_metrics(sections, prior_sections)
+    scores = score_deterministic(metrics)
+    return FilingScoreResult(
+        sections=sections,
+        metrics=metrics,
+        scores=scores,
+        versions={
+            "parser_version": PARSER_VERSION,
+            "metrics_engine_version": METRICS_ENGINE_VERSION,
+            "scoring_model_version": SCORING_MODEL_VERSION,
+        },
+    )

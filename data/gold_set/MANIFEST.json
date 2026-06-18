@@ -1,0 +1,254 @@
+{
+  "version": 1,
+  "created_at": "2026-06-18",
+  "target_counts": {
+    "10-K": 20,
+    "10-Q": 5,
+    "8-K": 5
+  },
+  "cases_total": 30,
+  "cases_labeled": 10,
+  "cases_with_html": 20,
+  "cases": [
+    {
+      "accession_number": "0000320193-25-000079",
+      "form_type": "10-K",
+      "ticker": "AAPL",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0001744489-25-000155",
+      "form_type": "10-K",
+      "ticker": "DIS",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0000886982-26-000091",
+      "form_type": "10-K",
+      "ticker": "GS",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0000310764-26-000010",
+      "form_type": "10-K",
+      "ticker": "SYK",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0001018724-26-000004",
+      "form_type": "10-K",
+      "ticker": "AMZN",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0000006281-25-000153",
+      "form_type": "10-K",
+      "ticker": "ADI",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0001104659-26-013549",
+      "form_type": "10-K",
+      "ticker": "APH",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0001628280-26-003942",
+      "form_type": "10-K",
+      "ticker": "META",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0000027419-26-000016",
+      "form_type": "10-K",
+      "ticker": "TGT",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0000831001-26-000011",
+      "form_type": "10-K",
+      "ticker": "C",
+      "labeled": true,
+      "has_html": true,
+      "section_count": 6
+    },
+    {
+      "accession_number": "0001628280-26-010185",
+      "form_type": "10-K",
+      "ticker": "ABT",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000318154-26-000010",
+      "form_type": "10-K",
+      "ticker": "AMGN",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000070858-26-000157",
+      "form_type": "10-K",
+      "ticker": "BAC",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0001193125-26-071966",
+      "form_type": "10-K",
+      "ticker": "BLK",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000018230-26-000008",
+      "form_type": "10-K",
+      "ticker": "CAT",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000064803-26-000010",
+      "form_type": "10-K",
+      "ticker": "CVS",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000040545-26-000008",
+      "form_type": "10-K",
+      "ticker": "GE",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000051143-26-000010",
+      "form_type": "10-K",
+      "ticker": "IBM",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0001571949-26-000004",
+      "form_type": "10-K",
+      "ticker": "ICE",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0001628280-26-011430",
+      "form_type": "10-K",
+      "ticker": "LIN",
+      "labeled": false,
+      "has_html": true,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000950170-25-118967",
+      "form_type": "10-Q",
+      "ticker": "MSFT",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0001652044-25-000062",
+      "form_type": "10-Q",
+      "ticker": "GOOGL",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000019617-25-000478",
+      "form_type": "10-Q",
+      "ticker": "JPM",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000200406-25-000043",
+      "form_type": "10-Q",
+      "ticker": "JNJ",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0001045810-25-000023",
+      "form_type": "10-Q",
+      "ticker": "NVDA",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000320193-25-000108",
+      "form_type": "8-K",
+      "ticker": "AAPL",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0001193125-25-256321",
+      "form_type": "8-K",
+      "ticker": "MSFT",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0001193125-25-234567",
+      "form_type": "8-K",
+      "ticker": "JPM",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000104169-25-000089",
+      "form_type": "8-K",
+      "ticker": "WMT",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    },
+    {
+      "accession_number": "0000034088-25-000156",
+      "form_type": "8-K",
+      "ticker": "XOM",
+      "labeled": false,
+      "has_html": false,
+      "section_count": 0
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "filing": {
+    "ticker": "AAPL",
+    "cik": "0000320193",
+    "accession_number": "0000320193-25-000108",
+    "form_type": "8-K"
+  },
+  "labeled": false,
+  "status": "template",
+  "sections": [],
+  "labeling_checklist": [
+    "item_1_01",
+    "item_1_05",
+    "item_2_02",
+    "item_5_02",
+    "item_8_01"
+  ],
+  "notes": "Download HTML into this directory as {accession}.html before labeling."
+}

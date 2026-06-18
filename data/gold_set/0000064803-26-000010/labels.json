@@ -1,0 +1,21 @@
+{
+  "filing": {
+    "ticker": "CVS",
+    "cik": "0000064803",
+    "accession_number": "0000064803-26-000010",
+    "form_type": "10-K",
+    "filing_date": "2026-02-12"
+  },
+  "labeled": false,
+  "status": "template",
+  "sections": [],
+  "labeling_checklist": [
+    "item_1a_risk_factors",
+    "item_3_legal_proceedings",
+    "item_7_mdna",
+    "item_7a_market_risk",
+    "item_9a_controls",
+    "item_1c_cybersecurity"
+  ],
+  "notes": "Add sections[] with verified section_name values; set labeled=true when complete."
+}

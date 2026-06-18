@@ -37,9 +37,6 @@ disclosure-alpha-mcp = "disclosure_alpha.mcp.server:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/disclosure_alpha"]
 
-[tool.hatch.build.targets.sdist]
-include = ["src/disclosure_alpha", "README.md", "LICENSE", "pyproject.toml"]
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

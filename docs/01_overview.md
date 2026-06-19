@@ -16,7 +16,8 @@ No LLM. Fully reproducible given the same `metrics_engine_version` and input tex
 - Not a buy/sell signal or investment advice
 - Not a substitute for reading the filing
 - Not equivalent to the **composite** matrix (which blends LLM interpretation)
-- Not validated to predict returns until calibration gates pass (see [07_validation_protocol.md](./07_validation_protocol.md))
+- Not validated to predict returns (L3/L4 not run; see [07_validation_protocol.md](./07_validation_protocol.md))
+- Not full S&P 500 L2 coverage (`overall_l2_pass` false; ~425/503 cohort validated — see [L2 achieved status](./07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025))
 
 ## Pipeline placement
 
@@ -84,9 +85,9 @@ coverage   = (# non-null weighted components) / 9
 | Free | Matrix endpoint | `view=deterministic` — component scores, no LLM evidence |
 | Pro | Matrix endpoint | `view=composite` or `view=full` |
 
-**Marketing claim (deterministic):** "Measurable language and filing-change signals backed by peer-reviewed textual analysis methods."
+**Marketing claim (deterministic):** "Deterministic disclosure risk scores from SEC Item 1A text, validated on **425 S&P 500 FY2025 10-Ks** (~84% of index). Boilerplate and specificity metrics correlate with reference constructs on that cohort."
 
-**Do not claim:** "AI-identified hidden risks" on deterministic-only output.
+**Do not claim:** "AI-identified hidden risks" on deterministic-only output; "L2 validation passed" or full-index S&P 500 coverage.
 
 ## Required sections by form
 

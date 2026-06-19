@@ -167,3 +167,71 @@ def test_real_filing_regression_fixtures():
         assert required_sections_present("10-K", sections)
         assert all(s.word_count >= 50 for s in sections)
         assert min(s.extraction_confidence for s in sections) >= 0.75
+
+
+def test_fallback_picks_substantive_body_heading():
+    body = "Competition and regulatory risk may adversely affect operations. " * 80
+    html = f"""
+    <html><body>
+    <p>Table of Contents</p>
+    <p>Item 1A. Risk Factors .......... 5</p>
+    <p>Item 7. Management's Discussion .......... 20</p>
+    <h1>Item 1A. Risk Factors</h1>
+    <p>{body}</p>
+    <h1>Item 7. Management's Discussion and Analysis</h1>
+    <p>Revenue may fluctuate due to market volatility.</p>
+    </body></html>
+    """
+    sections = extract_sections(FilingDocument("1", "x", "10-K", html))
+    item_1a = next(s for s in sections if s.section_name == "item_1a_risk_factors")
+    assert item_1a.word_count >= 200
+    assert "Competition and regulatory risk" in item_1a.cleaned_text
+
+
+def test_finalize_confidence_long_slice():
+    from disclosure_alpha.section_extractor import _finalize_confidence
+
+    assert _finalize_confidence(0.5, 5000, []) >= 0.85
+    assert _finalize_confidence(0.5, 250, []) >= 0.76
+
+
+def test_short_slice_stays_low_confidence():
+    from disclosure_alpha.section_extractor import _finalize_confidence
+
+    assert _finalize_confidence(0.9, 30, ["short_section"]) <= 0.35
+
+
+def test_item1a_last_resort_clean_html():
+    from disclosure_alpha.section_extractor import _extract_item1a_from_clean_html
+
+    body = "Operational and competitive risks are described herein. " * 60
+    html = f"""
+    <html><body>
+    <div>ITEM 1A. RISK FACTORS</div>
+    <p>{body}</p>
+    <div>Item 1B. Unresolved Staff Comments</div>
+    <p>None.</p>
+    </body></html>
+    """
+    doc = FilingDocument("1", "x", "10-K", html)
+    sec = _extract_item1a_from_clean_html(doc, "test_v")
+    assert sec is not None
+    assert sec.word_count >= 200
+    assert sec.extraction_method == "clean_html_last_resort"
+
+
+def test_pick_best_extraction_prefers_longer_fallback():
+    from disclosure_alpha.section_extractor import ExtractedSection, _pick_best_extraction
+
+    primary = ExtractedSection(
+        "item_1a_risk_factors", "short", "short", "h1", 10, 1, 0.35,
+        "sec_parser_sequence_v2", "v", warnings=["short_section"],
+    )
+    fallback = ExtractedSection(
+        "item_1a_risk_factors", "x " * 300, "x " * 300, "h2", 300, 5, 0.85,
+        "heading_boundary_fallback", "v",
+    )
+    merged = _pick_best_extraction(primary, fallback)
+    assert merged is not None
+    assert merged.word_count >= 200
+    assert merged.extraction_method == "heading_boundary_fallback_merged"

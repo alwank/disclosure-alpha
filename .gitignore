@@ -7,3 +7,4 @@ dist/
 .mypy_cache/
 .ruff_cache/
 data/cache/
+data/validation/corpus/*.jsonl

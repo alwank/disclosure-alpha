@@ -1,0 +1,157 @@
+# L2 Construct Validity — S&P 500 Corpus
+
+Default validation universe is **S&P 500** latest 10-K Item 1A per company.
+
+Universe reference: [data/universe/sp500.csv](../universe/sp500.csv) (~503 tickers).
+
+## Option A — Build from EDGAR (recommended)
+
+```bash
+export SEC_USER_AGENT="YourName your@email.com"
+
+# Refresh universe list (optional)
+python scripts/fetch_sp500_universe.py
+
+# Build corpus (~500 filings; use --resume to continue)
+python scripts/build_validation_corpus_from_edgar.py --fiscal-year 2025 --resume
+
+# Run L2 validation
+python scripts/validate_deterministic_construct.py
+```
+
+Smoke test:
+
+```bash
+python scripts/build_validation_corpus_from_edgar.py --fiscal-year 2025 --limit 5
+```
+
+The EDGAR build script writes a manifest alongside the corpus:
+`data/validation/corpus/sp500_item1a.manifest.json` (fetch failures by ticker/reason).
+
+Targeted retry after parser fixes (re-fetches manifest failures + filter drops only):
+
+```bash
+python scripts/build_validation_corpus_from_edgar.py \
+  --fiscal-year 2025 \
+  --retry-failures \
+  --validation-report data/validation/reports/deterministic_validation_report.json
+
+python scripts/audit_validation_corpus.py
+```
+
+## Option B — Local HTML files
+
+```bash
+python scripts/build_validation_corpus.py \
+  --html-dir ./my_sp500_html \
+  --universe data/universe/sp500.csv
+```
+
+Expected layout: `{html_dir}/{TICKER}_10k.html` or any `*.html` with ticker from filename prefix.
+
+## Corpus format (JSONL)
+
+Output path (gitignored): `data/validation/corpus/sp500_item1a.jsonl`
+
+```json
+{
+  "ticker": "AAPL",
+  "fiscal_year": 2025,
+  "section_name": "item_1a_risk_factors",
+  "cleaned_text": "...",
+  "word_count": 8420,
+  "extraction_confidence": 0.92,
+  "extraction_method": "heading_boundary_fallback_merged",
+  "warnings": ["open_ended_boundary"],
+  "quality_tier": "analysis",
+  "accession_number": "optional",
+  "cik": "0000320193"
+}
+```
+
+### Filters (default)
+
+- `section_name` must be `item_1a_risk_factors`
+- `word_count >= 200`
+- `extraction_confidence >= 0.75` when present
+- Recommended cohort `n >= 80` for stable Spearman estimates (target ~500)
+
+The validation report includes `filter_breakdown` (skip reasons) and
+`filtered_tickers_sample` for diagnosing filter drops.
+
+### Optional holdout
+
+`data/validation/holdout_tickers.txt` — one ticker per line, excluded from pass/fail headline.
+
+## Run L2 validation
+
+```bash
+pip install -e ".[validation,dev]"
+python -m spacy download en_core_web_sm
+
+python scripts/validate_deterministic_construct.py \
+  --corpus data/validation/corpus/sp500_item1a.jsonl \
+  --universe data/universe/sp500.csv
+```
+
+Dev / CI mini corpus:
+
+```bash
+python scripts/validate_deterministic_construct.py \
+  --corpus tests/fixtures/validation/mini_corpus.jsonl \
+  --min-n 3 --boilerplate-min-docs 2
+```
+
+## L2 results
+
+### Achieved status (FY2025, accepted MVP)
+
+| Metric | Value |
+|--------|-------|
+| Universe | 503 |
+| Fetched / analysis cohort | **425** (~84.5%) |
+| `construct_pass` | **true** |
+| `edgar_pass` | **false** |
+| `overall_l2_pass` | **false** (accepted for MVP) |
+
+| Gate / pair | Protocol | Achieved | Status |
+|-------------|----------|----------|--------|
+| E1 fetch rate | >= 0.90 | 0.84 (425/503) | fail |
+| E2 analysis rate | >= 0.85 | 0.84 (425/503) | fail |
+| E3 filter retention | >= 0.85 | 1.00 (425/425) | pass |
+| E4 median confidence | >= 0.75 | 0.95 | pass |
+| E5 min analysis n | >= 80 | 425 | pass |
+| `specificity_vs_ner` | rho >= 0.60 | rho 0.79 (n=425) | pass |
+| `boilerplate_vs_ls4gram` | rho >= 0.50 | rho 0.68 (n=425) | pass |
+
+Re-run `scripts/audit_validation_corpus.py` after corpus changes to refresh figures.
+
+### Protocol targets (aspirational)
+
+| Result | Meaning |
+|--------|---------|
+| `edgar_pass` | EDGAR coverage gates E1–E5 |
+| `construct_pass` | NER + boilerplate Spearman thresholds |
+| `overall_l2_pass` | both pass |
+
+| Pair | Spearman rho |
+|------|------------|
+| `company_specificity_score` vs NER entity density | >= 0.60 |
+| `boilerplate_phrase_ratio` vs cross-firm 4-gram | >= 0.50 |
+
+| Gate | Metric | Threshold |
+|------|--------|-----------|
+| E1 | fetch rate (corpus rows / universe) | >= 0.90 |
+| E2 | analysis rate (post-filter / universe) | >= 0.85 |
+| E3 | filter retention (post-filter / input) | >= 0.85 |
+| E4 | median extraction confidence | >= 0.75 |
+| E5 | min analysis cohort size | >= 80 |
+
+### Known gaps
+
+**14 manifest failures** (not in corpus): ALB, CLX, DASH, DVN, FDXF, HAL, IBKR, ICE, MCD, MO, MS, SATS, SWKS, TSLA (FDXF = `filing_not_found`; rest = `no_item_1a`).
+
+Diagnose: `python scripts/diagnose_item1a.py`  
+Retry: `--retry-failures` on the EDGAR build script (optional; not required for current MVP claims).
+
+See [docs/07_validation_protocol.md](../../docs/07_validation_protocol.md).

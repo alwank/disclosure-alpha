@@ -11,10 +11,10 @@ Automated validation for deterministic scoring before marketing as "research-bac
 | L1 | Parser regression | Static and synthetic fixture extraction tests pass |
 | L2 | Construct validity | Correlations with literature proxies or external datasets |
 | L3 | Predictive monotonicity | Quintile sorts on outcome variables |
-| L4 | Production gates | Automated thresholds below met on SP100 |
+| L4 | Production gates | Automated thresholds below met on S&P 500 |
 
-**MVP launch (deterministic free tier):** L0 + L1.  
-**"Validated" marketing claim:** L0-L4.
+**MVP launch (deterministic free tier):** L0 + L1 + **partial L2** (construct validity on ~425-firm cohort).  
+**"Validated" marketing claim (full ladder):** L0-L4.
 
 ## L0 - Structural Tests
 
@@ -50,16 +50,86 @@ not in external `labels.json` files.
 
 ## L2 - Construct Validity
 
-Run on SP100 latest 10-K per company.
+Run on S&P 500 latest 10-K per company. **Build the corpus** from
+[data/universe/sp500.csv](../data/universe/sp500.csv) via EDGAR or local HTML. See
+[data/validation/README.md](../data/validation/README.md).
+
+L2 reports three independent outcomes:
+
+| Result | Meaning |
+|--------|---------|
+| `edgar_pass` | S&P 500 ingestion + extraction quality gates |
+| `construct_pass` | NER + boilerplate Spearman thresholds |
+| `overall_l2_pass` | `edgar_pass AND construct_pass` |
+
+### L2 achieved status (accepted MVP, FY2025)
+
+**Accepted for MVP:** `construct_pass: true`, `edgar_pass: false`, `overall_l2_pass: false`.
+
+Re-run `scripts/audit_validation_corpus.py` and validation after corpus changes to refresh figures.
+
+Report: [data/validation/reports/deterministic_validation_report.json](../data/validation/reports/deterministic_validation_report.json)  
+Manifest: [data/validation/corpus/sp500_item1a.manifest.json](../data/validation/corpus/sp500_item1a.manifest.json)
+
+#### EDGAR gates (achieved vs protocol)
+
+| Gate | Protocol | Achieved (FY2025) | Status |
+|------|----------|-------------------|--------|
+| E1 fetch rate | >= 0.90 (453/503) | 425/503 = **0.84** | fail |
+| E2 analysis rate | >= 0.85 (428/503) | 425/503 = **0.84** | fail |
+| E3 filter retention | >= 0.85 | 425/425 = **1.00** | pass |
+| E4 median confidence | >= 0.75 | **0.95** | pass |
+| E5 min analysis n | >= 80 | **425** | pass |
+
+#### Construct pairs (achieved vs protocol)
+
+| Pair | Protocol | Achieved (FY2025) | Status |
+|------|----------|-------------------|--------|
+| `specificity_vs_ner` | rho >= 0.60 | rho **0.79** (n=425) | pass |
+| `boilerplate_vs_ls4gram` | rho >= 0.50 | rho **0.68** (n=425) | pass |
+
+#### Manifest failures (14 tickers not in corpus)
+
+| Reason | Tickers |
+|--------|---------|
+| `no_item_1a` (13) | ALB, CLX, DASH, DVN, HAL, IBKR, ICE, MCD, MO, MS, SATS, SWKS, TSLA |
+| `filing_not_found` (1) | FDXF |
+
+Improving E1/E2 is optional future work; not required for current MVP external claims.
+
+### Construct pairs (protocol targets)
 
 | Pair | Target |
 |------|--------|
-| MVP `negative_word_ratio` vs licensed LM negative % | Spearman rho >= 0.85 |
-| MVP `uncertainty_word_ratio` vs licensed LM uncertainty % | Spearman rho >= 0.80 |
 | `company_specificity_score` vs NER entity density | Spearman rho >= 0.60 |
 | `boilerplate_phrase_ratio` vs cross-firm 4-gram boilerplate | Spearman rho >= 0.50 |
 
-Future script: `scripts/validate_deterministic_construct.py`.
+### EDGAR coverage gates (protocol targets)
+
+| Gate | Metric | Threshold |
+|------|--------|-----------|
+| E1 | `fetch_rate` = corpus rows / universe | >= 0.90 |
+| E2 | `analysis_rate` = post-filter rows / universe | >= 0.85 |
+| E3 | `filter_retention` = post-filter / input | >= 0.85 |
+| E4 | median `extraction_confidence` on analysis cohort | >= 0.75 |
+| E5 | `min_analysis_n` | >= 80 |
+
+Script: `scripts/validate_deterministic_construct.py`
+
+NER pair reports **`skipped`** when `spacy` is not installed (`pip install -e ".[validation]"`).
+
+```bash
+export SEC_USER_AGENT="YourName your@email.com"
+python scripts/build_validation_corpus_from_edgar.py --fiscal-year 2025 --resume
+
+PYTHONUNBUFFERED=1 .venv/bin/python scripts/validate_deterministic_construct.py \
+  --corpus data/validation/corpus/sp500_item1a.jsonl \
+  --universe data/universe/sp500.csv \
+  --out data/validation/reports/deterministic_validation_report.json
+```
+
+CI runs construct logic on `tests/fixtures/validation/mini_corpus.jsonl` via
+`tests/test_construct_validity.py`.
 
 ## L3 - Predictive Monotonicity
 
@@ -77,16 +147,18 @@ Future script: `scripts/validate_deterministic_outcomes.py`.
 
 ## L4 - Production Gates
 
+L3 and L4 remain future work. L4 D3 still targets E2 >= 0.85 on the full S&P 500 universe.
+
 | Gate | Metric | Threshold |
 |------|--------|-----------|
 | D1 | Structural test pass rate | 100% |
 | D2 | Parser regression pass rate | 100% |
-| D3 | LM correlation, negative | rho >= 0.85 |
+| D3 | EDGAR analysis cohort rate (E2) | >= 0.85 |
 | D4 | Volatility monotonicity | Q5/Q1 ratio > 1.1 |
 | D5 | Change score -> earnings surprise | Q5/Q1 > 1.05 |
 | D6 | Material weakness flag precision | >= 0.70 |
 | D7 | Score replay across runs | 100% identical |
-| D8 | Coverage on SP100 10-K | median coverage >= 0.85 |
+| D8 | Coverage on S&P 500 10-K | median coverage >= 0.85 |
 
 Report in: `data/validation/reports/deterministic_validation_report.json`.
 
@@ -105,6 +177,16 @@ Allowed after L0 + L1:
 
 > "Deterministic scores are computed from reproducible text metrics and filing diffs."
 
+Allowed after L0 + L1 + partial L2 (current MVP):
+
+> "Deterministic Item 1A metrics validated on **425 S&P 500 FY2025 10-Ks** (~84% of index)."
+>
+> "Boilerplate phrase ratio correlates with cross-firm 4-gram boilerplate reference (Spearman rho ~ 0.68)."
+>
+> "Company specificity correlates with NER entity density (Spearman rho ~ 0.79)."
+>
+> "100% filter retention on the fetched cohort; median extraction confidence 0.95."
+
 Allowed after L4:
 
 > "Component scores show significant association with post-filing volatility and disclosure
@@ -112,4 +194,8 @@ Allowed after L4:
 
 Not allowed:
 
-> "Scores predict stock returns" or "validated trading strategy."
+> "L2 validation passed", `overall_l2_pass`, or "validated on the S&P 500" (implies full universe).
+>
+> "85%+ universe coverage" (current cohort is ~84%).
+>
+> "Scores predict stock returns", "validated trading strategy", or LM-validated tone.

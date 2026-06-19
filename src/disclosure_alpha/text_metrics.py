@@ -39,8 +39,12 @@ class TextMetricResult:
     boilerplate_phrase_ratio: float
 
 
-def _tokenize(text: str) -> list[str]:
+def tokenize_words(text: str) -> list[str]:
     return re.findall(r"\b[a-zA-Z]+\b", text.lower())
+
+
+def _tokenize(text: str) -> list[str]:
+    return tokenize_words(text)
 
 
 def _count_sentences(text: str) -> int:

@@ -16,6 +16,8 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 | Scoring model | `deterministic_scoring_v3` | strict missing-metric semantics; outcome-calibrated weights (P3) |
 | Dictionary | MVP built-in lists in `dictionaries.py` | LM-aligned + licensed expansion path |
 
+**Validation status (FY2025):** L0 + L1 pass. **Partial L2 accepted:** construct validity on 425-firm S&P 500 cohort (boilerplate rho ~ 0.68, specificity-vs-NER rho ~ 0.79); full-index EDGAR gates not met. See [07_validation_protocol.md](./07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025).
+
 ## Document map
 
 | Doc | Purpose |
@@ -42,9 +44,19 @@ app/services/metrics_service.py   → persist + orchestrate deterministic stage
 ## Quick start
 
 ```bash
-# Run automated validation
+# L0 + L1 (pytest) and L2 harness unit tests
 python3.11 -m pytest -q
+
+# Audit S&P 500 corpus quality (no network)
+python scripts/audit_validation_corpus.py
+
+# Full L2 validation on S&P 500 corpus (slow; requires spaCy)
+export SEC_USER_AGENT="YourName your@email.com"
+PYTHONUNBUFFERED=1 .venv/bin/python scripts/validate_deterministic_construct.py \
+  --universe data/universe/sp500.csv
 
 # Score a filing through the package CLI
 disclosure-alpha score --html filing.html --form 10-K
 ```
+
+L2 corpus format and env vars: [data/validation/README.md](../data/validation/README.md).

@@ -86,7 +86,47 @@ def _period_matches(form_type: str, period: str | None, quarter: str | None) -> 
     return period == quarter
 
 
-def _candidate_score(
+def _fiscal_year_match_tier(
+    fiscal_year: int,
+    *,
+    fiscal_year_html: int | None,
+    report_date: str | None,
+    filing_date: str | None = None,
+) -> int | None:
+    """3=DEI exact, 2=reportDate year, 1=filingDate year, None=no match."""
+    if fiscal_year_html == fiscal_year:
+        return 3
+    if report_date:
+        try:
+            if int(report_date[:4]) == fiscal_year:
+                return 2
+        except ValueError:
+            pass
+    if filing_date:
+        try:
+            if int(filing_date[:4]) == fiscal_year:
+                return 1
+        except ValueError:
+            pass
+    return None
+
+
+def _fiscal_year_matches(
+    fiscal_year: int,
+    *,
+    fiscal_year_html: int | None,
+    report_date: str | None,
+    filing_date: str | None = None,
+) -> bool:
+    return _fiscal_year_match_tier(
+        fiscal_year,
+        fiscal_year_html=fiscal_year_html,
+        report_date=report_date,
+        filing_date=filing_date,
+    ) is not None
+
+
+def _score_filing_row(
     row: dict[str, str],
     *,
     form_type: str,
@@ -107,22 +147,99 @@ def _candidate_score(
             fy = int(row["reportDate"][:4])
         except ValueError:
             fy = None
-    if fy != fiscal_year:
+
+    tier = _fiscal_year_match_tier(
+        fiscal_year,
+        fiscal_year_html=fy,
+        report_date=row.get("reportDate"),
+        filing_date=row.get("filingDate"),
+    )
+    if tier is None:
         return None
     if not _period_matches(form_type, period, quarter):
         return None
-    # Prefer non-amendment; tie-break by later filing_date
-    score = 0 if _is_amendment(form) else 100
+    score = tier * 1_000_000_000
+    score += 0 if _is_amendment(form) else 100_000
     score += int(row.get("filingDate", "0000-00-00").replace("-", ""))
     return score
 
 
+def _candidate_score(
+    row: dict[str, str],
+    *,
+    form_type: str,
+    fiscal_year: int,
+    quarter: str | None,
+    fiscal_year_html: int | None,
+    period_html: str | None,
+) -> int | None:
+    return _score_filing_row(
+        row,
+        form_type=form_type,
+        fiscal_year=fiscal_year,
+        quarter=quarter,
+        fiscal_year_html=fiscal_year_html,
+        period_html=period_html,
+    )
+
+
+def _weak_year_hint(row: dict[str, str], fiscal_year: int) -> bool:
+    for field in ("reportDate", "filingDate"):
+        val = row.get(field)
+        if not val:
+            continue
+        try:
+            if abs(int(val[:4]) - fiscal_year) <= 1:
+                return True
+        except ValueError:
+            continue
+    return False
+
+
+def _row_form_matches(row: dict[str, str], form_type: str) -> bool:
+    return _try_normalize_form_type(row.get("form", "")) == form_type
+
+
+def _html_dei_score(
+    row: dict[str, str],
+    html: str,
+    *,
+    form_type: str,
+    fiscal_year: int,
+    quarter: str | None,
+) -> int | None:
+    """Accept metadata mismatches when HTML DEI tags match requested fiscal year."""
+    form = row["form"]
+    base = _try_normalize_form_type(form)
+    if base is None or base != form_type:
+        return None
+    fy_html, period_html = parse_fiscal_tags(html)
+    if fy_html != fiscal_year:
+        return None
+    if not _period_matches(form_type, period_html, quarter):
+        return None
+    score = 500_000_000
+    score += 0 if _is_amendment(form) else 100_000
+    score += int(row.get("filingDate", "0000-00-00").replace("-", ""))
+    return score
+
+
+def _ticker_lookup_keys(ticker: str) -> list[str]:
+    key = ticker.upper().strip()
+    keys = [key]
+    if "-" in key:
+        keys.append(key.replace("-", "."))
+    if "." in key:
+        keys.append(key.replace(".", "-"))
+    return list(dict.fromkeys(keys))
+
+
 def resolve_cik(ticker: str, *, tickers: dict[str, tuple[str, str]] | None = None) -> str:
     mapping = tickers or client.fetch_company_tickers()
-    key = ticker.upper().strip()
-    if key not in mapping:
-        raise FilingNotFoundError(f"Unknown ticker: {ticker}")
-    return mapping[key][0]
+    for key in _ticker_lookup_keys(ticker):
+        if key in mapping:
+            return mapping[key][0]
+    raise FilingNotFoundError(f"Unknown ticker: {ticker}")
 
 
 def list_filings(
@@ -144,12 +261,6 @@ def list_filings(
         base = _try_normalize_form_type(row["form"])
         if base is None or base not in forms:
             continue
-        if row.get("reportDate"):
-            try:
-                if int(row["reportDate"][:4]) != fiscal_year:
-                    continue
-            except ValueError:
-                pass
 
         html = cache.read_cached_html(cache_dir, cik, row["accessionNumber"]) if use_cache else None
         if html is None:
@@ -160,7 +271,12 @@ def list_filings(
                 continue
 
         fy_html, period_html = parse_fiscal_tags(html)
-        if fy_html != fiscal_year:
+        if not _fiscal_year_matches(
+            fiscal_year,
+            fiscal_year_html=fy_html,
+            report_date=row.get("reportDate"),
+            filing_date=row.get("filingDate"),
+        ):
             continue
         if base == "10-K":
             if period_html in _QUARTERS:
@@ -220,12 +336,11 @@ def resolve_filing(
     best_html: str | None = None
 
     for row in rows:
-        html = None
-        if use_cache:
-            html = cache.read_cached_html(cache_dir, cik, row["accessionNumber"])
+        html = cache.read_cached_html(cache_dir, cik, row["accessionNumber"]) if use_cache else None
         fy_html, period_html = (None, None)
         if html:
             fy_html, period_html = parse_fiscal_tags(html)
+
         score = _candidate_score(
             row,
             form_type=base,
@@ -234,9 +349,18 @@ def resolve_filing(
             fiscal_year_html=fy_html,
             period_html=period_html,
         )
+        if score is None and html:
+            score = _html_dei_score(
+                row,
+                html,
+                form_type=base,
+                fiscal_year=fiscal_year,
+                quarter=q,
+            )
+
         if score is None:
-            continue
-        if html is None:
+            if not _row_form_matches(row, base) or not _weak_year_hint(row, fiscal_year):
+                continue
             try:
                 url = client.filing_document_url(cik, row["accessionNumber"], row["primaryDocument"])
                 html = client.fetch_text(url)
@@ -250,9 +374,18 @@ def resolve_filing(
                     period_html=period_html,
                 )
                 if score is None:
-                    continue
+                    score = _html_dei_score(
+                        row,
+                        html,
+                        form_type=base,
+                        fiscal_year=fiscal_year,
+                        quarter=q,
+                    )
             except SecFetchError:
                 continue
+
+        if score is None:
+            continue
         if score > best_score:
             best_score = score
             best_row = row

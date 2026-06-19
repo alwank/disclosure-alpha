@@ -4,6 +4,8 @@
 
 Parse SEC filing HTML, compute deterministic text metrics, diff sections, and produce reproducible disclosure risk scores — no LLM required.
 
+**What we claim today:** deterministic Item 1A analytics validated on **425 S&P 500 FY2025 10-Ks** (~84% of index); boilerplate and specificity metrics correlate with reference constructs on that cohort (see [L2 status](docs/07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025)).
+
 ## Install
 
 Requires **Python 3.11+**.
@@ -137,6 +139,22 @@ Resource: `disclosure://taxonomy/v1`
 | Parser | `section_extractor_v2` |
 | Metrics | `text_metrics_v1.3` |
 | Scoring | `deterministic_scoring_v3` |
+
+## L2 validation (partial, accepted MVP)
+
+Tested on **425 of 503** S&P 500 constituents (FY2025 Item 1A). **Construct validity passes** on this cohort (boilerplate rho ~ 0.68, specificity-vs-NER rho ~ 0.79). Full-index EDGAR gates (E1/E2) are below protocol targets; **not** claiming `overall_l2_pass`.
+
+```bash
+export SEC_USER_AGENT="YourName your@email.com"
+python scripts/build_validation_corpus_from_edgar.py --fiscal-year 2025 --resume
+
+pip install -e ".[validation]"
+python -m spacy download en_core_web_sm
+PYTHONUNBUFFERED=1 .venv/bin/python scripts/validate_deterministic_construct.py \
+  --universe data/universe/sp500.csv
+```
+
+See [data/validation/README.md](data/validation/README.md) and [docs/07_validation_protocol.md](docs/07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025).
 
 ## Hosted vs self-hosted
 

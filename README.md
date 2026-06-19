@@ -135,7 +135,7 @@ Resource: `disclosure://taxonomy/v1`
 | Artifact | Version |
 |----------|---------|
 | Parser | `section_extractor_v1` |
-| Metrics | `text_metrics_v1.2` |
+| Metrics | `text_metrics_v1.3` |
 | Scoring | `deterministic_scoring_v3` |
 
 ## Hosted vs self-hosted

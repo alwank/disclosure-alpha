@@ -1,12 +1,44 @@
 """Built-in word lists for deterministic text metrics. Replaceable with licensed dictionaries."""
 
-DICTIONARY_VERSION = "built_in_dictionaries_v1"
+DICTIONARY_VERSION = "built_in_dictionaries_v2"
+
+TERM_PACK_METADATA = {
+    "negative": {
+        "source": "built_in_finance_curated",
+        "match_type": "token",
+        "consumer": ["negative_word_ratio", "risk_factor_intensity_score"],
+        "license": "repo_safe_manual_curation",
+    },
+    "uncertainty": {
+        "source": "built_in_finance_curated",
+        "match_type": "token",
+        "consumer": ["uncertainty_word_ratio", "mdna_uncertainty_score"],
+        "license": "repo_safe_manual_curation",
+    },
+    "litigious": {
+        "source": "built_in_finance_curated",
+        "match_type": "token",
+        "consumer": ["litigious_word_ratio", "legal_regulatory_risk_score"],
+        "license": "repo_safe_manual_curation",
+    },
+    "flags": {
+        "source": "sec_pcaob_fasb_phrase_curated",
+        "match_type": "phrase",
+        "consumer": ["section_flags", "component_flag_boosts"],
+        "license": "repo_safe_manual_curation",
+    },
+}
 
 NEGATIVE_WORDS = frozenset(
     {
         "loss", "losses", "decline", "declined", "adverse", "adversely", "impairment",
         "deterioration", "weakness", "weak", "negative", "deficit", "shortfall",
         "downgrade", "failure", "failed", "harm", "damage", "breach", "default",
+        "impaired", "impair", "impairments", "disruption", "disruptions", "disrupted",
+        "bankruptcy", "bankrupt", "insolvency", "insolvent", "delinquency",
+        "delinquencies", "delinquent", "writedown", "writeoff", "chargeoff",
+        "chargeoffs", "recall", "recalls", "outage", "outages", "misstatement",
+        "misstatements", "fraud", "fraudulent",
     }
 )
 
@@ -14,6 +46,10 @@ UNCERTAINTY_WORDS = frozenset(
     {
         "may", "might", "could", "uncertain", "uncertainty", "volatility", "volatile",
         "unpredictable", "depend", "depends", "possible", "potentially",
+        "approximate", "approximately", "contingency", "contingencies", "contingent",
+        "fluctuate", "fluctuates", "fluctuation", "fluctuations", "variable",
+        "variability", "unresolved", "pending", "exposure", "exposures", "exposed",
+        "susceptible", "unforeseen", "undetermined", "assumption", "assumptions",
     }
 )
 
@@ -22,6 +58,9 @@ LITIGIOUS_WORDS = frozenset(
         "litigation", "lawsuit", "investigation", "inquiry", "regulatory", "enforcement",
         "claim", "claims", "proceeding", "proceedings", "subpoena", "subpoenas",
         "settlement", "complaint", "penalty", "penalties", "plaintiff", "defendant",
+        "arbitration", "arbitrations", "appeal", "appeals", "appellate", "antitrust",
+        "allegation", "allegations", "alleged", "damages", "injunction", "injunctive",
+        "indemnification", "indemnify", "sanction", "sanctions", "decree",
     }
 )
 
@@ -30,15 +69,18 @@ CONSTRAINING_WORDS = frozenset(
         "covenant", "covenants", "restriction", "restrictions", "limitation", "limitations",
         "mandatory", "obligation", "obligations", "compliance", "constraint", "constraints",
         "default", "defaults", "breach", "breaches",
+        "restricted", "restrictive", "waiver", "waivers", "forbearance", "acceleration",
+        "accelerated", "maturity", "maturities", "refinance", "refinancing", "collateral",
+        "lien", "liens", "pledged", "encumbered", "obligated",
     }
 )
 
-MODAL_WORDS = frozenset(
-    {
-        "may", "could", "might", "should", "would", "expect", "expects", "intend",
-        "intends", "believe", "believes",
-    }
+WEAK_MODAL_WORDS = frozenset({"may", "might", "could", "possibly", "possible"})
+MODERATE_MODAL_WORDS = frozenset(
+    {"should", "would", "expect", "expects", "believe", "believes", "intend", "intends"}
 )
+STRONG_MODAL_WORDS = frozenset({"must", "will", "shall", "required", "obligated"})
+MODAL_WORDS = WEAK_MODAL_WORDS | MODERATE_MODAL_WORDS | STRONG_MODAL_WORDS
 
 BOILERPLATE_PHRASES = [
     "actual results could differ materially",
@@ -51,18 +93,32 @@ BOILERPLATE_PHRASES = [
     "should not place undue reliance",
     "from time to time",
     "there can be no assurance",
+    "we face risks and uncertainties",
+    "risks and uncertainties described below",
+    "could materially and adversely affect",
+    "material adverse effect on our business",
+    "no assurance can be given",
+    "may not be successful",
+    "may fail to",
+    "subject to a number of risks",
+    "unknown risks and uncertainties",
+    "not exhaustive",
 ]
 
 GEOGRAPHY_TERMS = frozenset(
     {
         "americas", "europe", "asia", "china", "japan", "international", "domestic",
-        "global", "region", "regions", "country", "countries",
+        "global", "region", "regions", "country", "countries", "north america",
+        "latin america", "emea", "european union", "apac",
     }
 )
 
 SEGMENT_TERMS = frozenset(
     {
         "segment", "segments", "division", "divisions", "business unit", "product line",
+        "brand", "brands", "channel", "channels", "market", "markets", "platform",
+        "platforms", "subscription", "subscriptions", "service line", "service lines",
+        "geography", "geographies",
     }
 )
 
@@ -78,6 +134,12 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
         "subpoena",
         "civil penalty",
         "settlement",
+        "civil investigative demand",
+        "wells notice",
+        "consent order",
+        "consent decree",
+        "cease and desist",
+        "class action complaint",
     ],
     "liquidity": [
         "liquidity",
@@ -89,6 +151,15 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
         "covenant",
         "going concern",
         "working capital",
+        "working capital deficit",
+        "negative working capital",
+        "cash runway",
+        "need to raise capital",
+        "debt service",
+        "near-term maturities",
+        "credit facility availability",
+        "borrowing base",
+        "restricted cash",
     ],
     "supply chain": [
         "supplier",
@@ -97,6 +168,9 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
         "supply chain disruptions",
         "sourcing",
         "vendor",
+        "single-source supplier",
+        "sole supplier",
+        "supplier concentration",
     ],
     "cybersecurity": [
         "cybersecurity",
@@ -107,9 +181,25 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
         "security breach",
         "ransomware",
         "data breach",
+        "ransomware attack",
+        "data exfiltration",
+        "network intrusion",
+        "unauthorized access",
     ],
-    "customer concentration": ["major customer", "customer concentration", "largest customer"],
-    "supplier concentration": ["sole supplier", "single supplier", "supplier concentration"],
+    "customer concentration": [
+        "major customer",
+        "customer concentration",
+        "largest customer",
+        "significant customer",
+        "top customer",
+        "revenue concentration",
+    ],
+    "supplier concentration": [
+        "sole supplier",
+        "single supplier",
+        "supplier concentration",
+        "single-source supplier",
+    ],
     "macroeconomic": ["recession", "inflation", "macroeconomic", "economic downturn"],
     "interest rate": [
         "interest rate",
@@ -142,6 +232,35 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
         "production delay",
         "facility closure",
     ],
+    "ai/data/privacy": [
+        "artificial intelligence",
+        "machine learning",
+        "privacy law",
+        "consumer data",
+        "data processing",
+        "model risk",
+    ],
+    "tax": ["tax audit", "tax examination", "uncertain tax position", "transfer pricing"],
+    "credit/default": [
+        "credit deterioration",
+        "delinquency",
+        "nonperforming",
+        "charge-off",
+        "chargeoff",
+    ],
+    "banking/capital": [
+        "capital ratio",
+        "risk-weighted assets",
+        "liquidity coverage ratio",
+        "stress capital buffer",
+    ],
+    "real estate": ["occupancy", "lease termination", "tenant default", "cap rate"],
+    "healthcare/regulatory": [
+        "fda approval",
+        "clinical trial",
+        "reimbursement",
+        "cms",
+    ],
     "accounting/internal controls": [
         "internal control",
         "internal control over financial reporting",
@@ -154,7 +273,11 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
 }
 
 SEVERITY_WORDS = frozenset(
-    {"severe", "material", "significant", "substantial", "critical", "adverse", "major"}
+    {
+        "severe", "severely", "material", "materially", "significant", "significantly",
+        "substantial", "substantially", "critical", "adverse", "major", "acute",
+        "persistent", "prolonged", "widespread", "recurring",
+    }
 )
 
 SUPPORTED_SECTIONS_10K = {
@@ -232,35 +355,76 @@ FLAG_PATTERNS: dict[str, list[str]] = {
         "ineffective internal control",
         "disclosure controls and procedures were not effective",
         "disclosure controls and procedures are not effective",
+        "disclosure controls and procedures were ineffective",
+        "internal control over financial reporting was not effective",
+        "management concluded that our internal control over financial reporting was ineffective",
     ],
-    "restatement_flag": ["restatement", "restated", "revision of previously issued"],
-    "non_reliance_flag": ["should no longer be relied upon", "non-reliance"],
+    "restatement_flag": [
+        "restatement", "restated", "revision of previously issued",
+        "will restate its financial statements",
+    ],
+    "non_reliance_flag": [
+        "should no longer be relied upon", "non-reliance",
+        "previously issued financial statements should no longer be relied upon",
+        "audit committee concluded",
+    ],
     "auditor_change_flag": ["change in certifying accountant", "resignation of our independent"],
     "investigation_flag": [
         "investigation",
         "subpoena",
+        "received a subpoena",
+        "subpoena from",
         "inquiry by the sec",
         "regulatory inquiry",
         "regulatory investigation",
+        "civil investigative demand",
+        "wells notice",
+        "department of justice investigation",
     ],
-    "settlement_flag": ["settlement", "consent decree", "civil penalty"],
-    "material_legal_proceeding_flag": ["material legal proceeding", "material litigation"],
+    "settlement_flag": [
+        "settlement", "consent decree", "civil penalty", "consent order",
+        "cease and desist", "settled with the sec",
+    ],
+    "material_legal_proceeding_flag": [
+        "material legal proceeding", "material litigation", "class action complaint",
+        "enforcement action",
+    ],
     "going_concern_flag": [
         "going concern",
         "continue as a going concern",
         "substantial doubt about our ability",
+        "substantial doubt exists",
+        "ability to continue as a going concern",
+        "unable to meet obligations as they become due",
+        "substantial doubt has not been alleviated",
     ],
     "covenant_breach_flag": [
         "covenant breach",
         "default under",
+        "event of default",
+        "default under our credit agreement",
         "violation of covenants",
         "breach of covenant",
         "failed to comply with covenants",
+        "failed to comply with financial covenants",
+        "breach of financial covenant",
+        "waiver from lenders",
+        "forbearance agreement",
+        "accelerated repayment",
+        "liquidity shortfall",
+        "insufficient liquidity",
+        "unable to refinance",
     ],
     "guidance_withdrawal_flag": [
         "withdraw our guidance",
+        "withdraws guidance",
+        "withdrawing guidance",
         "suspend guidance",
+        "suspended guidance",
+        "suspending guidance",
         "no longer providing guidance",
+        "does not expect to provide guidance",
+        "unable to provide guidance",
     ],
     "cybersecurity_incident_flag": [
         "material cybersecurity incident",
@@ -268,7 +432,15 @@ FLAG_PATTERNS: dict[str, list[str]] = {
         "cyber incident",
         "security incident",
         "ransomware",
+        "ransomware attack",
         "data breach",
+        "unauthorized access",
+        "data exfiltration",
+        "data compromise",
+        "network intrusion",
+        "business email compromise",
+        "personal information was accessed",
+        "reasonably likely material impact",
     ],
 }
 
@@ -341,8 +513,16 @@ MDNA_DENSITY_TERMS: dict[str, list[str]] = {
         "uncertain",
         "uncertainty",
         "subject to",
+        "subject to change",
         "volatile",
         "unpredictable",
+        "known trends",
+        "known uncertainties",
+        "reasonably likely",
+        "unable to predict",
+        "cannot predict",
+        "remains uncertain",
+        "uncertain timing",
     ],
     "demand_softness_density": [
         "soft demand",
@@ -351,6 +531,16 @@ MDNA_DENSITY_TERMS: dict[str, list[str]] = {
         "weakened demand",
         "demand softness",
         "order slowdown",
+        "weaker demand",
+        "reduced demand",
+        "decline in demand",
+        "order cancellations",
+        "delayed orders",
+        "customer destocking",
+        "inventory correction",
+        "lower volumes",
+        "volume decline",
+        "sales slowdown",
     ],
     "margin_pressure_density": [
         "margin pressure",
@@ -362,6 +552,15 @@ MDNA_DENSITY_TERMS: dict[str, list[str]] = {
         "inflationary pressures",
         "lower gross margins",
         "margin headwinds",
+        "cost inflation",
+        "input cost inflation",
+        "higher input costs",
+        "freight costs",
+        "labor costs increased",
+        "discounting",
+        "promotional activity",
+        "mix shift",
+        "gross margin decreased",
     ],
     "liquidity_constraint_density": [
         "liquidity constraint",
@@ -373,6 +572,18 @@ MDNA_DENSITY_TERMS: dict[str, list[str]] = {
         "covenant pressure",
         "refinancing risk",
         "working capital",
+        "working capital deficit",
+        "negative working capital",
+        "cash runway",
+        "additional financing",
+        "need to raise capital",
+        "substantial doubt",
+        "debt service",
+        "near-term maturities",
+        "credit facility availability",
+        "borrowing base",
+        "covenant compliance",
+        "restricted cash",
     ],
 }
 

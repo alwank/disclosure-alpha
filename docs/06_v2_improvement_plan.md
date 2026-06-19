@@ -74,7 +74,7 @@ liquidity_stress = blend(
 )
 ```
 
-Bump `metrics_engine_version` → `text_metrics_v1.2` if only wiring; `v2.0` if dictionary changes too.
+Bump `metrics_engine_version` for density wiring or matching changes; use `v2.0` if adopting licensed LM-style dictionaries.
 
 ### 4. Diff engine lexical blend
 

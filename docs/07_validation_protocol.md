@@ -156,7 +156,7 @@ Report in: `data/validation/reports/deterministic_validation_report.json`
 ```json
 {
   "validated_at": "2026-06-18T...",
-  "metrics_engine_version": "text_metrics_v1.1",
+  "metrics_engine_version": "text_metrics_v1.3",
   "scoring_model_version": "deterministic_scoring_v3",
   "gates": {
     "D1": {"status": "pass", "value": 1.0},

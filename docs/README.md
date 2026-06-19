@@ -12,7 +12,7 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 
 | Artifact | Current | Next |
 |----------|---------|------|
-| `metrics_engine_version` | `text_metrics_v1.2` | `text_metrics_v2.0` (LM dictionary) |
+| `metrics_engine_version` | `text_metrics_v1.3` | `text_metrics_v2.0` (LM dictionary) |
 | Scoring model | `deterministic_scoring_v3` | strict missing-metric semantics; outcome-calibrated weights (P3) |
 | Dictionary | MVP built-in lists in `dictionaries.py` | LM-aligned + licensed expansion path |
 
@@ -27,6 +27,7 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 | [05_aggregation_spec.md](./05_aggregation_spec.md) | 10 component formulas, weights, coverage, confidence |
 | [06_v2_improvement_plan.md](./06_v2_improvement_plan.md) | Prioritized upgrades from literature → code |
 | [07_validation_protocol.md](./07_validation_protocol.md) | Empirical validation tests, gates, acceptance criteria |
+| [08_dictionary_enrichment_research.md](./08_dictionary_enrichment_research.md) | Category-by-category dictionary enrichment research and implementation rules |
 
 ## Code map
 

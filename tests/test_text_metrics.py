@@ -4,7 +4,14 @@ from disclosure_alpha.text_metrics import (
     compute_text_metrics,
     detect_section_flags,
 )
-from disclosure_alpha.dictionaries import sections_for_form_type
+from disclosure_alpha.dictionaries import (
+    DICTIONARY_VERSION,
+    MODAL_WORDS,
+    MODERATE_MODAL_WORDS,
+    STRONG_MODAL_WORDS,
+    WEAK_MODAL_WORDS,
+    sections_for_form_type,
+)
 
 
 def test_empty_text():
@@ -24,6 +31,27 @@ def test_uncertainty_and_litigious_ratios():
     assert result.litigious_word_ratio > 0
 
 
+def test_enriched_finance_word_categories():
+    text = (
+        "Fraudulent misstatements caused insolvency and outages. "
+        "Contingencies remain unresolved pending an antitrust arbitration appeal. "
+        "Debt maturities and liens restricted pledged collateral."
+    )
+    result = compute_text_metrics(SectionTextInput("item_1a_risk_factors", text))
+    assert result.negative_word_ratio > 0
+    assert result.uncertainty_word_ratio > 0
+    assert result.litigious_word_ratio > 0
+    assert result.constraining_word_ratio > 0
+
+
+def test_modal_split_preserves_compatibility():
+    assert DICTIONARY_VERSION == "built_in_dictionaries_v2"
+    assert WEAK_MODAL_WORDS | MODERATE_MODAL_WORDS | STRONG_MODAL_WORDS == MODAL_WORDS
+    text = "We may refinance and will be obligated to comply with covenants."
+    result = compute_text_metrics(SectionTextInput("item_7_mdna", text))
+    assert result.modal_word_ratio > 0
+
+
 def test_boilerplate_ratio():
     text = "There can be no assurance that results may materially adversely affect our business."
     result = compute_text_metrics(SectionTextInput("item_1a_risk_factors", text))
@@ -34,6 +62,20 @@ def test_expanded_safe_harbor_boilerplate_ratio():
     text = "Actual results could differ materially. You should not place undue reliance."
     result = compute_text_metrics(SectionTextInput("item_1a_risk_factors", text))
     assert result.boilerplate_phrase_ratio > 0
+
+
+def test_expanded_boilerplate_phrase_boundary():
+    result = compute_text_metrics(
+        SectionTextInput(
+            "item_1a_risk_factors",
+            "These risks are not exhaustive and could materially and adversely affect results.",
+        )
+    )
+    near_miss = compute_text_metrics(
+        SectionTextInput("item_1a_risk_factors", "The review was not exhaustively performed.")
+    )
+    assert result.boilerplate_phrase_ratio > 0
+    assert near_miss.boilerplate_phrase_ratio == 0.0
 
 
 def test_risk_heading_terms_do_not_inflate_negative_ratio():
@@ -67,6 +109,16 @@ def test_legal_flags():
     assert flags["investigation_flag"] is True
 
 
+def test_expanded_legal_and_control_flags():
+    legal = "The Company received a Wells notice and entered into a consent order."
+    flags = detect_section_flags(legal, "item_3_legal_proceedings")
+    assert flags["investigation_flag"] is True
+    assert flags["settlement_flag"] is True
+
+    controls = "Management concluded that our internal control over financial reporting was ineffective."
+    assert detect_section_flags(controls, "item_9a_controls")["ineffective_controls_flag"] is True
+
+
 def test_guidance_withdrawal_flag_mdna_only():
     text = "We withdraw our guidance for the remainder of the fiscal year."
     assert detect_section_flags(text, "item_7_mdna")["guidance_withdrawal_flag"] is True
@@ -74,10 +126,30 @@ def test_guidance_withdrawal_flag_mdna_only():
     assert detect_section_flags(text, "item_2_02")["guidance_withdrawal_flag"] is True
 
 
+def test_expanded_guidance_and_covenant_flags():
+    guidance = "The company is withdrawing guidance and is unable to provide guidance."
+    assert detect_section_flags(guidance, "item_2_02")["guidance_withdrawal_flag"] is True
+
+    covenant = "We received a waiver from lenders after an event of default."
+    assert detect_section_flags(covenant, "item_7_mdna")["covenant_breach_flag"] is True
+    assert detect_section_flags("Users can restore default settings.", "item_7_mdna")[
+        "covenant_breach_flag"
+    ] is False
+
+
 def test_cybersecurity_incident_flag_scoped_to_cyber_sections():
     text = "We determined that the ransomware event was a material cybersecurity incident."
     assert detect_section_flags(text, "item_1_05")["cybersecurity_incident_flag"] is True
     assert detect_section_flags(text, "item_7_mdna")["cybersecurity_incident_flag"] is False
+
+
+def test_expanded_cybersecurity_incident_flag_without_governance_false_positive():
+    incident = "The ransomware attack involved unauthorized access and data exfiltration."
+    governance = "Our cybersecurity program includes board oversight and annual training."
+    assert detect_section_flags(incident, "item_1_05")["cybersecurity_incident_flag"] is True
+    assert detect_section_flags(governance, "item_1c_cybersecurity")[
+        "cybersecurity_incident_flag"
+    ] is False
 
 
 def test_investigation_flag_word_boundary():
@@ -121,6 +193,19 @@ def test_expanded_mdna_density_phrases():
         "Cash shortfall risk increased cash requirements."
     )
     densities = compute_density_metrics(text, "item_7_mdna")
+    assert densities["margin_pressure_density"] > 0
+    assert densities["liquidity_constraint_density"] > 0
+
+
+def test_enriched_mdna_density_phrases():
+    text = (
+        "Known uncertainties include customer destocking and lower volumes. "
+        "Gross margin decreased due to higher input costs. "
+        "We may need to raise capital because of negative working capital."
+    )
+    densities = compute_density_metrics(text, "item_7_mdna")
+    assert densities["uncertainty_term_density"] > 0
+    assert densities["demand_softness_density"] > 0
     assert densities["margin_pressure_density"] > 0
     assert densities["liquidity_constraint_density"] > 0
 

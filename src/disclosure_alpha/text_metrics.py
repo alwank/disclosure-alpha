@@ -57,6 +57,16 @@ def _word_ratio(words: list[str], vocab: frozenset[str]) -> float:
     return hits / len(words)
 
 
+def _phrase_pattern(phrase: str) -> str:
+    parts = [re.escape(part) for part in re.split(r"[\s-]+", phrase.lower()) if part]
+    body = r"[\s-]+".join(parts)
+    return rf"(?<![a-z0-9]){body}(?![a-z0-9])"
+
+
+def _phrase_count(lower: str, phrase: str) -> int:
+    return len(re.findall(_phrase_pattern(phrase), lower))
+
+
 def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
     text = inp.cleaned_text or ""
     words = _tokenize(text)
@@ -81,7 +91,7 @@ def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
         else 0.0,
     )
 
-    boilerplate_hits = sum(lower.count(p) for p in BOILERPLATE_PHRASES)
+    boilerplate_hits = sum(_phrase_count(lower, p) for p in BOILERPLATE_PHRASES)
     boilerplate_ratio = min(1.0, boilerplate_hits / max(1, sentence_count))
 
     return TextMetricResult(
@@ -118,10 +128,8 @@ def compute_metric_families(inp: SectionTextInput) -> list[dict[str, float | str
 
 
 def _phrase_matches(lower: str, phrase: str) -> bool:
-    """Word-boundary match for single tokens; substring for multi-word phrases."""
-    if " " in phrase:
-        return phrase in lower
-    return bool(re.search(rf"\b{re.escape(phrase)}\b", lower))
+    """Word-boundary phrase match with whitespace/hyphen separator tolerance."""
+    return bool(re.search(_phrase_pattern(phrase), lower))
 
 
 def detect_section_flags(text: str, section_name: str) -> dict[str, bool]:
@@ -146,7 +154,7 @@ def compute_density_metrics(text: str, section_name: str) -> dict[str, float]:
     lower = (text or "").lower()
     densities: dict[str, float] = {}
     for name, terms in MDNA_DENSITY_TERMS.items():
-        hits = sum(lower.count(term) for term in terms)
+        hits = sum(_phrase_count(lower, term) for term in terms)
         raw = hits / word_count * 1000
         densities[name] = round(min(100.0, raw), 4)
     return densities

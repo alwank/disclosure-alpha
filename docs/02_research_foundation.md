@@ -1,6 +1,6 @@
 # 02 — Research Foundation
 
-Maps peer-reviewed literature to Disclosure Alpha deterministic metrics. Use this doc to justify methodology to customers, auditors, and calibration reviewers.
+Maps peer-reviewed literature to Disclosure Alpha deterministic metrics. Use this doc to justify methodology to customers, auditors, and calibration users.
 
 ## Core references (read first)
 
@@ -72,7 +72,7 @@ Maps peer-reviewed literature to Disclosure Alpha deterministic metrics. Use thi
 | `investigation_flag` | Cohen et al. — litigation language changes informative |
 | `guidance_withdrawal_flag` | Practitioner + event-study literature (no single canonical paper) |
 
-**Validation target:** Precision/recall vs labeled event databases for ICW and restatements.
+**Validation target:** Precision/recall vs external event databases for ICW and restatements.
 
 ## Outcome variables for calibration
 

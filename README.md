@@ -134,7 +134,7 @@ Resource: `disclosure://taxonomy/v1`
 
 | Artifact | Version |
 |----------|---------|
-| Parser | `section_extractor_v1` |
+| Parser | `section_extractor_v2` |
 | Metrics | `text_metrics_v1.3` |
 | Scoring | `deterministic_scoring_v3` |
 

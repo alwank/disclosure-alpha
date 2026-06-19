@@ -13,7 +13,7 @@ from disclosure_alpha.edgar.types import FilingNotFoundError, FilingRef
 
 GOLD_HTML = (
     Path(__file__).resolve().parents[1]
-    / "data/parser_eval/gold_set/0000320193-25-000079/0000320193-25-000079.html"
+    / "tests/fixtures/filings/aapl_2025_10k.html"
 )
 
 

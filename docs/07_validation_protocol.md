@@ -1,229 +1,115 @@
-# 07 — Validation Protocol
+# 07 - Automated Validation Protocol
 
-Empirical validation for deterministic scoring before marketing as "research-backed" or "calibrated." Complements unit tests and [SCORING_AUDIT.md](../SCORING_AUDIT.md).
+Automated validation for deterministic scoring before marketing as "research-backed" or
+"calibrated."
 
-## Validation levels
+## Validation Levels
 
 | Level | Name | Requirement |
 |-------|------|-------------|
 | L0 | Structural | Unit tests pass; deterministic replay identical |
-| L1 | Face validity | Manual review of 50 high/low scores |
-| L2 | Construct validity | Correlations with literature proxies |
+| L1 | Parser regression | Static and synthetic fixture extraction tests pass |
+| L2 | Construct validity | Correlations with literature proxies or external datasets |
 | L3 | Predictive monotonicity | Quintile sorts on outcome variables |
-| L4 | Production gates | Thresholds below met on SP100 |
+| L4 | Production gates | Automated thresholds below met on SP100 |
 
-**MVP launch (deterministic free tier):** L0 + L1 + partial L2  
-**"Validated" marketing claim:** L0–L4
+**MVP launch (deterministic free tier):** L0 + L1.  
+**"Validated" marketing claim:** L0-L4.
 
----
+## L0 - Structural Tests
 
-## L0 — Structural tests
+Existing: `tests/test_deterministic_scoring.py`, `tests/test_diff_engine.py`,
+`tests/test_section_extractor.py`.
 
-Existing: `tests/test_deterministic_scoring.py`, `tests/test_diff_engine.py`, `tests/test_score_stages.py`.
+```bash
+python3.11 -m pytest -q
+```
 
-Add:
+Required assertions:
 
 | Test | Assertion |
 |------|-----------|
-| Replay determinism | Same metrics dict → identical `aggregate_deterministic_matrix` output |
-| Missing diff null | No prior → `disclosure_change_score is None`, not 0 |
-| Flag boost cap | Boosted component ≤ 100 |
-| Coverage math | 7/9 components → coverage ≈ 0.778 |
+| Replay determinism | Same metrics dict -> identical aggregation output |
+| Missing diff null | No prior -> `disclosure_change_score is None`, not 0 |
+| Flag boost cap | Boosted component <= 100 |
+| Coverage math | Missing components reduce coverage |
 
-```bash
-pytest tests/test_deterministic_scoring.py tests/test_diff_engine.py -q
-```
+## L1 - Parser Regression
 
----
+Parser quality is enforced through deterministic fixtures, not label files.
 
-## L1 — Face validity sample
+| Fixture type | Requirement |
+|--------------|-------------|
+| Synthetic TOC | TOC entries suppressed when body headings exist |
+| Synthetic forms | 10-K, 10-Q, and 8-K section maps route correctly |
+| Static filings | Expected section names are asserted in code |
+| Confidence | Normal real-filing sections avoid low-confidence output |
 
-**Sample:** 50 filings stratified:
+Static filing fixtures live under `tests/fixtures/filings/`. Expectations live in tests,
+not in external `labels.json` files.
 
-- 10 highest `deterministic_overall_score`
-- 10 lowest
-- 10 highest `disclosure_change_score`
-- 10 with any hard flag true
-- 10 random
+## L2 - Construct Validity
 
-**Reviewers** (2+) independently rate: "Does the score direction match a 5-minute read of Item 1A + MD&A?"
-
-**Gate:** ≥ 80% agreement on direction (higher score = more concern).
-
-**Artifact:** `data/validation/deterministic_face_validity_sheet.csv`
-
-```csv
-filing_id,ticker,accession,deterministic_overall,reviewer1_direction,reviewer2_direction,agree,notes
-```
-
----
-
-## L2 — Construct validity
-
-Run on SP100 latest 10-K per company (n ≈ 100).
-
-### 2a. Dictionary correlation (if LM licensed)
-
-| Pair | Target Spearman ρ |
-|------|-------------------|
-| MVP `negative_word_ratio` vs LM negative % | ≥ 0.85 |
-| MVP `uncertainty_word_ratio` vs LM uncertainty % | ≥ 0.80 |
-
-### 2b. Specificity proxy
+Run on SP100 latest 10-K per company.
 
 | Pair | Target |
 |------|--------|
-| `company_specificity_score` vs NER entity density | ρ ≥ 0.60 |
+| MVP `negative_word_ratio` vs licensed LM negative % | Spearman rho >= 0.85 |
+| MVP `uncertainty_word_ratio` vs licensed LM uncertainty % | Spearman rho >= 0.80 |
+| `company_specificity_score` vs NER entity density | Spearman rho >= 0.60 |
+| `boilerplate_phrase_ratio` vs cross-firm 4-gram boilerplate | Spearman rho >= 0.50 |
 
-### 2c. Boilerplate
+Future script: `scripts/validate_deterministic_construct.py`.
 
-| Pair | Target |
-|------|--------|
-| `boilerplate_phrase_ratio` vs cross-firm 4-gram boilerplate (if computed) | ρ ≥ 0.50 |
+## L3 - Predictive Monotonicity
 
-### 2d. Internal consistency
+Not alpha / return forecasting. Test whether higher scores associate with adverse outcome
+families used in the literature.
 
-| Check | Target |
-|-------|--------|
-| `boilerplate_risk_score` vs `100 - specificity_quality_score` | ρ ≥ 0.40 |
-| `tone_negativity_score` vs `negative_word_ratio` (1A) | ρ ≥ 0.70 |
+| Outcome | Sort | Expected direction |
+|---------|------|--------------------|
+| Realized volatility 90d post filing | deterministic overall quintiles | Q5 > Q1 |
+| Absolute next-quarter earnings surprise | disclosure change quintiles | Q5 > Q1 |
+| Known material weakness disclosures | material weakness flag | precision >= 0.70 |
+| Going-concern audit opinions | going concern flag | recall >= 0.50 |
 
-**Script (to implement):** `scripts/validate_deterministic_construct.py`  
-**Output:** `data/validation/reports/deterministic_construct_report.json`
+Future script: `scripts/validate_deterministic_outcomes.py`.
 
----
+## L4 - Production Gates
 
-## L3 — Predictive monotonicity
+| Gate | Metric | Threshold |
+|------|--------|-----------|
+| D1 | Structural test pass rate | 100% |
+| D2 | Parser regression pass rate | 100% |
+| D3 | LM correlation, negative | rho >= 0.85 |
+| D4 | Volatility monotonicity | Q5/Q1 ratio > 1.1 |
+| D5 | Change score -> earnings surprise | Q5/Q1 > 1.05 |
+| D6 | Material weakness flag precision | >= 0.70 |
+| D7 | Score replay across runs | 100% identical |
+| D8 | Coverage on SP100 10-K | median coverage >= 0.85 |
 
-Not alpha / return forecasting. Test whether higher scores associate with **bad outcomes** in the literature.
+Report in: `data/validation/reports/deterministic_validation_report.json`.
 
-### Test 1 — Volatility (Loughran & McDonald 2011)
+## Regression on Version Upgrades
 
-```text
-Outcome: realized_vol_90d post filing_date
-Sort: quintiles by deterministic_overall_score
-Expect: Q5 vol > Q1 vol (t-test p < 0.10 on SP100)
-```
+When bumping `PARSER_VERSION`, `METRICS_ENGINE_VERSION`, or scoring weights:
 
-### Test 2 — Disclosure change (Cohen et al. 2020)
+1. Re-run the full unit suite.
+2. Re-run parser regression fixtures.
+3. Re-run construct and outcome validation when those scripts exist.
+4. Document the version delta in the validation report changelog.
 
-```text
-Outcome: |earnings_surprise_next_q|
-Sort: quintiles by disclosure_change_score
-Expect: Q5 > Q1
-```
+## External Claims
 
-### Test 3 — Flags (precision)
-
-```text
-Outcome: known material_weakness filings (SOX 404 disclosures)
-Metric: precision of material_weakness_flag ≥ 0.70
-```
-
-```text
-Outcome: going-concern audit opinions (subset with labels)
-Metric: recall ≥ 0.50 (flags are sparse; precision matters more)
-```
-
-### Test 4 — Specificity (Hope et al. 2016)
-
-```text
-Outcome: |CAR[-1,+1]| around 10-K filing
-Sort: quintiles by specificity_quality_score
-Expect: Q5 |CAR| > Q1 (more specific → stronger market reaction)
-```
-
-**Script (to implement):** `scripts/validate_deterministic_outcomes.py`  
-**Data needs:** Price/volatility feed or exported CRSP substitute; `validation_labels` table.
-
----
-
-## L4 — Production gates
-
-| Gate | Metric | Threshold | Status |
-|------|--------|-----------|--------|
-| D1 | Structural test pass rate | 100% | — |
-| D2 | Face validity agreement | ≥ 80% | — |
-| D3 | LM correlation (negative) | ρ ≥ 0.85 | pending license |
-| D4 | Volatility monotonicity | Q5/Q1 ratio > 1.1 | — |
-| D5 | Change score → earnings surprise | Q5/Q1 > 1.05 | — |
-| D6 | MW flag precision | ≥ 0.70 | — |
-| D7 | Score replay across runs | 100% identical | — |
-| D8 | Coverage on SP100 10-K | median coverage ≥ 0.85 | — |
-
-Report in: `data/validation/reports/deterministic_validation_report.json`
-
-```json
-{
-  "validated_at": "2026-06-18T...",
-  "metrics_engine_version": "text_metrics_v1.3",
-  "scoring_model_version": "deterministic_scoring_v3",
-  "gates": {
-    "D1": {"status": "pass", "value": 1.0},
-    "D4": {"status": "pending", "value": null}
-  },
-  "overall_status": "partial"
-}
-```
-
----
-
-## Operational workflow
-
-```bash
-# 1. Ensure deterministic backfill complete
-python scripts/ingest_universe.py --phase deterministic --universe sp100 --resume
-
-# 2. Aggregate deterministic only
-python scripts/backfill_score_sources.py --deterministic-only --limit 500
-
-# 3. Export matrices
-python scripts/validate_scores.py --export-csv data/validation/sp100_deterministic.csv
-
-# 4. Run construct + outcome validation (when scripts exist)
-python scripts/validate_deterministic_construct.py
-python scripts/validate_deterministic_outcomes.py
-
-# 5. Face validity — manual CSV fill, then:
-python scripts/run_scoring_audit.py  # extend for deterministic gates
-```
-
----
-
-## Label table extensions
-
-Add to `validation_labels` (or CSV import):
-
-| label_type | label_value | Use |
-|------------|-------------|-----|
-| `deterministic_direction` | `concern` / `benign` | Face validity |
-| `material_weakness` | `true` / `false` | Flag precision |
-| `going_concern` | `true` / `false` | Flag recall |
-| `high_volatility_90d` | `true` / `false` | Outcome bucket |
-
----
-
-## Regression on version upgrades
-
-When bumping `metrics_engine_version` or scoring weights:
-
-1. Re-run L0 (unit tests)
-2. Re-run L2 correlations (should not drop > 0.05 ρ)
-3. Re-run L3 monotonicity (direction must hold)
-4. Document delta in validation report changelog
-
----
-
-## What we report externally
-
-**Allowed after L0 + L1:**
+Allowed after L0 + L1:
 
 > "Deterministic scores are computed from reproducible text metrics and filing diffs."
 
-**Allowed after L4 (partial, no return claims):**
+Allowed after L4:
 
-> "Component scores show significant association with post-filing volatility and disclosure change patterns consistent with peer-reviewed textual analysis literature (Loughran & McDonald 2011; Cohen, Malloy & Nguyen 2020)."
+> "Component scores show significant association with post-filing volatility and disclosure
+> change patterns consistent with peer-reviewed textual analysis literature."
 
-**Not allowed:**
+Not allowed:
 
-> "Scores predict stock returns" or "validated trading strategy"
+> "Scores predict stock returns" or "validated trading strategy."

@@ -46,7 +46,7 @@ def _minimal_metrics_result() -> FilingMetricsResult:
             "prior_accession_number": None,
         },
         versions={
-            "parser_version": "section_extractor_v1",
+            "parser_version": "section_extractor_v2",
             "metrics_engine_version": "text_metrics_v1.3",
             "scoring_model_version": "deterministic_scoring_v3",
         },

@@ -39,22 +39,12 @@ app/core/deterministic_scoring.py → filing-level component aggregation
 app/services/metrics_service.py   → persist + orchestrate deterministic stage
 ```
 
-## Related docs
-
-- [SCORING_ARCHITECTURE.md](../SCORING_ARCHITECTURE.md) — three-layer composite + LLM blend
-- [SCORING_AUDIT.md](../SCORING_AUDIT.md) — audit script and label types
-- Requirements: `06_text_metrics.md`, `07_diff_engine.md`, `09_scoring_matrix.md`
-
-## Quick start (operators)
+## Quick start
 
 ```bash
-# Compute metrics + diffs only (no LLM)
-python scripts/ingest_universe.py --phase deterministic --universe sp100 --resume
+# Run automated validation
+python3.11 -m pytest -q
 
-# Aggregate deterministic scores (no LLM cost) — per ticker after metrics exist
-python -m app.pipeline.cli aggregate --ticker AAPL
-
-# Validation export + audit
-python scripts/validate_scores.py --export-csv data/validation/sp100_matrices.csv
-python scripts/run_scoring_audit.py
+# Score a filing through the package CLI
+disclosure-alpha score --html filing.html --form 10-K
 ```

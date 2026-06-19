@@ -14,7 +14,7 @@ def test_score_filing_html_minimal():
     """
     result = score_filing_html(html, "10-K")
     assert result.scores.overall_disclosure_risk_score is not None
-    assert result.versions["parser_version"] == "section_extractor_v1"
+    assert result.versions["parser_version"] == "section_extractor_v2"
     payload = result.to_dict()
     assert "scores" in payload
     assert json.dumps(payload)
@@ -35,7 +35,7 @@ def test_score_filing_ticker_mocked(monkeypatch):
 
     html_path = (
         Path(__file__).resolve().parents[1]
-        / "data/parser_eval/gold_set/0000320193-25-000079/0000320193-25-000079.html"
+        / "tests/fixtures/filings/aapl_2025_10k.html"
     )
     html = html_path.read_text(encoding="utf-8", errors="replace")
     ref = FilingRef(

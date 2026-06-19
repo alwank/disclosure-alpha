@@ -61,7 +61,7 @@ TERM_PACK_METADATA = {
 }
 ```
 
-The metadata does not need to drive runtime behavior immediately, but it gives reviewers and
+The metadata does not need to drive runtime behavior immediately, but it gives users and
 API consumers a stable audit trail.
 
 ### Matching Rules
@@ -84,7 +84,7 @@ Every new term or phrase must satisfy at least one of:
 
 - It appears in a recognized finance/accounting dictionary category.
 - It is directly grounded in SEC, PCAOB, FASB, or Form 8-K disclosure language.
-- It appears repeatedly in manually reviewed SEC filing snippets for the intended section.
+- It appears repeatedly in SEC filing snippets for the intended section.
 - It materially improves a validation metric without increasing false positives.
 
 Every addition needs at least one fixture-level test:

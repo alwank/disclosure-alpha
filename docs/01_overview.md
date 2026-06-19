@@ -111,7 +111,7 @@ Bump `metrics_engine_version` when:
 - Metric formulas change
 - Diff weights change
 
-Bump `deterministic_scoring_v2` (new `scoring_model_version`) when:
+Bump `deterministic_scoring_v3` (new `scoring_model_version`) when:
 
 - Component blend weights change
 - New components added to deterministic set

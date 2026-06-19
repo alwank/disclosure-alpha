@@ -48,7 +48,7 @@ def _minimal_metrics_result() -> FilingMetricsResult:
         versions={
             "parser_version": "section_extractor_v1",
             "metrics_engine_version": "text_metrics_v1.2",
-            "scoring_model_version": "deterministic_scoring_v2",
+            "scoring_model_version": "deterministic_scoring_v3",
         },
     )
 

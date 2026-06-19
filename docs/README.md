@@ -13,7 +13,7 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 | Artifact | Current | Next |
 |----------|---------|------|
 | `metrics_engine_version` | `text_metrics_v1.2` | `text_metrics_v2.0` (LM dictionary) |
-| Scoring model | `deterministic_scoring_v2` | outcome-calibrated weights (P3) |
+| Scoring model | `deterministic_scoring_v3` | strict missing-metric semantics; outcome-calibrated weights (P3) |
 | Dictionary | MVP built-in lists in `dictionaries.py` | LM-aligned + licensed expansion path |
 
 ## Document map

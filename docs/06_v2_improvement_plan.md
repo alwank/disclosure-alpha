@@ -178,7 +178,7 @@ Store universe percentiles per component (`scripts/compute_percentiles.py`) for 
 When implementing v2:
 
 - [ ] Update `metrics_engine_version` in `app/config.py`
-- [ ] Add `deterministic_scoring_v2` to `scoring_model_version`
+- [ ] Add the next deterministic scoring version to `scoring_model_version`
 - [ ] Alembic migration if new JSON columns (provenance)
 - [ ] Backfill: `ingest_universe.py --phase deterministic --resume`
 - [ ] Re-aggregate without LLM

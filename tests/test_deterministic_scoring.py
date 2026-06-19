@@ -1,4 +1,5 @@
 from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix
+from disclosure_alpha.deterministic_scoring import DETERMINISTIC_COMPONENT_WEIGHTS
 
 
 _BASE_METRICS = {
@@ -59,6 +60,91 @@ def test_missing_diff_null_not_zero():
         section_diffs={},
     )
     assert agg.components.disclosure_change_score is None
+
+
+def test_empty_metrics_have_no_weighted_coverage():
+    agg = aggregate_deterministic_matrix(section_metrics={}, section_diffs={})
+
+    assert agg.overall_disclosure_risk_score is None
+    assert agg.score_coverage_ratio == 0.0
+    assert set(agg.missing_components) == set(DETERMINISTIC_COMPONENT_WEIGHTS)
+
+
+def test_missing_item_1a_does_not_synthesize_item_1a_scores():
+    agg = aggregate_deterministic_matrix(
+        section_metrics={
+            "item_7_mdna": {
+                "uncertainty_word_ratio": 0.05,
+                "modal_word_ratio": 0.03,
+                "readability_score": 35,
+                "constraining_word_ratio": 0.02,
+            }
+        },
+        section_diffs={"item_1a_risk_factors": 50, "item_7_mdna": 20},
+        language_deltas={"item_1a_risk_factors": {"legal_language_delta": 10.0}},
+    )
+
+    assert agg.components.risk_factor_intensity_score is None
+    assert agg.components.legal_regulatory_risk_score is None
+    assert agg.components.boilerplate_risk_score is None
+    assert "risk_factor_intensity_score" in agg.missing_components
+    assert "legal_regulatory_risk_score" in agg.missing_components
+    assert "boilerplate_risk_score" in agg.missing_components
+
+
+def test_missing_mdna_does_not_synthesize_mdna_scores():
+    agg = aggregate_deterministic_matrix(
+        section_metrics={
+            "item_1a_risk_factors": {
+                "negative_word_ratio": 0.01,
+                "uncertainty_word_ratio": 0.01,
+                "litigious_word_ratio": 0.01,
+                "boilerplate_phrase_ratio": 0.01,
+                "numeric_specificity_score": 10,
+                "company_specificity_score": 10,
+            }
+        },
+        section_diffs={},
+        section_densities={"item_7_mdna": {"liquidity_constraint_density": 50.0}},
+    )
+
+    assert agg.components.mdna_uncertainty_score is None
+    assert agg.components.liquidity_stress_score is None
+    assert "mdna_uncertainty_score" in agg.missing_components
+    assert "liquidity_stress_score" in agg.missing_components
+
+
+def test_explicit_zero_metric_values_count_as_present_evidence():
+    agg = aggregate_deterministic_matrix(
+        section_metrics={
+            "item_1a_risk_factors": {
+                "negative_word_ratio": 0.0,
+                "uncertainty_word_ratio": 0.0,
+                "litigious_word_ratio": 0.0,
+                "boilerplate_phrase_ratio": 0.0,
+                "numeric_specificity_score": 0.0,
+                "company_specificity_score": 0.0,
+                "constraining_word_ratio": 0.0,
+            },
+            "item_7_mdna": {
+                "uncertainty_word_ratio": 0.0,
+                "modal_word_ratio": 0.0,
+                "readability_score": 0.0,
+                "constraining_word_ratio": 0.0,
+            },
+        },
+        section_diffs={"item_1a_risk_factors": 0.0, "item_7_mdna": 0.0},
+    )
+
+    assert agg.components.risk_factor_intensity_score == 0.0
+    assert agg.components.mdna_uncertainty_score == 0.0
+    assert agg.components.liquidity_stress_score == 0.0
+    assert agg.components.legal_regulatory_risk_score == 0.0
+    assert agg.components.disclosure_change_score == 0.0
+    assert agg.components.event_severity_score == 0.0
+    assert agg.components.boilerplate_risk_score is not None
+    assert abs(agg.components.boilerplate_risk_score - 66.66666666666667) < 1e-12
+    assert agg.score_coverage_ratio == 1.0
 
 
 def test_flag_boost_cap_at_100():

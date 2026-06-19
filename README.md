@@ -136,7 +136,7 @@ Resource: `disclosure://taxonomy/v1`
 |----------|---------|
 | Parser | `section_extractor_v1` |
 | Metrics | `text_metrics_v1.2` |
-| Scoring | `deterministic_scoring_v2` |
+| Scoring | `deterministic_scoring_v3` |
 
 ## Hosted vs self-hosted
 

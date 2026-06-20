@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Disclosure Alpha API",
-    "description": "Self-hosted deterministic SEC filing analytics.\n\nBefore running requests:\n1. `export SEC_USER_AGENT=\"YourName your@email.com\"`\n2. `disclosure-alpha-api` (default http://0.0.0.0:8000)\n\nAll endpoints are GET — no request body required.",
+    "description": "Full API re-export (all endpoints). Prefer product collections: discovery, analytics, scores, compliance, panel — see docs/09_product_surfaces.md.\n\nBefore running requests:\n1. `export SEC_USER_AGENT=\"YourName your@email.com\"`\n2. `disclosure-alpha-api` (default http://0.0.0.0:8000)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

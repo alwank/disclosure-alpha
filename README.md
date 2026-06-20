@@ -78,8 +78,13 @@ disclosure-alpha-api
 | `GET /v1/company/{ticker}/sections?fiscal_year=2025&form_type=10-K` | Extracted sections (metadata; add `include_text=true` for body text) |
 | `GET /v1/company/{ticker}/disclosure-metrics?fiscal_year=2025&form_type=10-K` | Metrics, flags, diffs (no scoring) |
 | `GET /v1/company/{ticker}/disclosure-matrix?fiscal_year=2025&view=deterministic` | Deterministic scores (+ metrics by default) |
+| `GET /v1/company/{ticker}/disclosure-flags?fiscal_year=2025` | Boolean risk flags only (no scores) |
+| `GET /v1/company/{ticker}/disclosure-changes?fiscal_year=2025` | Section diffs and change score |
+| `POST /v1/panel/disclosure-matrix` | Batch screener (max 25 tickers) |
 
 For 10-Q, add `quarter=Q1|Q2|Q3`.
+
+See [docs/09_product_surfaces.md](docs/09_product_surfaces.md) for product map, tier presets, and Pro boundary.
 
 **Shared query params** (`sections`, `disclosure-metrics`, `disclosure-matrix`):
 
@@ -92,6 +97,8 @@ For 10-Q, add `quarter=Q1|Q2|Q3`.
 
 | Param | Default | Description |
 |-------|---------|-------------|
+| `view` | `deterministic` | `deterministic` (free), `composite` / `full` (Pro — HTTP 402) |
+| `tier` | — | `lite`, `standard`, or `analyst` — overrides `include`/`fields` |
 | `include` | `metrics,provenance` | Comma-set: `metrics`, `provenance`. Empty (`include=`) → scores only |
 | `fields` | all | Slim scores, e.g. `fields=overall,components` |
 
@@ -111,13 +118,21 @@ curl "http://localhost:8000/v1/company/AAPL/sections?fiscal_year=2025&sections=i
 
 ## MCP server
 
-Add to Cursor MCP config:
+Two focused bundles plus a legacy alias:
+
+| Entry point | Use when |
+|-------------|----------|
+| `disclosure-alpha-mcp-analyst` | Ticker filings + scores (2 tools) |
+| `disclosure-alpha-mcp-builder` | Raw HTML pipeline (5 tools) |
+| `disclosure-alpha-mcp` | Legacy alias → analyst (deprecated) |
+
+**Analyst** (Cursor / Claude Desktop):
 
 ```json
 {
   "mcpServers": {
-    "disclosure-alpha": {
-      "command": "disclosure-alpha-mcp",
+    "disclosure-alpha-analyst": {
+      "command": "disclosure-alpha-mcp-analyst",
       "env": {
         "SEC_USER_AGENT": "YourName your@email.com"
       }
@@ -126,11 +141,21 @@ Add to Cursor MCP config:
 }
 ```
 
-**Low-level tools:** `extract_sections`, `compute_section_metrics_tool`, `diff_sections`, `score_deterministic_tool`, `score_filing_html_tool`
+**Builder** (custom HTML workflows):
 
-**Ticker tools:** `score_company_filing`, `list_company_filings`
+```json
+{
+  "mcpServers": {
+    "disclosure-alpha-builder": {
+      "command": "disclosure-alpha-mcp-builder"
+    }
+  }
+}
+```
 
-Resource: `disclosure://taxonomy/v1`
+**Analyst tools:** `list_company_filings_tool`, `score_company_filing_tool` — resource `disclosure://taxonomy/v1`
+
+**Builder tools:** `extract_sections_tool`, `compute_section_metrics_tool_wrapper`, `diff_sections_tool`, `score_deterministic_tool_wrapper`, `score_filing_html_tool_wrapper`
 
 ## Versions
 
@@ -174,7 +199,7 @@ RUN_INTEGRATION=1 pytest -q -m integration
 ### Pre-publish checklist (v0.1.0)
 
 - [ ] `pytest -m "not integration"` green on Python 3.11 and 3.12
-- [ ] `pip install -e ".[api,mcp,dev]"` — entry points resolve: `disclosure-alpha`, `disclosure-alpha-api`, `disclosure-alpha-mcp`
+- [ ] `pip install -e ".[api,mcp,dev]"` — entry points resolve: `disclosure-alpha`, `disclosure-alpha-api`, `disclosure-alpha-mcp`, `disclosure-alpha-mcp-analyst`, `disclosure-alpha-mcp-builder`
 - [ ] Smoke: `disclosure-alpha extract --html …`, `curl localhost:8000/health`, MCP tools import
 - [ ] No secrets in repo; `SEC_USER_AGENT` documented only
 

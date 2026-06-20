@@ -1,0 +1,54 @@
+{
+  "info": {
+    "name": "Disclosure Alpha — Analytics",
+    "description": "Section extraction and raw disclosure metrics (no scoring).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "ticker", "value": "AAPL" },
+    { "key": "fiscalYear", "value": "2025" }
+  ],
+  "item": [
+    {
+      "name": "Sections",
+      "item": [
+        {
+          "name": "Extracted sections (metadata)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/sections?fiscal_year={{fiscalYear}}&form_type=10-K",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "sections"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "item": [
+        {
+          "name": "Disclosure metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-metrics?fiscal_year={{fiscalYear}}&form_type=10-K",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-metrics"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

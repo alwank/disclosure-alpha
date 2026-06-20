@@ -1,0 +1,33 @@
+"""Panel batch response models — Track C owns implementation."""
+
+from __future__ import annotations
+
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
+
+
+class PanelRequest(BaseModel):
+    tickers: list[str]
+    fiscal_year: int
+    form_type: str = "10-K"
+    quarter: str | None = None
+    view: str = "deterministic"
+    compare: str = "prior"
+    include: str | None = None
+    fields: str | None = None
+
+
+class PanelResult(BaseModel):
+    ticker: str
+    status: Literal["ok", "error"]
+    filing: dict[str, Any] | None = None
+    scores: dict[str, Any] | None = None
+    error: str | None = None
+
+
+class PanelResponse(BaseModel):
+    results: list[PanelResult]
+    summary: dict[str, int]
+    versions: dict[str, str]
+    view: str = "deterministic"

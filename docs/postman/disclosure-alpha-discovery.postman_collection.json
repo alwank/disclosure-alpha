@@ -1,0 +1,40 @@
+{
+  "info": {
+    "name": "Disclosure Alpha — Discovery",
+    "description": "Health check and filing index.\n\n1. `export SEC_USER_AGENT=\"YourName your@email.com\"`\n2. `disclosure-alpha-api`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "ticker", "value": "AAPL" },
+    { "key": "fiscalYear", "value": "2025" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+        }
+      ]
+    },
+    {
+      "name": "Filings",
+      "item": [
+        {
+          "name": "List filings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/filings?fiscal_year={{fiscalYear}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "filings"],
+              "query": [{ "key": "fiscal_year", "value": "{{fiscalYear}}" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

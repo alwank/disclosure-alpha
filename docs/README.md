@@ -30,6 +30,7 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 | [06_v2_improvement_plan.md](./06_v2_improvement_plan.md) | Prioritized upgrades from literature → code |
 | [07_validation_protocol.md](./07_validation_protocol.md) | Empirical validation tests, gates, acceptance criteria |
 | [08_dictionary_enrichment_research.md](./08_dictionary_enrichment_research.md) | Category-by-category dictionary enrichment research and implementation rules |
+| [09_product_surfaces.md](./09_product_surfaces.md) | Product map: HTTP endpoints, MCP bundles, tiers, Pro 402 boundary |
 
 ## Code map
 

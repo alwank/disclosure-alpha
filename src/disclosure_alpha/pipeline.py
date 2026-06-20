@@ -402,3 +402,68 @@ def score_filing_ticker(
     )
     result.filing = _filing_meta(bundle.ref, prior_accession=bundle.prior_accession)
     return result
+
+
+@dataclass
+class PanelTickerResult:
+    ticker: str
+    status: str
+    filing: dict[str, Any] | None = None
+    scores: DeterministicAggregationResult | None = None
+    error: str | None = None
+
+
+@dataclass
+class PanelBatchResult:
+    results: list[PanelTickerResult]
+    summary: dict[str, int]
+    versions: dict[str, str]
+
+
+def score_panel_tickers(
+    tickers: list[str],
+    fiscal_year: int,
+    *,
+    form_type: str = "10-K",
+    quarter: str | None = None,
+    use_cache: bool = True,
+    compare_prior: bool = True,
+) -> PanelBatchResult:
+    """Score many tickers sequentially; per-ticker errors do not fail the batch."""
+    results: list[PanelTickerResult] = []
+    ok = 0
+    failed = 0
+    for raw in tickers:
+        ticker = raw.strip().upper()
+        try:
+            scored = score_filing_ticker(
+                ticker,
+                fiscal_year,
+                form_type=form_type,
+                quarter=quarter,
+                use_cache=use_cache,
+                compare_prior=compare_prior,
+            )
+            results.append(
+                PanelTickerResult(
+                    ticker=ticker,
+                    status="ok",
+                    filing=scored.filing,
+                    scores=scored.scores,
+                )
+            )
+            ok += 1
+        except Exception as exc:
+            results.append(
+                PanelTickerResult(
+                    ticker=ticker,
+                    status="error",
+                    error=str(exc),
+                )
+            )
+            failed += 1
+    return PanelBatchResult(
+        results=results,
+        summary={"ok": ok, "failed": failed},
+        versions=dict(_VERSIONS),
+    )

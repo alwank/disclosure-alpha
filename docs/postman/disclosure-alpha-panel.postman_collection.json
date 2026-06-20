@@ -1,0 +1,30 @@
+{
+  "info": {
+    "name": "Disclosure Alpha — Panel",
+    "description": "Batch panel screener (POST, max 25 tickers).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "fiscalYear", "value": "2025" }
+  ],
+  "item": [
+    {
+      "name": "Panel",
+      "item": [
+        {
+          "name": "POST panel disclosure-matrix",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tickers\": [\"AAPL\", \"MSFT\", \"GOOGL\"],\n  \"fiscal_year\": 2025,\n  \"form_type\": \"10-K\",\n  \"view\": \"deterministic\",\n  \"compare\": \"prior\"\n}"
+            },
+            "url": "{{baseUrl}}/v1/panel/disclosure-matrix"
+          }
+        }
+      ]
+    }
+  ]
+}

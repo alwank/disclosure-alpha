@@ -51,8 +51,8 @@ def test_health():
     assert resp.json()["status"] == "ok"
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
-@patch("disclosure_alpha.api.routes.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
 def test_disclosure_matrix(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -69,20 +69,20 @@ def test_disclosure_matrix(mock_score, mock_metrics):
     mock_score.assert_called_once()
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
-@patch("disclosure_alpha.api.routes.score_deterministic")
-def test_disclosure_metrics_skips_scoring(mock_score, mock_metrics):
+@patch("disclosure_alpha.api.endpoints.metrics.metrics_filing_ticker")
+def test_disclosure_metrics_skips_scoring(mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     resp = client.get(
         "/v1/company/AAPL/disclosure-metrics",
         params={"fiscal_year": 2025},
     )
     assert resp.status_code == 200
-    assert "metrics" in resp.json()
-    mock_score.assert_not_called()
+    body = resp.json()
+    assert "metrics" in body
+    assert "scores" not in body
 
 
-@patch("disclosure_alpha.api.routes.sections_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.sections.sections_filing_ticker")
 def test_company_sections(mock_sections):
     from disclosure_alpha.pipeline import extract_sections_from_html
 
@@ -103,7 +103,7 @@ def test_company_sections(mock_sections):
     assert "cleaned_text" not in body["sections"][0]
 
 
-@patch("disclosure_alpha.api.routes.sections_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.sections.sections_filing_ticker")
 def test_company_sections_include_text(mock_sections):
     from disclosure_alpha.pipeline import extract_sections_from_html
 
@@ -121,8 +121,8 @@ def test_company_sections_include_text(mock_sections):
     assert "cleaned_text" in resp.json()["sections"][0]
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
-@patch("disclosure_alpha.api.routes.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
 def test_disclosure_matrix_slim_include(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -136,8 +136,8 @@ def test_disclosure_matrix_slim_include(mock_score, mock_metrics):
     assert "provenance" not in body["scores"]
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
-@patch("disclosure_alpha.api.routes.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
 def test_disclosure_matrix_fields(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -152,7 +152,7 @@ def test_disclosure_matrix_fields(mock_score, mock_metrics):
     assert "provenance" not in scores
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.metrics.metrics_filing_ticker")
 def test_disclosure_metrics_compare_none(mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     resp = client.get(
@@ -180,7 +180,7 @@ def test_10q_requires_quarter():
     assert resp.status_code == 422
 
 
-@patch("disclosure_alpha.api.routes.list_filings")
+@patch("disclosure_alpha.api.endpoints.filings.list_filings")
 def test_company_filings(mock_list):
     mock_list.return_value = [
         FilingRef(
@@ -200,7 +200,7 @@ def test_company_filings(mock_list):
     assert len(resp.json()["filings"]) == 1
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
 def test_disclosure_matrix_not_found(mock_metrics):
     mock_metrics.side_effect = FilingNotFoundError("No 10-K for AAPL FY2025")
     resp = client.get(
@@ -211,7 +211,7 @@ def test_disclosure_matrix_not_found(mock_metrics):
     assert "detail" in resp.json()
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.metrics.metrics_filing_ticker")
 def test_disclosure_metrics_sec_fetch_error(mock_metrics):
     mock_metrics.side_effect = SecFetchError("SEC rate limited")
     resp = client.get(
@@ -238,16 +238,17 @@ def test_invalid_include_param():
     assert resp.status_code == 422
 
 
-def test_invalid_view_param():
+def test_composite_view_returns_402():
     resp = client.get(
         "/v1/company/AAPL/disclosure-matrix",
         params={"fiscal_year": 2025, "view": "composite"},
     )
-    assert resp.status_code == 422
+    assert resp.status_code == 402
+    assert resp.json()["pro_required"] is True
 
 
-@patch("disclosure_alpha.api.routes.metrics_filing_ticker")
-@patch("disclosure_alpha.api.routes.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
 def test_disclosure_matrix_sections_filter(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores

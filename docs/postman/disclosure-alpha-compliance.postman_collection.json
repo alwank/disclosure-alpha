@@ -1,0 +1,54 @@
+{
+  "info": {
+    "name": "Disclosure Alpha — Compliance",
+    "description": "Boolean risk flags and filing change diffs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "ticker", "value": "AAPL" },
+    { "key": "fiscalYear", "value": "2025" }
+  ],
+  "item": [
+    {
+      "name": "Flags",
+      "item": [
+        {
+          "name": "Disclosure flags",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-flags?fiscal_year={{fiscalYear}}&form_type=10-K",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-flags"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Changes",
+      "item": [
+        {
+          "name": "Disclosure changes (compare=prior)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-changes?fiscal_year={{fiscalYear}}&compare=prior",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-changes"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "compare", "value": "prior" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

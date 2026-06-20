@@ -45,11 +45,3 @@ class SectionsResponse(BaseModel):
     filing: dict[str, Any]
     sections: list[SectionSummary]
     versions: dict[str, str]
-
-
-class MatrixResponse(BaseModel):
-    filing: dict[str, Any]
-    metrics: dict[str, Any] | None = None
-    scores: dict[str, Any]
-    versions: dict[str, str]
-    view: str = Field(default="deterministic")

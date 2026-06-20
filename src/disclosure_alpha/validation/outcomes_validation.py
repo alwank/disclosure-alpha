@@ -84,7 +84,7 @@ def score_item1a_from_corpus_row(row: dict[str, Any]) -> dict[str, float | None]
         max(1, word_count // 20),
         float(row.get("extraction_confidence") or 0.5),
         str(row.get("extraction_method") or "corpus"),
-        "section_extractor_v2",
+        PARSER_VERSION,
         warnings=[],
     )
     metrics = compute_section_metrics([section], prior_sections=None)

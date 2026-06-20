@@ -2,10 +2,10 @@
   "validation_level": "L2",
   "generated_at": "2026-06-19T11:29:41.777420+00:00",
   "versions": {
-    "parser_version": "section_extractor_v2",
-    "metrics_engine_version": "text_metrics_v1.3",
-    "scoring_model_version": "deterministic_scoring_v3",
-    "dictionary_version": "built_in_dictionaries_v2"
+    "parser_version": "section_extractor_v1",
+    "metrics_engine_version": "text_metrics_v1",
+    "scoring_model_version": "deterministic_scoring_v1",
+    "dictionary_version": "built_in_dictionaries_v1"
   },
   "corpus": {
     "path": "data/validation/corpus/sp500_item1a.jsonl",

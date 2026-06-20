@@ -9,7 +9,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Disclosure Alpha API",
         description="Self-hosted deterministic SEC filing analytics",
-        version="0.1.0",
+        version="1.0.0",
     )
     for router in ROUTERS:
         app.include_router(router)

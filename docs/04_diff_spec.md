@@ -1,7 +1,7 @@
 # 04 — Diff Engine Specification
 
 Module: `app/core/diff_engine.py`  
-Storage: `section_diff_results` (`language_deltas_json` in v1.1)
+Storage: `section_diff_results` (`language_deltas_json` in v1)
 
 ## Purpose
 
@@ -110,7 +110,7 @@ clamp to [0, 100]
 | Weight litigation topic changes 1.5× | Cohen et al. — litigation language especially informative |
 | Penalize stickiness: if `lexical > 0.95` and `semantic > 0.95` but flags fired, floor score at 25 | Avoid false "no change" when flags disagree |
 
-## Language deltas (v1.1)
+## Language deltas (v1)
 
 Per-ratio change vs prior section (× 100 for percentage-point scale):
 

@@ -10,6 +10,11 @@ from fastapi.testclient import TestClient
 from disclosure_alpha.api.routes import app
 from disclosure_alpha.edgar.types import FilingNotFoundError
 from disclosure_alpha.pipeline import FilingMetricsResult, score_filing_html
+from disclosure_alpha.version import (
+    METRICS_ENGINE_VERSION,
+    PARSER_VERSION,
+    SCORING_MODEL_VERSION,
+)
 from html_fixtures import minimal_10k_html
 
 pytest.importorskip("fastapi")
@@ -36,9 +41,9 @@ def _minimal_metrics_result() -> FilingMetricsResult:
             "prior_accession_number": None,
         },
         versions={
-            "parser_version": "section_extractor_v2",
-            "metrics_engine_version": "text_metrics_v1.3",
-            "scoring_model_version": "deterministic_scoring_v3",
+            "parser_version": PARSER_VERSION,
+            "metrics_engine_version": METRICS_ENGINE_VERSION,
+            "scoring_model_version": SCORING_MODEL_VERSION,
         },
     )
 

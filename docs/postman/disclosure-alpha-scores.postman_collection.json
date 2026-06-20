@@ -67,7 +67,7 @@
               "name": "402 unsupported view",
               "status": "Payment Required",
               "code": 402,
-              "body": "{\n  \"detail\": \"view=composite is not supported in the open-source API (only view=deterministic is available; composite LLM scoring is not included)\",\n  \"available_views\": [\"deterministic\"],\n  \"scoring_model_version\": \"deterministic_scoring_v3\"\n}"
+              "body": "{\n  \"detail\": \"view=composite is not supported in the open-source API (only view=deterministic is available; composite LLM scoring is not included)\",\n  \"available_views\": [\"deterministic\"],\n  \"scoring_model_version\": \"deterministic_scoring_v1\"\n}"
             }
           ]
         }

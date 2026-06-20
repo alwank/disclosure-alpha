@@ -1,7 +1,7 @@
 # 03 — Metrics Engine Specification
 
 Module: `app/core/text_metrics.py`  
-Storage: `section_text_metrics` (`flags_json`, `density_json` in v1.1)
+Storage: `section_text_metrics` (`flags_json`, `density_json` in v1)
 
 ## Input / output
 
@@ -97,7 +97,7 @@ Where shared 4-grams appear in ≥ 75% of firms in the same fiscal year (precomp
 
 **v2:** Emit `fog_index` as separate column; use `readability_score` only inside MD&A uncertainty blend until calibrated.
 
-## Section flags (v1.1)
+## Section flags (v1)
 
 Function: `detect_section_flags(text, section_name) → dict[str, bool]`
 
@@ -113,8 +113,8 @@ Function: `detect_section_flags(text, section_name) → dict[str, bool]`
 | `investigation_flag` | `legal_regulatory_risk_score` (+15) |
 | `material_legal_proceeding_flag` | `legal_regulatory_risk_score` (+15) |
 | `guidance_withdrawal_flag` | `mdna_uncertainty_score` (+15) |
-| `cybersecurity_incident_flag` | Persisted for API; not in aggregation v1.2 |
-| Others | Persisted for API; not in aggregation v1.2 |
+| `cybersecurity_incident_flag` | Persisted for API; not in aggregation v1 |
+| Others | Persisted for API; not in aggregation v1 |
 
 **v2 flag rules:**
 
@@ -122,7 +122,7 @@ Function: `detect_section_flags(text, section_name) → dict[str, bool]`
 - Log matched phrase span in `flags_json` metadata for audit: `{"material_weakness_flag": {"hit": true, "span": "..."}}`
 - Add `substantial_doubt_flag` as alias check for going concern
 
-## MD&A density metrics (v1.1)
+## MD&A density metrics (v1)
 
 Function: `compute_density_metrics(text, section_name)`  
 Sections: `item_7_mdna`, `item_2_mdna` only.

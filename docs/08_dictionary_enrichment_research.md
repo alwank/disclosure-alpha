@@ -49,7 +49,7 @@ Keep the current constants for backward compatibility, but introduce metadata be
 large expansions:
 
 ```python
-DICTIONARY_VERSION = "built_in_dictionaries_v2"
+DICTIONARY_VERSION = "built_in_dictionaries_v1"
 
 TERM_PACK_METADATA = {
     "negative": {

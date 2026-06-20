@@ -9,6 +9,8 @@ from pathlib import Path
 
 from html_fixtures import minimal_10k_html, minimal_prior_html, write_temp_html
 
+from disclosure_alpha.version import PARSER_VERSION
+
 
 def _run_cli(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -26,7 +28,7 @@ def test_cli_extract(tmp_path: Path):
     payload = json.loads(result.stdout)
     assert isinstance(payload, list)
     assert payload[0]["section_name"]
-    assert payload[0]["parser_version"] == "section_extractor_v2"
+    assert payload[0]["parser_version"] == PARSER_VERSION
 
 
 def test_cli_metrics_with_prior(tmp_path: Path):

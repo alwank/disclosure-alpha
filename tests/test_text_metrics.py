@@ -4,8 +4,8 @@ from disclosure_alpha.text_metrics import (
     compute_text_metrics,
     detect_section_flags,
 )
+from disclosure_alpha.version import DICTIONARY_VERSION
 from disclosure_alpha.dictionaries import (
-    DICTIONARY_VERSION,
     MODAL_WORDS,
     MODERATE_MODAL_WORDS,
     STRONG_MODAL_WORDS,
@@ -45,7 +45,7 @@ def test_enriched_finance_word_categories():
 
 
 def test_modal_split_preserves_compatibility():
-    assert DICTIONARY_VERSION == "built_in_dictionaries_v2"
+    assert DICTIONARY_VERSION == "built_in_dictionaries_v1"
     assert WEAK_MODAL_WORDS | MODERATE_MODAL_WORDS | STRONG_MODAL_WORDS == MODAL_WORDS
     text = "We may refinance and will be obligated to comply with covenants."
     result = compute_text_metrics(SectionTextInput("item_7_mdna", text))

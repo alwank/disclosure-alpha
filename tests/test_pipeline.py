@@ -1,6 +1,7 @@
 import json
 
 from disclosure_alpha.pipeline import score_filing_html
+from disclosure_alpha.version import PARSER_VERSION
 
 
 def test_score_filing_html_minimal():
@@ -14,7 +15,7 @@ def test_score_filing_html_minimal():
     """
     result = score_filing_html(html, "10-K")
     assert result.scores.overall_disclosure_risk_score is not None
-    assert result.versions["parser_version"] == "section_extractor_v2"
+    assert result.versions["parser_version"] == PARSER_VERSION
     payload = result.to_dict()
     assert "scores" in payload
     assert json.dumps(payload)

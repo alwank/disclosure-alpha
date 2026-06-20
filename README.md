@@ -161,9 +161,11 @@ Two focused bundles plus a legacy alias:
 
 | Artifact | Version |
 |----------|---------|
-| Parser | `section_extractor_v2` |
-| Metrics | `text_metrics_v1.3` |
-| Scoring | `deterministic_scoring_v3` |
+| Parser | `section_extractor_v1` |
+| Metrics | `text_metrics_v1` |
+| Scoring | `deterministic_scoring_v1` |
+
+Bump artifact versions when reproducibility changes: dictionary terms → `built_in_dictionaries_v2`, metric formulas → `text_metrics_v2`, scoring weights → `deterministic_scoring_v2`, parser logic → `section_extractor_v2`.
 
 ## L2 validation (partial, accepted MVP)
 
@@ -196,7 +198,7 @@ Live integration tests (yfinance, optional EDGAR smoke):
 RUN_INTEGRATION=1 pytest -q -m integration
 ```
 
-### Pre-publish checklist (v0.1.0)
+### Pre-publish checklist (v1.0.0)
 
 - [ ] `pytest -m "not integration"` green on Python 3.11 and 3.12
 - [ ] `pip install -e ".[api,mcp,dev]"` — entry points resolve: `disclosure-alpha`, `disclosure-alpha-api`, `disclosure-alpha-mcp`, `disclosure-alpha-mcp-analyst`, `disclosure-alpha-mcp-builder`

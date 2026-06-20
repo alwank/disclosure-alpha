@@ -12,8 +12,8 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 
 | Artifact | Current | Next |
 |----------|---------|------|
-| `metrics_engine_version` | `text_metrics_v1.3` | `text_metrics_v2.0` (LM dictionary) |
-| Scoring model | `deterministic_scoring_v3` | strict missing-metric semantics; outcome-calibrated weights (P3) |
+| `metrics_engine_version` | `text_metrics_v1` | `text_metrics_v2.0` (LM dictionary) |
+| Scoring model | `deterministic_scoring_v1` | strict missing-metric semantics; outcome-calibrated weights (P3) |
 | Dictionary | MVP built-in lists in `dictionaries.py` | LM-aligned + licensed expansion path |
 
 **Validation status (FY2025):** L0 + L1 pass. **Partial L2:** construct on ~425-firm cohort. **Partial L3 (vol only, closed for MVP):** Q5/Q1 ~ 1.11, n ~ 435 (FY2025 corpus). Earnings gate failed on FY2024 robustness run — do not claim. See [07_validation_protocol.md](./07_validation_protocol.md).

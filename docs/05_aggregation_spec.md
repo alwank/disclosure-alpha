@@ -30,7 +30,7 @@ Weighted average over **non-null** values only; weights renormalized. Returns `N
 
 Mean of `max(0, uncertainty_language_delta)` across sections.
 
-## Component formulas (v1.1)
+## Component formulas (v1)
 
 Let `m_1a` = Item 1A metrics, `m_7` = MD&A metrics, `d_*` = section diff scores.
 
@@ -146,7 +146,7 @@ overall = Σ (weight_i × component_i) / Σ (weight_i for present components)
 clamp(overall, 0, 100)
 ```
 
-**Note:** `specificity_quality_score` and `event_severity_score` are computed but **not** in headline weights v1.1. Exposed in `components` JSON for transparency.
+**Note:** `specificity_quality_score` and `event_severity_score` are computed but **not** in headline weights v1. Exposed in `components` JSON for transparency.
 
 ### v2 headline weight proposal
 

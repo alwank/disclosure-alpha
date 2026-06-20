@@ -137,7 +137,7 @@ def _phrase_matches(lower: str, phrase: str) -> bool:
 
 
 def detect_section_flags(text: str, section_name: str) -> dict[str, bool]:
-    """Return all v1.1 boolean flags for a section (False when out of scope)."""
+    """Return all v1 boolean flags for a section (False when out of scope)."""
     lower = (text or "").lower()
     flags: dict[str, bool] = {}
     for flag_name, phrases in FLAG_PATTERNS.items():

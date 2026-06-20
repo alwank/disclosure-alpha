@@ -22,6 +22,7 @@ from disclosure_alpha.mcp.server import (
     taxonomy,
 )
 from disclosure_alpha.pipeline import extract_sections_from_html, score_filing_html
+from disclosure_alpha.version import PARSER_VERSION, SCORING_MODEL_VERSION
 from html_fixtures import minimal_10k_html, minimal_prior_html
 
 
@@ -32,7 +33,7 @@ def _sections_json(html: str) -> str:
 
 def test_mcp_extract_sections():
     payload = json.loads(extract_sections(minimal_10k_html(), "10-K"))
-    assert payload["parser_version"] == "section_extractor_v2"
+    assert payload["parser_version"] == PARSER_VERSION
     assert payload["sections"]
     assert payload["sections"][0]["section_name"]
 
@@ -65,7 +66,7 @@ def test_mcp_score_deterministic_tool():
     )
     payload = json.loads(score_deterministic_tool(json.dumps(metrics)))
     assert payload["overall_disclosure_risk_score"] is not None
-    assert payload["scoring_model_version"] == "deterministic_scoring_v3"
+    assert payload["scoring_model_version"] == SCORING_MODEL_VERSION
 
 
 def test_mcp_score_filing_html_tool():

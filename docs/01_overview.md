@@ -6,8 +6,8 @@ Deterministic scoring converts extracted SEC filing sections into a **0–100 di
 
 1. **Text metrics** — word-list ratios, specificity proxies, readability
 2. **Section diffs** — change vs prior comparable filing
-3. **Boolean flags** — phrase-pattern risk events (v1.1)
-4. **Language deltas** — tone ratio shifts vs prior section (v1.1)
+3. **Boolean flags** — phrase-pattern risk events (v1)
+4. **Language deltas** — tone ratio shifts vs prior section (v1)
 
 No LLM. Fully reproducible given the same `metrics_engine_version` and input text.
 
@@ -37,7 +37,7 @@ aggregate stage (partial — deterministic path)
   • persist deterministic_scores_json, deterministic_overall_score
 ```
 
-**Current gap (v1.1):** `--phase deterministic` does not persist the matrix. Scores materialize only when `aggregate` runs. **v2 target:** deterministic stage writes `deterministic_scores_json` without requiring LLM.
+**Current gap (v1):** `--phase deterministic` does not persist the matrix. Scores materialize only when `aggregate` runs. **v2 target:** deterministic stage writes `deterministic_scores_json` without requiring LLM.
 
 ## Score scale
 
@@ -114,7 +114,7 @@ Bump `metrics_engine_version` when:
 - Metric formulas change
 - Diff weights change
 
-Bump `deterministic_scoring_v3` (new `scoring_model_version`) when:
+Bump `deterministic_scoring_v1` (new `scoring_model_version`) when:
 
 - Component blend weights change
 - New components added to deterministic set

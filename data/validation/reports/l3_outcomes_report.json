@@ -2,9 +2,9 @@
   "validation_level": "L3",
   "generated_at": "2026-06-19T14:59:11.179088+00:00",
   "versions": {
-    "parser_version": "section_extractor_v2",
-    "metrics_engine_version": "text_metrics_v1.3",
-    "scoring_model_version": "deterministic_scoring_v3"
+    "parser_version": "section_extractor_v1",
+    "metrics_engine_version": "text_metrics_v1",
+    "scoring_model_version": "deterministic_scoring_v1"
   },
   "inputs": {
     "outcomes_path": "data/validation/outcomes/sp500_outcomes.jsonl",

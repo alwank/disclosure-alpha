@@ -5,6 +5,7 @@ from disclosure_alpha.section_extractor import (
     extract_sections,
     required_sections_present,
 )
+from disclosure_alpha.version import PARSER_VERSION
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_10k.html"
@@ -22,8 +23,8 @@ def test_extract_item_1a_and_item_7():
     item_1a = next(s for s in sections if s.section_name == "item_1a_risk_factors")
     assert item_1a.word_count > 20
     assert item_1a.extraction_confidence > 0.3
-    assert item_1a.extraction_method == "sec_parser_sequence_v2"
-    assert item_1a.parser_version == "section_extractor_v2"
+    assert item_1a.extraction_method == "sec_parser_sequence_v1"
+    assert item_1a.parser_version == PARSER_VERSION
     assert "competition" in item_1a.cleaned_text.lower()
 
 
@@ -225,7 +226,7 @@ def test_pick_best_extraction_prefers_longer_fallback():
 
     primary = ExtractedSection(
         "item_1a_risk_factors", "short", "short", "h1", 10, 1, 0.35,
-        "sec_parser_sequence_v2", "v", warnings=["short_section"],
+        "sec_parser_sequence_v1", "v", warnings=["short_section"],
     )
     fallback = ExtractedSection(
         "item_1a_risk_factors", "x " * 300, "x " * 300, "h2", 300, 5, 0.85,

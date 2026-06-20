@@ -34,7 +34,7 @@ All ticker endpoints share query params where applicable: `fiscal_year`, `form_t
 
 | `view` | Status | Behavior |
 |--------|--------|----------|
-| `deterministic` | Supported | Component scores from `deterministic_scoring_v3` |
+| `deterministic` | Supported | Component scores from `deterministic_scoring_v1` |
 | `composite` | Not supported (402) | LLM composite scoring not included in open-source API |
 | `full` | Not supported (402) | Future bundle of deterministic + composite |
 
@@ -44,7 +44,7 @@ All ticker endpoints share query params where applicable: `fiscal_year`, `form_t
 {
   "detail": "view=composite is not supported in the open-source API (only view=deterministic is available; composite LLM scoring is not included)",
   "available_views": ["deterministic"],
-  "scoring_model_version": "deterministic_scoring_v3"
+  "scoring_model_version": "deterministic_scoring_v1"
 }
 ```
 

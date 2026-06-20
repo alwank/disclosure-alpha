@@ -13,6 +13,7 @@ from disclosure_alpha.pipeline import (
     PanelTickerResult,
     score_filing_html,
 )
+from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 pytest.importorskip("fastapi")
 
@@ -40,7 +41,7 @@ def test_panel_mixed_results(mock_score):
             PanelTickerResult(ticker="BAD", status="error", error="No 10-K for BAD FY2025"),
         ],
         summary={"ok": 1, "failed": 1},
-        versions={"scoring_model_version": "deterministic_scoring_v3"},
+        versions={"scoring_model_version": SCORING_MODEL_VERSION},
     )
     resp = client.post(
         "/v1/panel/disclosure-matrix",
@@ -77,7 +78,7 @@ def test_panel_passes_compare(mock_score):
     mock_score.return_value = PanelBatchResult(
         results=[_ok_panel_result("AAPL")],
         summary={"ok": 1, "failed": 0},
-        versions={"scoring_model_version": "deterministic_scoring_v3"},
+        versions={"scoring_model_version": SCORING_MODEL_VERSION},
     )
     resp = client.post(
         "/v1/panel/disclosure-matrix",

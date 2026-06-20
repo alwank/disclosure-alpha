@@ -12,6 +12,11 @@ from disclosure_alpha.pipeline import (
     FilingSectionsResult,
     score_filing_html,
 )
+from disclosure_alpha.version import (
+    METRICS_ENGINE_VERSION,
+    PARSER_VERSION,
+    SCORING_MODEL_VERSION,
+)
 from html_fixtures import minimal_10k_html
 
 pytest.importorskip("fastapi")
@@ -38,9 +43,9 @@ def _minimal_metrics_result() -> FilingMetricsResult:
             "prior_accession_number": None,
         },
         versions={
-            "parser_version": "section_extractor_v2",
-            "metrics_engine_version": "text_metrics_v1.3",
-            "scoring_model_version": "deterministic_scoring_v3",
+            "parser_version": PARSER_VERSION,
+            "metrics_engine_version": METRICS_ENGINE_VERSION,
+            "scoring_model_version": SCORING_MODEL_VERSION,
         },
     )
 
@@ -291,4 +296,4 @@ def test_disclosure_matrix_end_to_end(mock_load, aapl_fixture_path: Path):
     assert resp.status_code == 200
     body = resp.json()
     assert body["scores"]["overall_disclosure_risk_score"] is not None
-    assert body["versions"]["scoring_model_version"] == "deterministic_scoring_v3"
+    assert body["versions"]["scoring_model_version"] == SCORING_MODEL_VERSION

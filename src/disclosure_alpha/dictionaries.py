@@ -1,6 +1,6 @@
 """Built-in word lists for deterministic text metrics. Replaceable with licensed dictionaries."""
 
-DICTIONARY_VERSION = "built_in_dictionaries_v2"
+from disclosure_alpha.version import DICTIONARY_VERSION
 
 TERM_PACK_METADATA = {
     "negative": {
@@ -341,7 +341,7 @@ SECTION_DISPLAY_NAMES = {
 
 MVP_FORM_TYPES = frozenset({"10-K", "10-Q"})
 
-# --- metrics v1.1: section flags and MD&A density packs ---
+# --- metrics v1: section flags and MD&A density packs ---
 
 FLAG_PATTERNS: dict[str, list[str]] = {
     "material_weakness_flag": [

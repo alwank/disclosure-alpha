@@ -720,7 +720,7 @@ def _extract_from_sec_parser(
             candidate=candidate,
             base_conf=0.75,
             parser_version=parser_version,
-            method="sec_parser_sequence_v2",
+            method="sec_parser_sequence_v1",
             extra_warnings=extra_warnings,
         )
 
@@ -737,7 +737,7 @@ def _extract_from_sec_parser(
                     candidate=candidate,
                     base_conf=0.75,
                     parser_version=parser_version,
-                    method="sec_parser_sequence_v2",
+                    method="sec_parser_sequence_v1",
                     extra_warnings=extra_warnings + ["boundary_extended"],
                 )
 
@@ -755,7 +755,7 @@ def _extract_from_sec_parser(
                     candidate=alt,
                     base_conf=0.75,
                     parser_version=parser_version,
-                    method="sec_parser_sequence_v2",
+                    method="sec_parser_sequence_v1",
                     extra_warnings=extra_warnings + ["alternate_candidate"],
                 )
                 if alt_section.word_count > section.word_count:

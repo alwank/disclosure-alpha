@@ -1,0 +1,48 @@
+{
+  "validation_level": "L3",
+  "generated_at": "2026-06-19T20:38:55.299042+00:00",
+  "versions": {
+    "parser_version": "section_extractor_v2",
+    "metrics_engine_version": "text_metrics_v1.3",
+    "scoring_model_version": "deterministic_scoring_v3"
+  },
+  "inputs": {
+    "outcomes_path": "data/validation/outcomes/sp500_outcomes_fy2024.jsonl",
+    "corpus_path": null,
+    "score_mode": "edgar",
+    "n_outcomes": 503,
+    "n_vol_pairs": 499,
+    "n_change_pairs": 490
+  },
+  "gates": {
+    "volatility_vs_overall": {
+      "name": "volatility_vs_overall",
+      "status": "pass",
+      "score_field": "overall_disclosure_risk_score",
+      "outcome_field": "realized_vol_90d",
+      "n": 499,
+      "q1_mean": 0.395579,
+      "q5_mean": 0.397719,
+      "q5_q1_ratio": 1.0054,
+      "threshold_direction": "Q5 > Q1",
+      "message": ""
+    },
+    "earnings_surprise_vs_change": {
+      "name": "earnings_surprise_vs_change",
+      "status": "fail",
+      "score_field": "disclosure_change_score",
+      "outcome_field": "earnings_surprise_abs",
+      "n": 490,
+      "q1_mean": 0.266837,
+      "q5_mean": 0.145,
+      "q5_q1_ratio": 0.5434,
+      "threshold_direction": "Q5 > Q1",
+      "message": ""
+    }
+  },
+  "monotonicity_pass": true,
+  "overall_l3_pass": true,
+  "notes": [
+    "edgar mode: full 10-K + prior via score_filing_ticker (requires SEC cache)"
+  ]
+}

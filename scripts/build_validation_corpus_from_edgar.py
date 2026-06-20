@@ -210,6 +210,7 @@ def main() -> None:
                 row = {
                     "ticker": entry.ticker,
                     "fiscal_year": bundle.ref.fiscal_year,
+                    "filing_date": bundle.ref.filing_date,
                     "section_name": sec.section_name,
                     "cleaned_text": sec.cleaned_text,
                     "word_count": sec.word_count,

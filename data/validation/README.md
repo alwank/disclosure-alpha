@@ -155,3 +155,73 @@ Diagnose: `python scripts/diagnose_item1a.py`
 Retry: `--retry-failures` on the EDGAR build script (optional; not required for current MVP claims).
 
 See [docs/07_validation_protocol.md](../../docs/07_validation_protocol.md).
+
+## L3 outcomes (OpenBB + yfinance)
+
+Post-filing outcome variables for predictive monotonicity (L3). Requires a running
+[OpenBB Platform API](https://docs.openbb.co/) (default `http://127.0.0.1:6900`) for
+90-day realized volatility via `equity/price/historical` (`provider=yfinance`).
+Next-quarter earnings surprise uses **yfinance** directly (quarterly estimate vs reported).
+
+```bash
+export SEC_USER_AGENT="YourName your@email.com"
+export OPENBB_API_URL="http://127.0.0.1:6900"   # optional if default
+
+pip install -e ".[outcomes]"
+
+# Smoke test (3 tickers)
+python scripts/fetch_validation_outcomes.py \
+  --corpus data/validation/corpus/sp500_item1a.jsonl \
+  --limit 3
+
+# Full cohort (slow: EDGAR filing_date resolve + OpenBB + yfinance per ticker)
+python scripts/fetch_validation_outcomes.py
+```
+
+Output: `data/validation/outcomes/sp500_outcomes.jsonl` (gitignored).
+
+Each row includes `realized_vol_90d`, `earnings_surprise_abs`, sources, and `errors`.
+Rebuild corpus with `filing_date` embedded (re-run EDGAR build) to skip per-row EDGAR lookups.
+
+FMP free-tier limits apply to OpenBB estimate routes; this pipeline does **not** require FMP.
+
+### Run L3 gates (after outcomes fetch)
+
+Default corpus mode (MVP canonical vol claim):
+
+```bash
+python scripts/validate_deterministic_outcomes.py
+```
+
+Uses corpus Item 1A scores (fast) for **volatility vs overall** quintile gate.
+`disclosure_change_score` gate is skipped in corpus mode (no prior-year diff); use
+`--score-mode edgar` for full 10-K + prior scoring (slow, needs SEC cache).
+
+Optional robustness run (FY2024 EDGAR — **completed**; earnings gate failed):
+
+```bash
+python scripts/fetch_validation_outcomes.py \
+  --universe data/universe/sp500.csv \
+  --fiscal-year 2024
+
+python scripts/validate_deterministic_outcomes.py \
+  --fiscal-year 2024 \
+  --score-mode edgar
+```
+
+Reports:
+- FY2025 corpus: `data/validation/reports/l3_outcomes_report.json`
+- FY2025 EDGAR: `data/validation/reports/l3_outcomes_report_edgar.json`
+- FY2024 EDGAR robustness: `data/validation/reports/l3_outcomes_report_edgar_fy2024.json`
+
+### L3 achieved (partial, accepted MVP — vol only)
+
+L3 validation **closed for MVP**. External vol claim uses FY2025 corpus only (Q5/Q1 ~1.11).
+
+| Gate | FY2025 corpus | FY2025 EDGAR | FY2024 EDGAR | MVP status |
+|------|---------------|--------------|--------------|------------|
+| Volatility vs overall score | **pass** Q5/Q1 1.11 n=435 | **pass** Q5/Q1 1.10 n=435 | pass Q5/Q1 1.005 n=499 | **claim corpus only** |
+| Earnings vs change score | skipped (no prior) | skipped n=14 | **fail** Q5/Q1 0.54 n=490 | **do not claim** |
+| ICW / GCO flags | not run | not run | not run | **deferred** |
+
+See [docs/07_validation_protocol.md](../../docs/07_validation_protocol.md#l3-achieved-status-accepted-partial-mvp--vol-only).

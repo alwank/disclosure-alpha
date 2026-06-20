@@ -4,7 +4,7 @@
 
 Parse SEC filing HTML, compute deterministic text metrics, diff sections, and produce reproducible disclosure risk scores — no LLM required.
 
-**What we claim today:** deterministic Item 1A analytics validated on **425 S&P 500 FY2025 10-Ks** (~84% of index); boilerplate and specificity metrics correlate with reference constructs on that cohort (see [L2 status](docs/07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025)).
+**What we claim today:** deterministic Item 1A analytics on **~425 S&P 500 FY2025 10-Ks** (~84% of index); construct validity on that cohort (L2); higher risk scores associate with higher 90d post-filing volatility (partial L3, Q5/Q1 ~ 1.11). Earnings-surprise outcome validation **not supported** (FY2024 gate failed). See [validation protocol](docs/07_validation_protocol.md).
 
 ## Install
 

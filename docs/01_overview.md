@@ -16,8 +16,9 @@ No LLM. Fully reproducible given the same `metrics_engine_version` and input tex
 - Not a buy/sell signal or investment advice
 - Not a substitute for reading the filing
 - Not equivalent to the **composite** matrix (which blends LLM interpretation)
-- Not validated to predict returns (L3/L4 not run; see [07_validation_protocol.md](./07_validation_protocol.md))
-- Not full S&P 500 L2 coverage (`overall_l2_pass` false; ~425/503 cohort validated — see [L2 achieved status](./07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025))
+- Not validated to predict returns (L4 not run; partial L3: vol association only — see [07](./07_validation_protocol.md))
+- Not validated to predict earnings surprise (`disclosure_change_score` gate failed on FY2024 cohort)
+- Not full S&P 500 L2/L3 coverage — see [L2](./07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025) and [L3](./07_validation_protocol.md#l3-achieved-status-accepted-partial-mvp--vol-only) achieved status
 
 ## Pipeline placement
 
@@ -85,9 +86,9 @@ coverage   = (# non-null weighted components) / 9
 | Free | Matrix endpoint | `view=deterministic` — component scores, no LLM evidence |
 | Pro | Matrix endpoint | `view=composite` or `view=full` |
 
-**Marketing claim (deterministic):** "Deterministic disclosure risk scores from SEC Item 1A text, validated on **425 S&P 500 FY2025 10-Ks** (~84% of index). Boilerplate and specificity metrics correlate with reference constructs on that cohort."
+**Marketing claim (deterministic):** "Deterministic disclosure risk scores from SEC Item 1A text, validated on **~425 S&P 500 FY2025 10-Ks**. Construct validity on boilerplate and specificity; higher scores associate with higher 90-day post-filing volatility on that cohort (partial L3)."
 
-**Do not claim:** "AI-identified hidden risks" on deterministic-only output; "L2 validation passed" or full-index S&P 500 coverage.
+**Do not claim:** "AI-identified hidden risks" on deterministic-only output; "L2/L3 validation passed" or full-index S&P 500 coverage; return prediction.
 
 ## Required sections by form
 

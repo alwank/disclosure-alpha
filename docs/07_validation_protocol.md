@@ -13,8 +13,8 @@ Automated validation for deterministic scoring before marketing as "research-bac
 | L3 | Predictive monotonicity | Quintile sorts on outcome variables |
 | L4 | Production gates | Automated thresholds below met on S&P 500 |
 
-**MVP launch (deterministic free tier):** L0 + L1 + **partial L2** (construct validity on ~425-firm cohort).  
-**"Validated" marketing claim (full ladder):** L0-L4.
+**MVP launch (deterministic free tier):** L0 + L1 + **partial L2** + **partial L3** (vol monotonicity on ~435-firm cohort).  
+**"Validated" marketing claim (full ladder):** L0-L4 (L3 requires >= 2 of 4 outcome families).
 
 ## L0 - Structural Tests
 
@@ -143,11 +143,50 @@ families used in the literature.
 | Known material weakness disclosures | material weakness flag | precision >= 0.70 |
 | Going-concern audit opinions | going concern flag | recall >= 0.50 |
 
-Future script: `scripts/validate_deterministic_outcomes.py`.
+**Protocol pass:** >= 2 of 4 tests pass ([02_research_foundation.md](./02_research_foundation.md)).
+
+Scripts:
+
+```bash
+pip install -e ".[outcomes]"
+export OPENBB_API_URL="http://127.0.0.1:6900"   # optional; default localhost
+export SEC_USER_AGENT="YourName your@email.com"
+
+python scripts/fetch_validation_outcomes.py
+python scripts/validate_deterministic_outcomes.py                    # corpus / Item 1A scores
+python scripts/validate_deterministic_outcomes.py --score-mode edgar # full 10-K + prior
+```
+
+### L3 achieved status (accepted partial MVP — vol only)
+
+**Accepted for MVP:** volatility monotonicity **pass** on FY2025 corpus-scored cohort; **not** full L3 (1 of 4 gates). L3 validation chapter **closed for MVP** — no further L3 runs planned.
+
+Re-run fetch + validate after corpus or scoring changes.
+
+Outcomes (FY2025): [data/validation/outcomes/sp500_outcomes.jsonl](../data/validation/outcomes/sp500_outcomes.jsonl)  
+Outcomes (FY2024): [data/validation/outcomes/sp500_outcomes_fy2024.jsonl](../data/validation/outcomes/sp500_outcomes_fy2024.jsonl)  
+Report (FY2025 corpus): [data/validation/reports/l3_outcomes_report.json](../data/validation/reports/l3_outcomes_report.json)  
+Report (FY2025 EDGAR): [data/validation/reports/l3_outcomes_report_edgar.json](../data/validation/reports/l3_outcomes_report_edgar.json)  
+Report (FY2024 EDGAR robustness): [data/validation/reports/l3_outcomes_report_edgar_fy2024.json](../data/validation/reports/l3_outcomes_report_edgar_fy2024.json)
+
+| Gate | Protocol | FY2025 corpus | FY2025 EDGAR | FY2024 EDGAR | MVP status |
+|------|----------|---------------|--------------|--------------|------------|
+| Volatility vs `overall_disclosure_risk_score` | Q5 > Q1 | Q5/Q1 **1.11**, n=**435** | Q5/Q1 **1.10**, n=**435** | Q5/Q1 **1.005**, n=**499** | **claim FY2025 corpus only** |
+| Earnings surprise vs `disclosure_change_score` | Q5 > Q1 | skipped (no prior diff) | skipped (n=**14**; min 50) | **fail** Q5/Q1 **0.54**, n=**490** | **do not claim** |
+| ICW vs `material_weakness_flag` | precision >= 0.70 | not run | not run | not run | **deferred** |
+| GCO vs `going_concern_flag` | recall >= 0.50 | not run | not run | not run | **deferred** |
+
+**EDGAR mode** uses full 10-K + prior (`score_filing_ticker`). FY2025 EDGAR vol association holds on production-style scores. FY2024 EDGAR robustness run confirmed sufficient earnings coverage (n=490 pairs); the earnings gate **failed** in the wrong direction (Q5 mean surprise below Q1) — hypothesis not supported on this cohort/measurement.
+
+**Caveats (corpus mode):** scores use **Item 1A text only** (not full 10-K matrix). FY2024 EDGAR vol (Q5/Q1 ~1.005) is internal robustness only — too weak for external claims.
+
+Outcome coverage (fetch): FY2025 vol **435/436**, earnings **427/436**; FY2024 vol **499/503**, earnings **494/503**.
+
+**Deferred post-MVP:** ICW/GCO gates, earnings gate rework, strict L3 (>= 2 of 4). Next product track: L4 production gates and dictionary enrichment ([08_dictionary_enrichment_research.md](./08_dictionary_enrichment_research.md)).
 
 ## L4 - Production Gates
 
-L3 and L4 remain future work. L4 D3 still targets E2 >= 0.85 on the full S&P 500 universe.
+L4 remains future work beyond partial L3. L4 D3 still targets E2 >= 0.85 on the full S&P 500 universe.
 
 | Gate | Metric | Threshold |
 |------|--------|-----------|
@@ -187,6 +226,12 @@ Allowed after L0 + L1 + partial L2 (current MVP):
 >
 > "100% filter retention on the fetched cohort; median extraction confidence 0.95."
 
+Allowed after L0 + L1 + partial L2 + partial L3 (current):
+
+> "Higher deterministic disclosure risk scores on our S&P 500 FY2025 cohort associate with higher **90-day post-filing realized volatility** (quintile Q5/Q1 ~ **1.11**, n ~ **435**)."
+>
+> Item 1A corpus scoring was used for this check; not a full production-matrix L3 pass.
+
 Allowed after L4:
 
 > "Component scores show significant association with post-filing volatility and disclosure
@@ -195,6 +240,14 @@ Allowed after L4:
 Not allowed:
 
 > "L2 validation passed", `overall_l2_pass`, or "validated on the S&P 500" (implies full universe).
+>
+> "L3 validation passed" or "fully validated on outcomes" (requires >= 2 of 4 L3 gates).
+>
+> Earnings surprise or `disclosure_change_score` outcome claims (FY2024 EDGAR gate **failed**, n=490).
+>
+> Citing FY2024 EDGAR vol (Q5/Q1 ~1.005) as validation evidence.
+>
+> Wording that implies the earnings gate passed or was inconclusive.
 >
 > "85%+ universe coverage" (current cohort is ~84%).
 >

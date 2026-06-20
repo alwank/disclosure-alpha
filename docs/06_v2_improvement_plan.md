@@ -162,8 +162,8 @@ Use in `tone_negativity_score` and `risk_factor_intensity_score` per Huang et al
 
 Grid search weights on SP100 to maximize monotonicity vs:
 
-- 90-day realized volatility
-- Next-quarter earnings surprise absolute value
+- 90-day realized volatility (MVP partial L3 pass on FY2025 corpus)
+- Next-quarter earnings surprise absolute value (**deferred** — FY2024 EDGAR gate failed; rework post-MVP)
 
 Constraints: weights sum to 1, each ≥ 0.03. Not return prediction (regulatory).
 

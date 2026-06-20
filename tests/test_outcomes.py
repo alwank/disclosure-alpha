@@ -1,0 +1,73 @@
+"""Tests for L3 outcome helpers."""
+
+from __future__ import annotations
+
+from datetime import date
+
+from disclosure_alpha.validation.outcomes import (
+    earnings_rows_from_yfinance,
+    first_reported_earnings_after,
+    realized_vol_90d_from_bars,
+)
+
+
+def test_realized_vol_90d_from_flat_bars_is_low():
+    filing = date(2025, 1, 1)
+    bars = [
+        {"date": f"2025-01-{d:02d}", "close": 100.0}
+        for d in range(2, 32)
+    ]
+    vol, n = realized_vol_90d_from_bars(bars, filing_date=filing)
+    assert n >= 20
+    assert vol == 0.0
+
+
+def test_realized_vol_90d_from_noisy_bars_is_positive():
+    filing = date(2025, 1, 1)
+    bars = []
+    price = 100.0
+    cur = date(2025, 1, 2)
+    end = date(2025, 4, 1)
+    i = 0
+    while cur <= end:
+        # alternating shocks -> non-zero realized vol
+        shock = 0.01 if i % 2 == 0 else -0.008
+        price *= 1.0 + shock
+        bars.append({"date": cur.isoformat(), "close": price})
+        cur = cur.fromordinal(cur.toordinal() + 1)
+        i += 1
+
+    vol, n = realized_vol_90d_from_bars(bars, filing_date=filing)
+    assert n >= 20
+    assert vol is not None
+    assert vol > 0.05
+
+
+def test_first_reported_earnings_after_picks_earliest():
+    rows = [
+        {
+            "earnings_date": "2025-12-01",
+            "reported_eps": 1.0,
+            "estimate_eps": 0.9,
+            "surprise_abs": 0.1,
+        },
+        {
+            "earnings_date": "2025-05-01",
+            "reported_eps": 1.2,
+            "estimate_eps": 1.0,
+            "surprise_abs": 0.2,
+        },
+    ]
+    match = first_reported_earnings_after(rows, date(2025, 1, 15))
+    assert match is not None
+    assert match["earnings_date"].startswith("2025-05")
+
+
+def test_earnings_rows_from_yfinance_aapl():
+    try:
+        import yfinance  # noqa: F401
+    except ImportError:
+        return
+    rows = earnings_rows_from_yfinance("AAPL", limit=8)
+    assert rows
+    assert "surprise_abs" in rows[0]

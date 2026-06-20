@@ -391,6 +391,15 @@ def resolve_filing(
             best_row = row
             best_html = html
 
+    if best_row is not None and best_html is None:
+        try:
+            url = client.filing_document_url(
+                cik, best_row["accessionNumber"], best_row["primaryDocument"]
+            )
+            best_html = client.fetch_text(url)
+        except SecFetchError:
+            best_row = None
+
     if best_row is None or best_html is None:
         label = f"{ticker} FY{fiscal_year} {base}"
         if q:

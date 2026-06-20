@@ -1,0 +1,48 @@
+{
+  "validation_level": "L3",
+  "generated_at": "2026-06-19T16:30:12.717261+00:00",
+  "versions": {
+    "parser_version": "section_extractor_v2",
+    "metrics_engine_version": "text_metrics_v1.3",
+    "scoring_model_version": "deterministic_scoring_v3"
+  },
+  "inputs": {
+    "outcomes_path": "data/validation/outcomes/sp500_outcomes.jsonl",
+    "corpus_path": null,
+    "score_mode": "edgar",
+    "n_outcomes": 436,
+    "n_vol_pairs": 435,
+    "n_change_pairs": 14
+  },
+  "gates": {
+    "volatility_vs_overall": {
+      "name": "volatility_vs_overall",
+      "status": "pass",
+      "score_field": "overall_disclosure_risk_score",
+      "outcome_field": "realized_vol_90d",
+      "n": 435,
+      "q1_mean": 0.31852,
+      "q5_mean": 0.349235,
+      "q5_q1_ratio": 1.0964,
+      "threshold_direction": "Q5 > Q1",
+      "message": ""
+    },
+    "earnings_surprise_vs_change": {
+      "name": "earnings_surprise_vs_change",
+      "status": "skipped",
+      "score_field": "disclosure_change_score",
+      "outcome_field": "earnings_surprise_abs",
+      "n": 14,
+      "q1_mean": null,
+      "q5_mean": null,
+      "q5_q1_ratio": null,
+      "threshold_direction": "Q5 > Q1",
+      "message": "insufficient pairs (n=14, min_n=50)"
+    }
+  },
+  "monotonicity_pass": true,
+  "overall_l3_pass": true,
+  "notes": [
+    "edgar mode: full 10-K + prior via score_filing_ticker (requires SEC cache)"
+  ]
+}

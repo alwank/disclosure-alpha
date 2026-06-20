@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Disclosure Alpha — Scores",
-    "description": "Deterministic matrix scores, tier presets, and composite Pro 402 stub.",
+    "description": "Deterministic matrix scores, tier presets, and unsupported view (402) examples.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "name": "Pro stub (402)",
+      "name": "Unsupported views (402)",
       "item": [
         {
           "name": "Composite view — expect 402",
@@ -64,10 +64,10 @@
           },
           "response": [
             {
-              "name": "402 Pro required",
+              "name": "402 unsupported view",
               "status": "Payment Required",
               "code": 402,
-              "body": "{\n  \"detail\": {\n    \"detail\": \"view=composite requires Disclosure Alpha Pro\",\n    \"available_views\": [\"deterministic\"],\n    \"pro_required\": true,\n    \"scoring_model_version\": \"deterministic_scoring_v3\"\n  }\n}"
+              "body": "{\n  \"detail\": \"view=composite is not supported in the open-source API (only view=deterministic is available; composite LLM scoring is not included)\",\n  \"available_views\": [\"deterministic\"],\n  \"scoring_model_version\": \"deterministic_scoring_v3\"\n}"
             }
           ]
         }

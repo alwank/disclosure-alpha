@@ -5,7 +5,7 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 ## Audience
 
 - Engineers implementing or extending `app/core/text_metrics.py`, `diff_engine.py`, `deterministic_scoring.py`
-- Product/API owners defining free-tier vs composite-tier claims
+- Product/API owners defining deterministic-only product claims
 - Validation owners running calibration and audit gates
 
 ## Version
@@ -30,7 +30,7 @@ Production documentation for Disclosure Alpha's **deterministic-only** scoring l
 | [06_v2_improvement_plan.md](./06_v2_improvement_plan.md) | Prioritized upgrades from literature → code |
 | [07_validation_protocol.md](./07_validation_protocol.md) | Empirical validation tests, gates, acceptance criteria |
 | [08_dictionary_enrichment_research.md](./08_dictionary_enrichment_research.md) | Category-by-category dictionary enrichment research and implementation rules |
-| [09_product_surfaces.md](./09_product_surfaces.md) | Product map: HTTP endpoints, MCP bundles, tiers, Pro 402 boundary |
+| [09_product_surfaces.md](./09_product_surfaces.md) | Product map: HTTP endpoints, MCP bundles, response tiers |
 
 ## Code map
 

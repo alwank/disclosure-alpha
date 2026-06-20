@@ -13,7 +13,7 @@ Automated validation for deterministic scoring before marketing as "research-bac
 | L3 | Predictive monotonicity | Quintile sorts on outcome variables |
 | L4 | Production gates | Automated thresholds below met on S&P 500 |
 
-**MVP launch (deterministic free tier):** L0 + L1 + **partial L2** + **partial L3** (vol monotonicity on ~435-firm cohort).  
+**MVP launch (deterministic, open-source):** L0 + L1 + **partial L2** + **partial L3** (vol monotonicity on ~435-firm cohort).  
 **"Validated" marketing claim (full ladder):** L0-L4 (L3 requires >= 2 of 4 outcome families).
 
 ## L0 - Structural Tests

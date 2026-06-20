@@ -20,19 +20,18 @@ from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 router = APIRouter(tags=["matrix"])
 
-_PRO_VIEWS = frozenset({"composite", "full"})
+_UNSUPPORTED_VIEWS = frozenset({"composite", "full"})
 
 
-def _pro_stub_response(view: str) -> JSONResponse:
+def _unsupported_view_response(view: str) -> JSONResponse:
     return JSONResponse(
         status_code=402,
         content={
             "detail": (
-                f"view={view} requires Disclosure Alpha Pro "
-                "(composite LLM scoring not available in open-source API)"
+                f"view={view} is not supported in the open-source API "
+                "(only view=deterministic is available; composite LLM scoring is not included)"
             ),
             "available_views": ["deterministic"],
-            "pro_required": True,
             "scoring_model_version": SCORING_MODEL_VERSION,
         },
     )
@@ -63,8 +62,8 @@ def disclosure_matrix(
         description="Response tier preset (lite|standard|analyst); overrides include/fields when set",
     ),
 ) -> MatrixResponse | JSONResponse:
-    if view in _PRO_VIEWS:
-        return _pro_stub_response(view)
+    if view in _UNSUPPORTED_VIEWS:
+        return _unsupported_view_response(view)
     if view != "deterministic":
         raise HTTPException(status_code=422, detail="view must be deterministic, composite, or full")
     base, q = parse_form_quarter(form_type, quarter)

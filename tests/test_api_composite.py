@@ -29,26 +29,30 @@ def _minimal_metrics_result() -> FilingMetricsResult:
     )
 
 
-def test_composite_view_returns_402_pro_stub():
+def test_composite_view_returns_402_unsupported():
     resp = client.get(
         "/v1/company/AAPL/disclosure-matrix",
         params={"fiscal_year": 2025, "view": "composite"},
     )
     assert resp.status_code == 402
     body = resp.json()
-    assert body["pro_required"] is True
     assert body["available_views"] == ["deterministic"]
     assert body["scoring_model_version"] == SCORING_MODEL_VERSION
     assert "composite" in body["detail"]
+    assert "open-source" in body["detail"]
+    assert "Pro" not in body["detail"]
 
 
-def test_full_view_returns_402_pro_stub():
+def test_full_view_returns_402_unsupported():
     resp = client.get(
         "/v1/company/AAPL/disclosure-matrix",
         params={"fiscal_year": 2025, "view": "full"},
     )
     assert resp.status_code == 402
-    assert resp.json()["pro_required"] is True
+    body = resp.json()
+    assert body["available_views"] == ["deterministic"]
+    assert "open-source" in body["detail"]
+    assert "Pro" not in body["detail"]
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")

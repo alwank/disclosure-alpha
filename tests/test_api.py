@@ -244,7 +244,10 @@ def test_composite_view_returns_402():
         params={"fiscal_year": 2025, "view": "composite"},
     )
     assert resp.status_code == 402
-    assert resp.json()["pro_required"] is True
+    body = resp.json()
+    assert body["available_views"] == ["deterministic"]
+    assert "open-source" in body["detail"]
+    assert "Pro" not in body["detail"]
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")

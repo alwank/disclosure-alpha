@@ -15,34 +15,35 @@ Disclosure Alpha exposes deterministic SEC filing analytics through **focused HT
 
 ## HTTP API map
 
-| Product | Method | Path | Tier |
-|---------|--------|------|------|
-| Health | `GET` | `/health` | infra |
-| Filing Index | `GET` | `/v1/company/{ticker}/filings` | free |
-| Section Extractor | `GET` | `/v1/company/{ticker}/sections` | free |
-| Disclosure Analytics | `GET` | `/v1/company/{ticker}/disclosure-metrics` | free |
-| Disclosure Risk Score | `GET` | `/v1/company/{ticker}/disclosure-matrix` | free (`deterministic`) / Pro stub (`composite`, `full`) |
-| Risk Flags | `GET` | `/v1/company/{ticker}/disclosure-flags` | free |
-| Filing Changes | `GET` | `/v1/company/{ticker}/disclosure-changes` | free |
-| Panel Screener | `POST` | `/v1/panel/disclosure-matrix` | free (`deterministic`) |
+| Product | Method | Path |
+|---------|--------|------|
+| Health | `GET` | `/health` |
+| Filing Index | `GET` | `/v1/company/{ticker}/filings` |
+| Section Extractor | `GET` | `/v1/company/{ticker}/sections` |
+| Disclosure Analytics | `GET` | `/v1/company/{ticker}/disclosure-metrics` |
+| Disclosure Risk Score | `GET` | `/v1/company/{ticker}/disclosure-matrix` |
+| Risk Flags | `GET` | `/v1/company/{ticker}/disclosure-flags` |
+| Filing Changes | `GET` | `/v1/company/{ticker}/disclosure-changes` |
+| Panel Screener | `POST` | `/v1/panel/disclosure-matrix` |
+
+All endpoints above are available in this open-source repo.
 
 All ticker endpoints share query params where applicable: `fiscal_year`, `form_type`, `quarter` (10-Q), `compare` (`prior`|`none`), `sections` (comma-separated filter).
 
-## Matrix views and Pro boundary
+## Matrix views
 
 | `view` | Status | Behavior |
 |--------|--------|----------|
-| `deterministic` | **Free** | Component scores from `deterministic_scoring_v3` |
-| `composite` | **Pro stub** | HTTP **402** — LLM composite scoring not in open-source API |
-| `full` | **Pro stub** | HTTP **402** — future bundle of deterministic + composite |
+| `deterministic` | Supported | Component scores from `deterministic_scoring_v3` |
+| `composite` | Not supported (402) | LLM composite scoring not included in open-source API |
+| `full` | Not supported (402) | Future bundle of deterministic + composite |
 
 402 response shape:
 
 ```json
 {
-  "detail": "view=composite requires Disclosure Alpha Pro (composite LLM scoring not available in open-source API)",
+  "detail": "view=composite is not supported in the open-source API (only view=deterministic is available; composite LLM scoring is not included)",
   "available_views": ["deterministic"],
-  "pro_required": true,
   "scoring_model_version": "deterministic_scoring_v3"
 }
 ```
@@ -85,7 +86,7 @@ Product-oriented collections under `docs/postman/`:
 
 - `disclosure-alpha-discovery.postman_collection.json` — health + filings
 - `disclosure-alpha-analytics.postman_collection.json` — sections + metrics
-- `disclosure-alpha-scores.postman_collection.json` — matrix tiers + composite 402
+- `disclosure-alpha-scores.postman_collection.json` — matrix tiers + unsupported view (402)
 - `disclosure-alpha-compliance.postman_collection.json` — flags + changes
 - `disclosure-alpha-panel.postman_collection.json` — panel POST
 

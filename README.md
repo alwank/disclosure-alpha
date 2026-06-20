@@ -84,7 +84,7 @@ disclosure-alpha-api
 
 For 10-Q, add `quarter=Q1|Q2|Q3`.
 
-See [docs/09_product_surfaces.md](docs/09_product_surfaces.md) for product map, tier presets, and Pro boundary.
+See [docs/09_product_surfaces.md](docs/09_product_surfaces.md) for product map and tier presets.
 
 **Shared query params** (`sections`, `disclosure-metrics`, `disclosure-matrix`):
 
@@ -97,7 +97,7 @@ See [docs/09_product_surfaces.md](docs/09_product_surfaces.md) for product map, 
 
 | Param | Default | Description |
 |-------|---------|-------------|
-| `view` | `deterministic` | `deterministic` (free), `composite` / `full` (Pro — HTTP 402) |
+| `view` | `deterministic` | `deterministic` only; `composite` / `full` return HTTP 402 (not in OSS) |
 | `tier` | — | `lite`, `standard`, or `analyst` — overrides `include`/`fields` |
 | `include` | `metrics,provenance` | Comma-set: `metrics`, `provenance`. Empty (`include=`) → scores only |
 | `fields` | all | Slim scores, e.g. `fields=overall,components` |

@@ -78,13 +78,14 @@ confidence = clamp(0.3, 0.95, 0.5 + coverage × 0.4)
 coverage   = (# non-null weighted components) / 9
 ```
 
-## Product tiers
+## Supported API views
 
-| Tier | Surface | View |
-|------|---------|------|
-| Free | `GET /v1/company/{ticker}/disclosure-metrics` | Raw metrics, flags, diffs |
-| Free | Matrix endpoint | `view=deterministic` — component scores, no LLM evidence |
-| Pro | Matrix endpoint | `view=composite` or `view=full` |
+| Surface | View / path |
+|---------|-------------|
+| `GET /v1/company/{ticker}/disclosure-metrics` | Raw metrics, flags, diffs |
+| Matrix endpoint | `view=deterministic` — component scores, no LLM evidence |
+
+`view=composite` and `view=full` return HTTP **402** in the open-source API (not implemented here).
 
 **Marketing claim (deterministic):** "Deterministic disclosure risk scores from SEC Item 1A text, validated on **~425 S&P 500 FY2025 10-Ks**. Construct validity on boilerplate and specificity; higher scores associate with higher 90-day post-filing volatility on that cohort (partial L3)."
 

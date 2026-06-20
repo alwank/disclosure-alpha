@@ -156,6 +156,28 @@ PYTHONUNBUFFERED=1 .venv/bin/python scripts/validate_deterministic_construct.py 
 
 See [data/validation/README.md](data/validation/README.md) and [docs/07_validation_protocol.md](docs/07_validation_protocol.md#l2-achieved-status-accepted-mvp-fy2025).
 
+## Testing
+
+Default test run is **offline-safe** (no live SEC or yfinance):
+
+```bash
+pip install -e ".[api,mcp,dev]"
+pytest -q -m "not integration" --cov=disclosure_alpha --cov-fail-under=75
+```
+
+Live integration tests (yfinance, optional EDGAR smoke):
+
+```bash
+RUN_INTEGRATION=1 pytest -q -m integration
+```
+
+### Pre-publish checklist (v0.1.0)
+
+- [ ] `pytest -m "not integration"` green on Python 3.11 and 3.12
+- [ ] `pip install -e ".[api,mcp,dev]"` — entry points resolve: `disclosure-alpha`, `disclosure-alpha-api`, `disclosure-alpha-mcp`
+- [ ] Smoke: `disclosure-alpha extract --html …`, `curl localhost:8000/health`, MCP tools import
+- [ ] No secrets in repo; `SEC_USER_AGENT` documented only
+
 ## Hosted vs self-hosted
 
 This repo includes **self-hosted** `disclosure-alpha-api` and `disclosure-alpha-mcp` entry points. For a managed pre-scored S&P 500 universe, percentiles, and screeners, see the commercial **disclosure-alpha-api** hosted product.

@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: pip install -e ".[api,dev]"
-      - run: pytest -q
+      - run: pip install -e ".[api,mcp,dev]"
+      - run: pytest -q -m "not integration" --cov=disclosure_alpha --cov-fail-under=75
         env:
           EMBEDDING_BACKEND: tfidf

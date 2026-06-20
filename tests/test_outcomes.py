@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import os
 from datetime import date
+
+import pytest
 
 from disclosure_alpha.validation.outcomes import (
     earnings_rows_from_yfinance,
@@ -63,11 +66,17 @@ def test_first_reported_earnings_after_picks_earliest():
     assert match["earnings_date"].startswith("2025-05")
 
 
+@pytest.mark.integration
 def test_earnings_rows_from_yfinance_aapl():
+    if not os.environ.get("RUN_INTEGRATION"):
+        pytest.skip("Set RUN_INTEGRATION=1 to run live yfinance tests")
     try:
         import yfinance  # noqa: F401
     except ImportError:
-        return
-    rows = earnings_rows_from_yfinance("AAPL", limit=8)
+        pytest.skip("yfinance not installed")
+    try:
+        rows = earnings_rows_from_yfinance("AAPL", limit=8)
+    except Exception as exc:
+        pytest.skip(f"yfinance network unavailable: {exc}")
     assert rows
     assert "surprise_abs" in rows[0]

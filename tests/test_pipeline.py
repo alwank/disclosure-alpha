@@ -197,3 +197,24 @@ def test_filter_metrics_result():
     assert set(filtered.section_flags) == {"item_1a_risk_factors"}
     assert filtered.section_densities == {}
     assert set(filtered.language_deltas) == {"item_1a_risk_factors"}
+
+
+def test_filter_sections():
+    from disclosure_alpha.pipeline import extract_sections_from_html, filter_sections
+    from html_fixtures import minimal_10k_html
+
+    sections = extract_sections_from_html(minimal_10k_html(), "10-K")
+    filtered = filter_sections(sections, {"item_1a_risk_factors"})
+    assert len(filtered) == 1
+    assert filtered[0].section_name == "item_1a_risk_factors"
+
+
+def test_compute_section_metrics_item_1a_flags():
+    from disclosure_alpha.pipeline import compute_section_metrics, extract_sections_from_html
+    from html_fixtures import minimal_10k_html
+
+    sections = extract_sections_from_html(minimal_10k_html(), "10-K")
+    metrics = compute_section_metrics(sections)
+    assert "item_1a_risk_factors" in metrics.section_metrics
+    assert "negative_word_ratio" in metrics.section_metrics["item_1a_risk_factors"]
+    assert "investigation_flag" in metrics.section_flags["item_1a_risk_factors"]

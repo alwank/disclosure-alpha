@@ -1,0 +1,30 @@
+name: integration
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[api,mcp,outcomes,dev]"
+      - run: pytest -q -m integration
+        env:
+          RUN_INTEGRATION: "1"
+          EMBEDDING_BACKEND: tfidf
+      - name: EDGAR smoke score
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          if [ -z "$SEC_USER_AGENT" ]; then
+            echo "Skipping EDGAR smoke (SEC_USER_AGENT secret not set)"
+            exit 0
+          fi
+          score=$(disclosure-alpha score --ticker AAPL --fiscal-year 2025 --form 10-K | python -c "import json,sys; print(json.load(sys.stdin)['scores']['overall_disclosure_risk_score'])")
+          test -n "$score"

@@ -1,0 +1,229 @@
+{
+  "info": {
+    "name": "Disclosure Alpha API",
+    "description": "Self-hosted deterministic SEC filing analytics.\n\nBefore running requests:\n1. `export SEC_USER_AGENT=\"YourName your@email.com\"`\n2. `disclosure-alpha-api` (default http://0.0.0.0:8000)\n\nAll endpoints are GET — no request body required.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000" },
+    { "key": "ticker", "value": "AAPL" },
+    { "key": "fiscalYear", "value": "2025" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filings",
+      "item": [
+        {
+          "name": "List filings (10-K + 10-Q)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/filings?fiscal_year={{fiscalYear}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "filings"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List filings (10-K only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/filings?fiscal_year={{fiscalYear}}&form_type=10-K",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "filings"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sections",
+      "item": [
+        {
+          "name": "Extracted sections (metadata)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/sections?fiscal_year={{fiscalYear}}&form_type=10-K",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "sections"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sections with body text",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/sections?fiscal_year={{fiscalYear}}&form_type=10-K&include_text=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "sections"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" },
+                { "key": "include_text", "value": "true" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Risk factors only",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/sections?fiscal_year={{fiscalYear}}&form_type=10-K&sections=item_1a_risk_factors",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "sections"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" },
+                { "key": "sections", "value": "item_1a_risk_factors" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "10-Q sections (Q1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/sections?fiscal_year={{fiscalYear}}&form_type=10-Q&quarter=Q1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "sections"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-Q" },
+                { "key": "quarter", "value": "Q1" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disclosure Metrics",
+      "item": [
+        {
+          "name": "Full metrics (with prior diff)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-metrics?fiscal_year={{fiscalYear}}&form_type=10-K",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-metrics"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Metrics without prior comparison",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-metrics?fiscal_year={{fiscalYear}}&form_type=10-K&compare=none",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-metrics"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" },
+                { "key": "compare", "value": "none" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disclosure Matrix",
+      "item": [
+        {
+          "name": "Full matrix (default)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-matrix?fiscal_year={{fiscalYear}}&form_type=10-K&view=deterministic",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-matrix"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" },
+                { "key": "view", "value": "deterministic" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Scores only (no metrics, no provenance)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-matrix?fiscal_year={{fiscalYear}}&form_type=10-K&include=",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-matrix"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" },
+                { "key": "include", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Slim scores (overall + components)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-matrix?fiscal_year={{fiscalYear}}&form_type=10-K&fields=overall,components",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "company", "{{ticker}}", "disclosure-matrix"],
+              "query": [
+                { "key": "fiscal_year", "value": "{{fiscalYear}}" },
+                { "key": "form_type", "value": "10-K" },
+                { "key": "fields", "value": "overall,components" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

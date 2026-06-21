@@ -4,6 +4,8 @@ Install Disclosure Alpha with **Python 3.11+**.
 
 ## From PyPI
 
+Install from [PyPI](https://pypi.org/project/disclosure-alpha/):
+
 ```bash
 pip install "disclosure-alpha[dev]"
 ```
@@ -40,7 +42,7 @@ pip install "disclosure-alpha[api,mcp,dev]"
 ## From source (contributors)
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/alwank/disclosure-alpha.git
 cd disclosure-alpha
 pip install -e ".[api,mcp,dev]"
 ```

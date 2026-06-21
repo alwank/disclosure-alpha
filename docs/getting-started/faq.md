@@ -17,6 +17,10 @@ Use the same Python environment where you installed the package (`python3.11 -m 
 | MCP for agents | `disclosure-alpha[mcp,dev]` |
 | API + MCP | `disclosure-alpha[api,mcp,dev]` |
 
+**Q: `pip install disclosure-alpha` fails with "No matching distribution"**
+
+Requires **Python 3.11+**. If your Python version is fine, the package may not be published to PyPI yet — install from source via {doc}`installation`. Contributors use `pip install -e ".[api,mcp,dev]"` after cloning the repo.
+
 ## SEC EDGAR
 
 **Q: Error about `SEC_USER_AGENT`**

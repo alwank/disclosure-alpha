@@ -1,6 +1,6 @@
 # Documentation
 
-The Disclosure Alpha documentation site is built with **Sphinx + MyST** and published on Read the Docs.
+The Disclosure Alpha documentation site is built with **Sphinx + MyST** (Material theme) and published on Read the Docs.
 
 **Start here:** [index.md](index.md) (RTD home page)
 

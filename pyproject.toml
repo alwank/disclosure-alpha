@@ -9,7 +9,7 @@ description = "Open-source deterministic SEC filing analytics: parse, metrics, d
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.11"
-authors = [{ name = "Disclosure Alpha" }]
+authors = [{ name = "Alwan", email = "alwan.alkautsar@gmail.com" }]
 keywords = ["sec", "edgar", "10-k", "disclosure", "nlp", "mcp"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -29,6 +29,9 @@ dependencies = [
 [project.urls]
 Homepage = "https://disclosure-alpha.readthedocs.io/en/stable/"
 Documentation = "https://disclosure-alpha.readthedocs.io/en/stable/"
+Repository = "https://github.com/alwank/disclosure-alpha"
+Issues = "https://github.com/alwank/disclosure-alpha/issues"
+Changelog = "https://github.com/alwank/disclosure-alpha/blob/main/docs/appendix/changelog.md"
 
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "pydantic>=2.5.0"]

@@ -9,17 +9,24 @@ sys.path.insert(0, os.path.abspath("../src"))
 
 import disclosure_alpha
 
-project = "Disclosure Alpha"
+project = "disclosure-alpha"
 copyright = "Disclosure Alpha contributors"
 author = "Disclosure Alpha"
 release = disclosure_alpha.__version__
+html_title = "disclosure-alpha"
+
+_repo_url = os.environ.get(
+    "READTHEDOCS_GIT_REPOSITORY_URL",
+    "https://github.com/alwank/disclosure-alpha",
+).removesuffix(".git")
+_repo_name = _repo_url.rsplit("/", maxsplit=2)[-2] + "/" + _repo_url.rsplit("/", maxsplit=1)[-1]
 
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinxext.rediraffe",
-    "sphinx_copybutton",
+    "sphinx_immaterial",
 ]
 
 templates_path = ["_templates"]
@@ -46,11 +53,44 @@ source_suffix = {
 
 root_doc = "index"
 
-html_theme = "furo"
+html_theme = "sphinx_immaterial"
 html_static_path = ["_static"]
 html_theme_options = {
-    "sidebar_hide_name": False,
-    "top_of_page_buttons": ["view"],
+    "site_url": "https://disclosure-alpha.readthedocs.io/",
+    "repo_url": _repo_url,
+    "repo_name": _repo_name,
+    "edit_uri": "edit/main/docs/",
+    "palette": [
+        {
+            "media": "(prefers-color-scheme: light)",
+            "scheme": "default",
+            "primary": "black",
+            "accent": "teal",
+            "toggle": {
+                "icon": "material/brightness-7",
+                "name": "Switch to dark mode",
+            },
+        },
+        {
+            "media": "(prefers-color-scheme: dark)",
+            "scheme": "slate",
+            "primary": "black",
+            "accent": "teal",
+            "toggle": {
+                "icon": "material/brightness-4",
+                "name": "Switch to light mode",
+            },
+        },
+    ],
+    "features": [
+        "navigation.sections",
+        "navigation.expand",
+        "content.code.copy",
+        "toc.follow",
+    ],
+    "icon": {
+        "repo": "fontawesome/brands/github",
+    },
 }
 
 myst_heading_anchors = 3
@@ -62,9 +102,6 @@ autodoc_default_options = {
     "show-inheritance": False,
     "member-order": "bysource",
 }
-
-copybutton_prompt_text = r">>> |\.\.\. |\$ "
-copybutton_prompt_is_regexp = True
 
 rediraffe_redirects = {
     "01_overview.md": "methodology/overview.md",

@@ -3,7 +3,7 @@
 REST endpoints for filings, sections, metrics, scores, flags, changes, and batch panel screening.
 
 **Audience:** Backend developers integrating the REST API.
-**Before you start:** `pip install -e ".[api,dev]"` and {doc}`../../getting-started/sec-edgar-setup`.
+**Before you start:** `pip install "disclosure-alpha[api,dev]"` (see {doc}`../../getting-started/installation`) and {doc}`../../getting-started/sec-edgar-setup`.
 
 ## Typical journeys
 

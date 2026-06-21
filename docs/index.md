@@ -18,7 +18,7 @@ Parse SEC filing HTML, compute deterministic text metrics, diff sections, and pr
 **1. Install** (Python 3.11+)
 
 ```bash
-pip install "disclosure-alpha[dev]"
+pip install "disclosure-alpha"
 export SEC_USER_AGENT="YourName your@email.com"
 ```
 

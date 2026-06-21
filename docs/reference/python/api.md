@@ -6,7 +6,7 @@ The REST API is implemented with FastAPI. Route handlers live under `disclosure_
 
 - **User guide:** {doc}`../../guides/http/index`
 - **OpenAPI / schemas:** {doc}`../http/openapi`
-- **Start server:** `disclosure-alpha-api` (requires `pip install "disclosure-alpha[api,dev]"`)
+- **Start server:** `disclosure-alpha-api` (requires `pip install "disclosure-alpha[api]"`)
 
 Interactive docs when the server is running:
 

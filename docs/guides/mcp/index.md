@@ -2,7 +2,7 @@
 
 Disclosure Alpha ships two [Model Context Protocol](https://modelcontextprotocol.io/) servers for AI agents in Cursor, Claude Desktop, and other MCP hosts.
 
-**Prerequisites:** `pip install "disclosure-alpha[mcp,dev]"` (see {doc}`../../getting-started/installation`) and `SEC_USER_AGENT` for ticker-based tools.
+**Prerequisites:** `pip install "disclosure-alpha[mcp]"` (see {doc}`../../getting-started/installation`) and `SEC_USER_AGENT` for ticker-based tools.
 
 ## Choose a bundle
 

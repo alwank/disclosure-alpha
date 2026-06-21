@@ -12,7 +12,7 @@ cd disclosure-alpha
 pip install -e ".[api,mcp,dev]"
 ```
 
-End users install from PyPI instead: `pip install "disclosure-alpha[api,mcp,dev]"`. See [Installation](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/installation.html).
+End users install from PyPI instead: `pip install "disclosure-alpha[api,mcp]"`. See [Installation](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/installation.html).
 
 ## Run tests
 

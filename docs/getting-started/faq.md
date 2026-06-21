@@ -12,14 +12,14 @@ Use the same Python environment where you installed the package (`python3.11 -m 
 
 | Goal | Install |
 |------|---------|
-| CLI + Python SDK only | `disclosure-alpha[dev]` |
-| REST API | `disclosure-alpha[api,dev]` |
-| MCP for agents | `disclosure-alpha[mcp,dev]` |
-| API + MCP | `disclosure-alpha[api,mcp,dev]` |
+| CLI + Python SDK only | `disclosure-alpha` |
+| REST API | `disclosure-alpha[api]` |
+| MCP for agents | `disclosure-alpha[mcp]` |
+| API + MCP | `disclosure-alpha[api,mcp]` |
 
 **Q: `pip install disclosure-alpha` fails with "No matching distribution"**
 
-Requires **Python 3.11+**. If your Python version is fine, the package may not be published to PyPI yet — install from source via {doc}`installation`. Contributors use `pip install -e ".[api,mcp,dev]"` after cloning the repo.
+Requires **Python 3.11+**. On older Python versions PyPI will not offer a wheel. Contributors can install from source via {doc}`installation`.
 
 ## SEC EDGAR
 

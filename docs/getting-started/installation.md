@@ -7,36 +7,37 @@ Install Disclosure Alpha with **Python 3.11+**.
 Install from [PyPI](https://pypi.org/project/disclosure-alpha/):
 
 ```bash
-pip install "disclosure-alpha[dev]"
+pip install "disclosure-alpha"
 ```
 
 HTTP API and MCP together:
 
 ```bash
-pip install "disclosure-alpha[api,mcp,dev]"
+pip install "disclosure-alpha[api,mcp]"
 ```
 
 Pin a release when reproducibility matters:
 
 ```bash
-pip install "disclosure-alpha==1.0.0[api,mcp,dev]"
+pip install "disclosure-alpha==1.0.1[api,mcp]"
 ```
 
 ## Optional extras
 
 | Extra | Purpose |
 |-------|---------|
-| `dev` | CLI + pytest tooling |
+| *(base)* | CLI + Python SDK |
 | `api` | HTTP API (`disclosure-alpha-api`) |
 | `mcp` | MCP servers for Cursor / Claude Desktop |
+| `dev` | pytest tooling (contributors) |
 | `semantic` | MiniLM embeddings (default pipeline uses TF-IDF) |
 | `validation` | Construct-validity harness (spaCy) |
 | `outcomes` | L3 outcome fetch (yfinance) |
 
 ```bash
-pip install "disclosure-alpha[api,dev]"
-pip install "disclosure-alpha[mcp,dev]"
-pip install "disclosure-alpha[api,mcp,dev]"
+pip install "disclosure-alpha[api]"
+pip install "disclosure-alpha[mcp]"
+pip install "disclosure-alpha[api,mcp]"
 ```
 
 ## From source (contributors)

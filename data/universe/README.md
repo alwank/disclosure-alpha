@@ -2,7 +2,7 @@
 
 ## S&P 500 (`sp500.csv`)
 
-Checked-in reference list (**503** constituents). Current validated analysis cohort: **425** FY2025 Item 1A extractions (~84%). See [data/validation/README.md](../validation/README.md) for manifest failures and [docs/07_validation_protocol.md](../../docs/07_validation_protocol.md) for L2 status.
+Checked-in reference list (**503** constituents). Current validated analysis cohort: **425** FY2025 Item 1A extractions (~84%). See [data/validation/README.md](../validation/README.md) for manifest failures and [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html) for supported claims.
 
 Refresh from Wikipedia:
 

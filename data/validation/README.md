@@ -102,6 +102,24 @@ python scripts/validate_deterministic_construct.py \
   --min-n 3 --boilerplate-min-docs 2
 ```
 
+## Dictionary distribution shift (v2+)
+
+After dictionary or matching changes, compare metrics and component scores against the frozen baseline:
+
+```bash
+# First time (or after accepted engine change): refresh baseline
+python scripts/validate_dictionary_shift.py --write-baseline
+
+# Compare current engine to committed baseline
+python scripts/validate_dictionary_shift.py
+```
+
+Baseline: `data/validation/baselines/dictionary_shift_baseline.json`  
+Report: `data/validation/reports/dictionary_shift_report.json`  
+Gate: component score shift > 5 points on ≤ 5% of corpus (428-firm cohort).
+
+CI runs the compare step as a non-blocking check.
+
 ## L2 results
 
 ### Achieved status (FY2025, accepted MVP)
@@ -154,7 +172,7 @@ Re-run `scripts/audit_validation_corpus.py` after corpus changes to refresh figu
 Diagnose: `python scripts/diagnose_item1a.py`  
 Retry: `--retry-failures` on the EDGAR build script (optional; not required for current MVP claims).
 
-See [docs/07_validation_protocol.md](../../docs/07_validation_protocol.md).
+See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html).
 
 ## L3 outcomes (OpenBB + yfinance)
 
@@ -224,4 +242,4 @@ L3 validation **closed for MVP**. External vol claim uses FY2025 corpus only (Q5
 | Earnings vs change score | skipped (no prior) | skipped n=14 | **fail** Q5/Q1 0.54 n=490 | **do not claim** |
 | ICW / GCO flags | not run | not run | not run | **deferred** |
 
-See [docs/07_validation_protocol.md](../../docs/07_validation_protocol.md#l3-achieved-status-accepted-partial-mvp--vol-only).
+See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html) for supported outcome claims.

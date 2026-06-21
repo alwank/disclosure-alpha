@@ -26,6 +26,10 @@ dependencies = [
   "scikit-learn>=1.4.0",
 ]
 
+[project.urls]
+Homepage = "https://disclosure-alpha.readthedocs.io/en/stable/"
+Documentation = "https://disclosure-alpha.readthedocs.io/en/stable/"
+
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "pydantic>=2.5.0"]
 mcp = ["mcp>=1.0.0", "pydantic>=2.5.0"]

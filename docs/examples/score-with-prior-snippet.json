@@ -1,0 +1,28 @@
+{
+  "overall_disclosure_risk_score": 30.492722380952383,
+  "score_coverage_ratio": 0.7778,
+  "confidence_score": 0.596,
+  "missing_components": [
+    "mdna_uncertainty_score",
+    "liquidity_stress_score"
+  ],
+  "components": {
+    "risk_factor_intensity_score": 15.604162500000001,
+    "disclosure_change_score": 46.86111,
+    "mdna_uncertainty_score": null,
+    "legal_regulatory_risk_score": 37.2222,
+    "liquidity_stress_score": null,
+    "boilerplate_risk_score": 51.85186666666666,
+    "business_model_fragility_score": null,
+    "internal_controls_risk_score": 0.0,
+    "cybersecurity_risk_score": null,
+    "event_severity_score": 45.75,
+    "specificity_quality_score": 22.2222,
+    "tone_negativity_score": 0.0
+  },
+  "aggregates": {
+    "hidden_risk_score": null,
+    "disclosure_quality_score": 48.14813333333334,
+    "disclosure_deterioration_score": 46.86111
+  }
+}

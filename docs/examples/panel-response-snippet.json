@@ -1,0 +1,51 @@
+{
+  "results": [
+    {
+      "ticker": "AAPL",
+      "status": "ok",
+      "filing": {
+        "ticker": "AAPL",
+        "fiscal_year": 2025,
+        "form_type": "10-K"
+      },
+      "scores": {
+        "overall_disclosure_risk_score": 7.999999999999999,
+        "score_coverage_ratio": 0.5556,
+        "confidence_score": 0.3685,
+        "missing_components": [
+          "disclosure_change_score",
+          "mdna_uncertainty_score",
+          "liquidity_stress_score",
+          "event_severity_score"
+        ],
+        "components": {
+          "risk_factor_intensity_score": 0.0,
+          "disclosure_change_score": null,
+          "mdna_uncertainty_score": null,
+          "legal_regulatory_risk_score": 0.0,
+          "liquidity_stress_score": null,
+          "boilerplate_risk_score": 39.99999999999999,
+          "business_model_fragility_score": null,
+          "internal_controls_risk_score": 0.0,
+          "cybersecurity_risk_score": null,
+          "event_severity_score": null,
+          "specificity_quality_score": 40.0,
+          "tone_negativity_score": 0.0
+        }
+      }
+    },
+    {
+      "ticker": "BAD",
+      "status": "error",
+      "error": "No 10-K for BAD FY2025"
+    }
+  ],
+  "summary": {
+    "ok": 1,
+    "failed": 1
+  },
+  "versions": {
+    "scoring_model_version": "deterministic_scoring_v1"
+  },
+  "view": "deterministic"
+}

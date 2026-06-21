@@ -15,6 +15,24 @@ from disclosure_alpha.dictionaries import (
     SEGMENT_TERMS,
     UNCERTAINTY_WORDS,
 )
+from disclosure_alpha.text_matching import (
+    boilerplate_hits,
+    phrase_count,
+    phrase_matches,
+    split_sentences,
+    tokenize_words,
+)
+
+__all__ = [
+    "SectionTextInput",
+    "TextMetricResult",
+    "METRIC_FAMILIES",
+    "tokenize_words",
+    "compute_text_metrics",
+    "compute_metric_families",
+    "detect_section_flags",
+    "compute_density_metrics",
+]
 
 
 @dataclass
@@ -39,19 +57,13 @@ class TextMetricResult:
     boilerplate_phrase_ratio: float
 
 
-def tokenize_words(text: str) -> list[str]:
-    return re.findall(r"\b[a-zA-Z]+\b", text.lower())
-
-
 def _tokenize(text: str) -> list[str]:
     return tokenize_words(text)
 
 
 def _count_sentences(text: str) -> int:
-    if not text.strip():
-        return 0
-    parts = re.split(r"[.!?]+\s+", text.strip())
-    return max(1, len([p for p in parts if p.strip()]))
+    sentences = split_sentences(text)
+    return max(1, len(sentences)) if sentences else 0
 
 
 def _word_ratio(words: list[str], vocab: frozenset[str]) -> float:
@@ -59,16 +71,6 @@ def _word_ratio(words: list[str], vocab: frozenset[str]) -> float:
         return 0.0
     hits = sum(1 for w in words if w in vocab)
     return hits / len(words)
-
-
-def _phrase_pattern(phrase: str) -> str:
-    parts = [re.escape(part) for part in re.split(r"[\s-]+", phrase.lower()) if part]
-    body = r"[\s-]+".join(parts)
-    return rf"(?<![a-z0-9]){body}(?![a-z0-9])"
-
-
-def _phrase_count(lower: str, phrase: str) -> int:
-    return len(re.findall(_phrase_pattern(phrase), lower))
 
 
 def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
@@ -86,8 +88,8 @@ def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
 
     lower = text.lower()
     capitalized = len(re.findall(r"\b[A-Z][a-z]+\b", text))
-    geo_hits = sum(1 for g in GEOGRAPHY_TERMS if g in lower)
-    segment_hits = sum(1 for s in SEGMENT_TERMS if s in lower)
+    geo_hits = sum(1 for g in GEOGRAPHY_TERMS if phrase_matches(lower, g))
+    segment_hits = sum(1 for s in SEGMENT_TERMS if phrase_matches(lower, s))
     company_specificity = min(
         100.0,
         ((capitalized + numeric_tokens + geo_hits + segment_hits) / word_count * 100)
@@ -95,8 +97,8 @@ def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
         else 0.0,
     )
 
-    boilerplate_hits = sum(_phrase_count(lower, p) for p in BOILERPLATE_PHRASES)
-    boilerplate_ratio = min(1.0, boilerplate_hits / max(1, sentence_count))
+    bp_hits = boilerplate_hits(text, BOILERPLATE_PHRASES)
+    boilerplate_ratio = min(1.0, bp_hits / max(1, sentence_count))
 
     return TextMetricResult(
         word_count=word_count,
@@ -131,11 +133,6 @@ def compute_metric_families(inp: SectionTextInput) -> list[dict[str, float | str
     ]
 
 
-def _phrase_matches(lower: str, phrase: str) -> bool:
-    """Word-boundary phrase match with whitespace/hyphen separator tolerance."""
-    return bool(re.search(_phrase_pattern(phrase), lower))
-
-
 def detect_section_flags(text: str, section_name: str) -> dict[str, bool]:
     """Return all v1 boolean flags for a section (False when out of scope)."""
     lower = (text or "").lower()
@@ -145,7 +142,7 @@ def detect_section_flags(text: str, section_name: str) -> dict[str, bool]:
         if section_name not in scope:
             flags[flag_name] = False
             continue
-        flags[flag_name] = any(_phrase_matches(lower, phrase) for phrase in phrases)
+        flags[flag_name] = any(phrase_matches(lower, phrase) for phrase in phrases)
     return flags
 
 
@@ -158,7 +155,7 @@ def compute_density_metrics(text: str, section_name: str) -> dict[str, float]:
     lower = (text or "").lower()
     densities: dict[str, float] = {}
     for name, terms in MDNA_DENSITY_TERMS.items():
-        hits = sum(_phrase_count(lower, term) for term in terms)
+        hits = sum(phrase_count(lower, term) for term in terms)
         raw = hits / word_count * 1000
         densities[name] = round(min(100.0, raw), 4)
     return densities

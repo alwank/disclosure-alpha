@@ -21,10 +21,63 @@ TERM_PACK_METADATA = {
         "consumer": ["litigious_word_ratio", "legal_regulatory_risk_score"],
         "license": "repo_safe_manual_curation",
     },
+    "constraining": {
+        "source": "built_in_finance_curated",
+        "match_type": "token",
+        "consumer": ["constraining_word_ratio", "liquidity_stress_score"],
+        "license": "repo_safe_manual_curation",
+    },
+    "modal": {
+        "source": "built_in_finance_curated",
+        "match_type": "token",
+        "consumer": ["modal_word_ratio", "mdna_uncertainty_score"],
+        "license": "repo_safe_manual_curation",
+    },
+    "boilerplate": {
+        "source": "built_in_finance_curated",
+        "match_type": "phrase",
+        "consumer": ["boilerplate_phrase_ratio", "boilerplate_risk_score"],
+        "license": "repo_safe_manual_curation",
+    },
+    "topics": {
+        "source": "built_in_finance_curated",
+        "match_type": "phrase",
+        "consumer": ["diff_engine.new_topics", "diff_engine.intensified_topics"],
+        "license": "repo_safe_manual_curation",
+    },
+    "severity": {
+        "source": "built_in_finance_curated",
+        "match_type": "token",
+        "consumer": ["diff_engine.topic_intensity"],
+        "license": "repo_safe_manual_curation",
+    },
     "flags": {
         "source": "sec_pcaob_fasb_phrase_curated",
         "match_type": "phrase",
         "consumer": ["section_flags", "component_flag_boosts"],
+        "license": "repo_safe_manual_curation",
+    },
+    "mdna_density": {
+        "source": "built_in_finance_curated",
+        "match_type": "phrase",
+        "consumer": [
+            "uncertainty_term_density",
+            "demand_softness_density",
+            "margin_pressure_density",
+            "liquidity_constraint_density",
+        ],
+        "license": "repo_safe_manual_curation",
+    },
+    "geography": {
+        "source": "built_in_finance_curated",
+        "match_type": "phrase",
+        "consumer": ["company_specificity_score"],
+        "license": "repo_safe_manual_curation",
+    },
+    "segment": {
+        "source": "built_in_finance_curated",
+        "match_type": "phrase",
+        "consumer": ["company_specificity_score"],
         "license": "repo_safe_manual_curation",
     },
 }
@@ -218,7 +271,7 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
         "fx",
     ],
     "commodity": ["commodity", "commodities", "raw material", "raw material costs"],
-    "competition": ["competitive", "competition", "competitor"],
+    "competition": ["competition", "competitor"],
     "product/platform": [
         "product defect",
         "product liability",
@@ -229,6 +282,7 @@ TOPIC_KEYWORDS: dict[str, list[str]] = {
     "operational": [
         "operational disruption",
         "manufacturing disruption",
+        "manufacturing disruptions",
         "production delay",
         "facility closure",
     ],
@@ -348,6 +402,7 @@ FLAG_PATTERNS: dict[str, list[str]] = {
         "material weakness",
         "material weaknesses",
         "material weakness in internal control over financial reporting",
+        "material weaknesses in internal control over financial reporting",
     ],
     "significant_deficiency_flag": ["significant deficiency", "significant deficiencies"],
     "ineffective_controls_flag": [
@@ -397,6 +452,7 @@ FLAG_PATTERNS: dict[str, list[str]] = {
         "ability to continue as a going concern",
         "unable to meet obligations as they become due",
         "substantial doubt has not been alleviated",
+        "plans are intended to mitigate",
     ],
     "covenant_breach_flag": [
         "covenant breach",
@@ -425,6 +481,7 @@ FLAG_PATTERNS: dict[str, list[str]] = {
         "no longer providing guidance",
         "does not expect to provide guidance",
         "unable to provide guidance",
+        "no longer expects",
     ],
     "cybersecurity_incident_flag": [
         "material cybersecurity incident",
@@ -441,6 +498,8 @@ FLAG_PATTERNS: dict[str, list[str]] = {
         "business email compromise",
         "personal information was accessed",
         "reasonably likely material impact",
+        "incident response",
+        "systems outage",
     ],
 }
 

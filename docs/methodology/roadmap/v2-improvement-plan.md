@@ -44,7 +44,7 @@ persist_deterministic_matrix(run_id, det)  # no LLM required
 
 **Problem:** Consumers cannot see why `liquidity_stress_score = 58`.
 
-**Target:** `deterministic_provenance_json` on `score_outputs` / matrix with per-component input breakdown (see [05_aggregation_spec.md](./05_aggregation_spec.md)).
+**Target:** `deterministic_provenance_json` on `score_outputs` / matrix with per-component input breakdown (see [aggregation spec](../aggregation.md)).
 
 **Acceptance:** API `view=deterministic` includes provenance when `include_provenance=true`.
 
@@ -182,7 +182,7 @@ When implementing v2:
 - [ ] Alembic migration if new JSON columns (provenance)
 - [ ] Backfill: `ingest_universe.py --phase deterministic --resume`
 - [ ] Re-aggregate without LLM
-- [ ] Run validation protocol ([07_validation_protocol.md](./07_validation_protocol.md))
+- [ ] Run validation harness (`data/validation/README.md`)
 - [ ] Update API schema docs
 
 ---

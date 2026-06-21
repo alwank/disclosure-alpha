@@ -1,0 +1,266 @@
+{
+  "sections": [
+    {
+      "section_name": "item_1a_risk_factors",
+      "raw_text": "Item 1A. Risk Factors\n\nWe may face litigation and regulatory investigation. Resu\u2026",
+      "cleaned_text": "Item 1A. Risk Factors We may face litigation and regulatory investigation. Resul\u2026",
+      "text_hash": "cc63a67d70c1daa7ec432d68ca2343f0e98c9ae946bbad9ee991914f09b87eab",
+      "word_count": 31,
+      "sentence_count": 5,
+      "extraction_confidence": 0.35,
+      "extraction_method": "clean_html_last_resort",
+      "parser_version": "section_extractor_v1",
+      "start_offset": 0,
+      "end_offset": 218,
+      "warnings": [
+        "short_section",
+        "last_resort_extraction",
+        "open_ended_boundary",
+        "item1a_resliced",
+        "extraction_suspect"
+      ]
+    },
+    {
+      "section_name": "item_7_mdna",
+      "raw_text": "Item 7. Management's Discussion and AnalysisRevenue may decline amid margin pres\u2026",
+      "cleaned_text": "Item 7. Management's Discussion and AnalysisRevenue may decline amid margin pres\u2026",
+      "text_hash": "e1f268d96c7c4dac1e1aebb650a412b15baed1f769c5ec03bd03a6dc87bf5789",
+      "word_count": 15,
+      "sentence_count": 2,
+      "extraction_confidence": 0.35,
+      "extraction_method": "sec_parser_sequence_v1",
+      "parser_version": "section_extractor_v1",
+      "start_offset": 103,
+      "end_offset": 214,
+      "warnings": [
+        "early_candidate",
+        "short_section",
+        "open_ended_boundary"
+      ]
+    }
+  ],
+  "metrics": {
+    "section_metrics": {
+      "item_1a_risk_factors": {
+        "negative_word_ratio": 0.034483,
+        "uncertainty_word_ratio": 0.137931,
+        "litigious_word_ratio": 0.103448,
+        "modal_word_ratio": 0.103448,
+        "constraining_word_ratio": 0.034483,
+        "boilerplate_phrase_ratio": 0.0,
+        "numeric_specificity_score": 34.4828,
+        "company_specificity_score": 37.931,
+        "readability_score": 59.8759
+      },
+      "item_7_mdna": {
+        "negative_word_ratio": 0.071429,
+        "uncertainty_word_ratio": 0.071429,
+        "litigious_word_ratio": 0.0,
+        "modal_word_ratio": 0.071429,
+        "constraining_word_ratio": 0.071429,
+        "boilerplate_phrase_ratio": 0.0,
+        "numeric_specificity_score": 71.4286,
+        "company_specificity_score": 28.5714,
+        "readability_score": 64.0
+      }
+    },
+    "section_diffs": {},
+    "section_flags": {
+      "item_1a_risk_factors": {
+        "material_weakness_flag": false,
+        "significant_deficiency_flag": false,
+        "ineffective_controls_flag": false,
+        "restatement_flag": false,
+        "non_reliance_flag": false,
+        "auditor_change_flag": false,
+        "investigation_flag": true,
+        "settlement_flag": false,
+        "material_legal_proceeding_flag": false,
+        "going_concern_flag": false,
+        "covenant_breach_flag": false,
+        "guidance_withdrawal_flag": false,
+        "cybersecurity_incident_flag": false
+      },
+      "item_7_mdna": {
+        "material_weakness_flag": false,
+        "significant_deficiency_flag": false,
+        "ineffective_controls_flag": false,
+        "restatement_flag": false,
+        "non_reliance_flag": false,
+        "auditor_change_flag": false,
+        "investigation_flag": false,
+        "settlement_flag": false,
+        "material_legal_proceeding_flag": false,
+        "going_concern_flag": false,
+        "covenant_breach_flag": false,
+        "guidance_withdrawal_flag": false,
+        "cybersecurity_incident_flag": false
+      }
+    },
+    "section_densities": {
+      "item_1a_risk_factors": {
+        "uncertainty_term_density": 0.0,
+        "demand_softness_density": 0.0,
+        "margin_pressure_density": 0.0,
+        "liquidity_constraint_density": 0.0
+      },
+      "item_7_mdna": {
+        "uncertainty_term_density": 71.4286,
+        "demand_softness_density": 0.0,
+        "margin_pressure_density": 71.4286,
+        "liquidity_constraint_density": 0.0
+      }
+    },
+    "language_deltas": {},
+    "extraction_confs": [
+      0.35,
+      0.35
+    ],
+    "diff_confs": [
+      0.2,
+      0.2
+    ]
+  },
+  "scores": {
+    "overall_disclosure_risk_score": 17.837056062091502,
+    "score_coverage_ratio": 0.7778,
+    "confidence_score": 0.4426,
+    "missing_components": [
+      "disclosure_change_score",
+      "event_severity_score"
+    ],
+    "components": {
+      "risk_factor_intensity_score": 8.620700000000001,
+      "disclosure_change_score": null,
+      "mdna_uncertainty_score": 26.726220833333333,
+      "legal_regulatory_risk_score": 25.3448,
+      "liquidity_stress_score": 4.201705882352941,
+      "boilerplate_risk_score": 42.528733333333335,
+      "business_model_fragility_score": null,
+      "internal_controls_risk_score": 3.4483,
+      "cybersecurity_risk_score": null,
+      "event_severity_score": null,
+      "specificity_quality_score": 36.2069,
+      "tone_negativity_score": 5.2956
+    },
+    "aggregates": {
+      "hidden_risk_score": null,
+      "disclosure_quality_score": 57.471266666666665,
+      "disclosure_deterioration_score": null
+    },
+    "provenance": [
+      {
+        "score_name": "risk_factor_intensity_score",
+        "value": 8.620700000000001,
+        "inputs": {
+          "negative_word_ratio": 0.034483,
+          "uncertainty_word_ratio": 0.137931,
+          "diff_1a": null
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "disclosure_change_score",
+        "value": null,
+        "inputs": {
+          "diff_1a": null,
+          "diff_mdna": null
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "mdna_uncertainty_score",
+        "value": 26.726220833333333,
+        "inputs": {
+          "uncertainty_word_ratio": 0.071429,
+          "modal_word_ratio": 0.071429,
+          "readability_score": 64.0,
+          "uncertainty_term_density": 71.4286,
+          "demand_softness_density": 0.0,
+          "margin_pressure_density": 71.4286,
+          "guidance_withdrawal_flag": false,
+          "flag_boost": 0.0
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "legal_regulatory_risk_score",
+        "value": 25.3448,
+        "inputs": {
+          "litigious_word_ratio": 0.103448,
+          "legal_language_delta": null,
+          "investigation_flag": true,
+          "material_legal_proceeding_flag": false,
+          "flag_boost": 15.0
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "liquidity_stress_score",
+        "value": 4.201705882352941,
+        "inputs": {
+          "constraining_word_ratio": 0.071429,
+          "liquidity_constraint_density": 0.0,
+          "going_concern_flag": false,
+          "covenant_breach_flag": false,
+          "flag_boost": 0.0
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "boilerplate_risk_score",
+        "value": 42.528733333333335,
+        "inputs": {
+          "boilerplate_phrase_ratio": 0.0,
+          "numeric_specificity_score": 34.4828,
+          "company_specificity_score": 37.931
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "internal_controls_risk_score",
+        "value": 3.4483,
+        "inputs": {
+          "diff_controls": null,
+          "constraining_word_ratio": 0.034483,
+          "material_weakness_flag": false,
+          "restatement_flag": false,
+          "ineffective_controls_flag": false,
+          "flag_boost": 0.0
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "event_severity_score",
+        "value": null,
+        "inputs": {
+          "diff_1a": null
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "specificity_quality_score",
+        "value": 36.2069,
+        "inputs": {
+          "numeric_specificity_score": 34.4828,
+          "company_specificity_score": 37.931
+        },
+        "source": "deterministic"
+      },
+      {
+        "score_name": "tone_negativity_score",
+        "value": 5.2956,
+        "inputs": {
+          "negative_word_ratio_1a": 0.034483,
+          "uncertainty_word_ratio_mdna": 0.071429
+        },
+        "source": "deterministic"
+      }
+    ]
+  },
+  "versions": {
+    "parser_version": "section_extractor_v1",
+    "metrics_engine_version": "text_metrics_v2",
+    "scoring_model_version": "deterministic_scoring_v1"
+  }
+}

@@ -9,3 +9,4 @@ dist/
 data/cache/
 data/validation/corpus/*.jsonl
 data/validation/outcomes/
+docs/_build/

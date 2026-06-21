@@ -49,7 +49,7 @@ Keep the current constants for backward compatibility, but introduce metadata be
 large expansions:
 
 ```python
-DICTIONARY_VERSION = "built_in_dictionaries_v1"
+DICTIONARY_VERSION = "built_in_dictionaries_v2"
 
 TERM_PACK_METADATA = {
     "negative": {
@@ -732,6 +732,8 @@ to work.
    - deterministic replay,
    - false-positive review on at least 50 snippets,
    - SP100 distribution shift report before and after dictionary expansion.
+
+See {doc}`../../appendix/changelog` for the v2 ship record (`built_in_dictionaries_v2`, `text_metrics_v2`).
 
 ## Versioning Rules
 

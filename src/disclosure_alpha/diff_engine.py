@@ -6,7 +6,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from disclosure_alpha.dictionaries import SEVERITY_WORDS, TOPIC_KEYWORDS
 from disclosure_alpha.embedding_service import semantic_similarity
-from disclosure_alpha.text_metrics import SectionTextInput, TextMetricResult, compute_text_metrics
+from disclosure_alpha.text_matching import topic_intensity, topic_phrase_matches
+from disclosure_alpha.text_metrics import SectionTextInput, compute_text_metrics
 
 
 @dataclass
@@ -34,20 +35,15 @@ def lexical_similarity(text_a: str, text_b: str) -> float:
 
 
 def extract_topics(text: str) -> set[str]:
-    lower = text.lower()
     found: set[str] = set()
     for topic, keywords in TOPIC_KEYWORDS.items():
-        if any(kw in lower for kw in keywords):
+        if topic_phrase_matches(text, keywords):
             found.add(topic)
     return found
 
 
 def _topic_intensity(text: str, topic: str) -> float:
-    keywords = TOPIC_KEYWORDS.get(topic, [])
-    lower = text.lower()
-    hits = sum(lower.count(kw) for kw in keywords)
-    severity_hits = sum(1 for w in SEVERITY_WORDS if w in lower)
-    return hits + severity_hits * 0.5
+    return topic_intensity(text, topic, TOPIC_KEYWORDS, SEVERITY_WORDS)
 
 
 def compute_section_diff(

@@ -172,7 +172,7 @@ Re-run `scripts/audit_validation_corpus.py` after corpus changes to refresh figu
 Diagnose: `python scripts/diagnose_item1a.py`  
 Retry: `--retry-failures` on the EDGAR build script (optional; not required for current MVP claims).
 
-See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html).
+See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html).
 
 ## L3 outcomes (OpenBB + yfinance)
 
@@ -242,4 +242,4 @@ L3 validation **closed for MVP**. External vol claim uses FY2025 corpus only (Q5
 | Earnings vs change score | skipped (no prior) | skipped n=14 | **fail** Q5/Q1 0.54 n=490 | **do not claim** |
 | ICW / GCO flags | not run | not run | not run | **deferred** |
 
-See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html) for supported outcome claims.
+See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html) for supported outcome claims.

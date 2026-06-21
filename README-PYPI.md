@@ -7,11 +7,11 @@
 [![PyPI](https://img.shields.io/pypi/v/disclosure-alpha.svg)](https://pypi.org/project/disclosure-alpha/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-green.svg)](LICENSE)
-[![Documentation](https://readthedocs.org/projects/disclosure-alpha/badge/?version=stable)](https://disclosure-alpha.readthedocs.io/en/stable/)
+[![Documentation](https://readthedocs.org/projects/disclosure-alpha/badge/?version=latest)](https://disclosure-alpha.readthedocs.io/en/latest/)
 
 Open-source, deterministic SEC filing analytics for **10-K, 10-Q, and 8-K** HTML. Reproducible JSON scores from text metrics, boolean risk flags, and section diffs. CLI, Python SDK, HTTP API, and MCP.
 
-**Not investment advice.** See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html).
+**Not investment advice.** See [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html).
 
 ## Quick start
 
@@ -40,12 +40,12 @@ print(score_filing_ticker("AAPL", 2025, form_type="10-K").scores.overall_disclos
 
 ## Documentation
 
-Full guides, methodology, and validation evidence: **https://disclosure-alpha.readthedocs.io/en/stable/**
+Full guides, methodology, and validation evidence: **https://disclosure-alpha.readthedocs.io/en/latest/**
 
-- [Installation](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/installation.html)
-- [Understanding scores](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/understanding-scores.html)
-- [HTTP API](https://disclosure-alpha.readthedocs.io/en/stable/guides/http/index.html)
-- [MCP](https://disclosure-alpha.readthedocs.io/en/stable/guides/mcp/index.html)
+- [Installation](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/installation.html)
+- [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html)
+- [HTTP API](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html)
+- [MCP](https://disclosure-alpha.readthedocs.io/en/latest/guides/mcp/index.html)
 
 ## Links
 

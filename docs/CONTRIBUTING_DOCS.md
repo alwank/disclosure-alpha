@@ -1,6 +1,6 @@
 # Contributing to Documentation
 
-Disclosure Alpha docs are built with **Sphinx + MyST** and published on [Read the Docs](https://disclosure-alpha.readthedocs.io/en/stable/).
+Disclosure Alpha docs are built with **Sphinx + MyST** and published on [Read the Docs](https://disclosure-alpha.readthedocs.io/en/latest/).
 
 ## Parallel ownership
 

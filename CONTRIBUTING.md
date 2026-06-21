@@ -12,7 +12,7 @@ cd disclosure-alpha
 pip install -e ".[api,mcp,dev]"
 ```
 
-End users install from PyPI instead: `pip install "disclosure-alpha[api,mcp]"`. See [Installation](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/installation.html).
+End users install from PyPI instead: `pip install "disclosure-alpha[api,mcp]"`. See [Installation](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/installation.html).
 
 ## Run tests
 
@@ -39,7 +39,7 @@ Documentation-only edits: see [docs/CONTRIBUTING_DOCS.md](docs/CONTRIBUTING_DOCS
 
 ## Claim boundaries
 
-When writing docs or examples, match [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html):
+When writing docs or examples, match [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html):
 
 - **Supported:** deterministic Item 1A on ~425 S&P 500 FY2025 10-Ks; partial L2 construct validity; partial L3 volatility association
 - **Do not claim:** full-index validation, earnings-surprise prediction, buy/sell signals, or composite LLM scoring in the open-source API

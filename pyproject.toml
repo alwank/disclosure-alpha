@@ -27,8 +27,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://disclosure-alpha.readthedocs.io/en/stable/"
-Documentation = "https://disclosure-alpha.readthedocs.io/en/stable/"
+Homepage = "https://disclosure-alpha.readthedocs.io/en/latest/"
+Documentation = "https://disclosure-alpha.readthedocs.io/en/latest/"
 Repository = "https://github.com/alwank/disclosure-alpha"
 Issues = "https://github.com/alwank/disclosure-alpha/issues"
 Changelog = "https://github.com/alwank/disclosure-alpha/blob/main/docs/appendix/changelog.md"

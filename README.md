@@ -8,7 +8,7 @@
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://pypi.org/project/disclosure-alpha/"><img src="https://img.shields.io/pypi/v/disclosure-alpha.svg" alt="PyPI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache--2.0-green.svg" alt="License: Apache-2.0"></a>
-  <a href="https://readthedocs.org/projects/disclosure-alpha/badge/?version=stable"><img src="https://readthedocs.org/projects/disclosure-alpha/badge/?version=stable" alt="Documentation"></a>
+  <a href="https://readthedocs.org/projects/disclosure-alpha/badge/?version=latest"><img src="https://readthedocs.org/projects/disclosure-alpha/badge/?version=latest" alt="Documentation"></a>
   <a href="https://github.com/alwank/disclosure-alpha/actions/workflows/ci.yml"><img src="https://github.com/alwank/disclosure-alpha/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/alwank/disclosure-alpha"><img src="https://img.shields.io/github/stars/alwank/disclosure-alpha?style=social" alt="GitHub"></a>
 </p>
@@ -37,7 +37,7 @@ Requires **Python 3.11+**.
 pip install "disclosure-alpha"
 ```
 
-For HTTP API and MCP: `pip install "disclosure-alpha[api,mcp]"`. Full options: [Installation](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/installation.html).
+For HTTP API and MCP: `pip install "disclosure-alpha[api,mcp]"`. Full options: [Installation](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/installation.html).
 
 **2. Set your SEC User-Agent** (required for `--ticker` / EDGAR only; skip for local `--html` scoring)
 
@@ -45,7 +45,7 @@ For HTTP API and MCP: `pip install "disclosure-alpha[api,mcp]"`. Full options: [
 export SEC_USER_AGENT="YourName your@email.com"
 ```
 
-See [SEC EDGAR setup](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/sec-edgar-setup.html).
+See [SEC EDGAR setup](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/sec-edgar-setup.html).
 
 **3. Score a filing**
 
@@ -70,11 +70,11 @@ Open-source, deterministic SEC filing analytics for **10-K, 10-Q, and 8-K** HTML
 - Not a substitute for reading the filing
 - Not composite LLM scoring (open-source HTTP API is deterministic only; `view=composite` returns 402)
 
-Full scope and limits: [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html).
+Full scope and limits: [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html).
 
 ## Integration surfaces
 
-Five entry points, one deterministic pipeline. Not sure which to pick? See [Choose your surface](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/choose-your-surface.html).
+Five entry points, one deterministic pipeline. Not sure which to pick? See [Choose your surface](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/choose-your-surface.html).
 
 | You are… | Entry | Install extra |
 |----------|-------|---------------|
@@ -91,11 +91,11 @@ disclosure-alpha-api              # HTTP on :8000
 disclosure-alpha-mcp-analyst      # MCP for Cursor / Claude Desktop
 ```
 
-Guides, [Postman collections](https://github.com/alwank/disclosure-alpha/tree/main/docs/postman), and MCP reference: **[Guides](https://disclosure-alpha.readthedocs.io/en/stable/guides/index.html)**.
+Guides, [Postman collections](https://github.com/alwank/disclosure-alpha/tree/main/docs/postman), and MCP reference: **[Guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/index.html)**.
 
 ## Capabilities
 
-Deterministic scores (nine weighted components, 0–100), section extraction, year-over-year change detection. Score scale and component guide: [Understanding scores](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/understanding-scores.html). Section names: [section taxonomy](https://disclosure-alpha.readthedocs.io/en/stable/reference/section-taxonomy.html).
+Deterministic scores (nine weighted components, 0–100), section extraction, year-over-year change detection. Score scale and component guide: [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html). Section names: [section taxonomy](https://disclosure-alpha.readthedocs.io/en/latest/reference/section-taxonomy.html).
 
 | Task | How |
 |------|-----|
@@ -116,7 +116,7 @@ curl -s -X POST "http://localhost:8000/v1/panel/disclosure-matrix" \
 disclosure-alpha score --html current.html --form 10-K --prior-html prior.html
 ```
 
-Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/stable/guides/workflows/index.html). Pipeline overview: [Methodology](https://disclosure-alpha.readthedocs.io/en/stable/methodology/overview.html).
+Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html). Pipeline overview: [Methodology](https://disclosure-alpha.readthedocs.io/en/latest/methodology/overview.html).
 
 ## Example output
 
@@ -141,7 +141,7 @@ Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/stabl
 }
 ```
 
-More examples: [`docs/examples/`](docs/examples/) and [Workflows](https://disclosure-alpha.readthedocs.io/en/stable/guides/workflows/index.html).
+More examples: [`docs/examples/`](docs/examples/) and [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html).
 
 ## Research-backed
 
@@ -152,7 +152,7 @@ Validated on **~425 S&P 500 FY2025 10-Ks** (~84% of the index):
 | Language quality | Boilerplate and specificity scores correlate with independent text measures (Spearman ρ ~0.68 / ~0.84) |
 | Real-world signal | Higher disclosure risk scores associate with higher 90-day post-filing volatility in the same cohort |
 
-Partial L3: volatility association only — **earnings-surprise outcome validation not supported**. Metrics draw on finance text-analysis literature. See [Research foundation](https://disclosure-alpha.readthedocs.io/en/stable/methodology/research-foundation.html) and **[Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/stable/validation/evidence-and-limitations.html)**.
+Partial L3: volatility association only — **earnings-surprise outcome validation not supported**. Metrics draw on finance text-analysis literature. See [Research foundation](https://disclosure-alpha.readthedocs.io/en/latest/methodology/research-foundation.html) and **[Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html)**.
 
 ## MCP in Cursor
 
@@ -173,18 +173,18 @@ Requires `pip install "disclosure-alpha[mcp]"`. Add to your MCP settings (Analys
 
 If Cursor cannot find the command, use the full venv path: `"command": "/path/to/.venv/bin/disclosure-alpha-mcp-analyst"`.
 
-Full MCP guide: [MCP](https://disclosure-alpha.readthedocs.io/en/stable/guides/mcp/index.html) (Builder bundle for raw HTML pipelines).
+Full MCP guide: [MCP](https://disclosure-alpha.readthedocs.io/en/latest/guides/mcp/index.html) (Builder bundle for raw HTML pipelines).
 
 ## Documentation
 
 | I want to… | Start here |
 |------------|------------|
-| Copy-paste recipes | [Workflows](https://disclosure-alpha.readthedocs.io/en/stable/guides/workflows/index.html) |
-| Interpret scores | [Understanding scores](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/understanding-scores.html) |
-| Score from terminal | [Quickstart CLI](https://disclosure-alpha.readthedocs.io/en/stable/getting-started/quickstart-cli.html) |
-| Build a screener | [HTTP guides](https://disclosure-alpha.readthedocs.io/en/stable/guides/http/index.html) |
-| Wire an agent | [MCP guide](https://disclosure-alpha.readthedocs.io/en/stable/guides/mcp/index.html) |
-| See methodology | [Methodology overview](https://disclosure-alpha.readthedocs.io/en/stable/methodology/overview.html) |
+| Copy-paste recipes | [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html) |
+| Interpret scores | [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html) |
+| Score from terminal | [Quickstart CLI](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-cli.html) |
+| Build a screener | [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html) |
+| Wire an agent | [MCP guide](https://disclosure-alpha.readthedocs.io/en/latest/guides/mcp/index.html) |
+| See methodology | [Methodology overview](https://disclosure-alpha.readthedocs.io/en/latest/methodology/overview.html) |
 
 ## License
 

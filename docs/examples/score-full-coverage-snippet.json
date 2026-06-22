@@ -13,10 +13,15 @@
     "internal_controls_risk_score": 3.4483,
     "event_severity_score": 45.19,
     "specificity_quality_score": 36.2069,
-    "tone_negativity_score": 5.2956
+    "tone_negativity_score": 5.2956,
+    "cybersecurity_incident_risk_score": null,
+    "event_materiality_score": null
   },
   "aggregates": {
-    "disclosure_quality_score": 57.471267,
-    "disclosure_deterioration_score": 41.9008
+    "disclosure_quality_score": 36.2069,
+    "disclosure_deterioration_score": 41.9008,
+    "static_disclosure_quality_score": 36.2069,
+    "static_disclosure_risk_score": 17.696952,
+    "disclosure_change_risk_score": 43.5454
   }
 }

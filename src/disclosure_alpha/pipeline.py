@@ -175,8 +175,9 @@ def compute_section_metrics(
         )
         if diff.disclosure_change_score is not None:
             section_diffs[section.section_name] = float(diff.disclosure_change_score)
-        if diff.disclosure_change_score_v2 is not None:
-            section_diffs_v2[section.section_name] = float(diff.disclosure_change_score_v2)
+        change_v2 = getattr(diff, "disclosure_change_score_v2", None)
+        if change_v2 is not None:
+            section_diffs_v2[section.section_name] = float(change_v2)
         if diff.language_deltas:
             language_deltas[section.section_name] = dict(diff.language_deltas)
         if diff.confidence_score is not None:

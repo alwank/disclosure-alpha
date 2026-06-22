@@ -40,6 +40,7 @@ exclude_patterns = [
     "README.md",
     "readthedocs-public-docs-improvement-plan.md",
     "codebase-audit-report.md",  # repo-only audit; not public RTD nav
+    "analytics-scoring-layer-improvement-plan.md",  # internal agent brief; repo-only
     # Contributor / repo-only (not public RTD pages)
     "CONTRIBUTING_DOCS.md",
     "developer/**",

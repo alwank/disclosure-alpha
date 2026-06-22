@@ -114,6 +114,52 @@ python scripts/build_matrix_validation_corpus.py --html-dir ./my_html --form 10-
 python -m pytest tests/test_matrix_validation.py -q
 ```
 
+### EDGAR full-matrix corpus (SP500)
+
+Build multi-section rows per ticker for matrix gates at production scale:
+
+```bash
+export SEC_USER_AGENT="YourName your@email.com"
+
+python scripts/build_matrix_validation_corpus_from_edgar.py \
+  --fiscal-year 2025 --universe data/universe/sp500.csv --resume
+```
+
+Smoke test (no network when EDGAR cache is warm; use `--limit` for a tiny run):
+
+```bash
+python scripts/build_matrix_validation_corpus_from_edgar.py --fiscal-year 2025 --limit 5
+```
+
+Default output (gitignored): `data/validation/corpus/sp500_matrix_fy2025.jsonl`  
+Manifest: `data/validation/corpus/sp500_matrix_fy2025.manifest.json`
+
+Prior-year sections are fetched by default (`prior_sections`) for change-score coverage.
+Pass `--no-prior` to skip the extra EDGAR fetch.
+
+Matrix JSONL row shape (one row per filing, all `MATRIX_SECTIONS_10K` sections extracted):
+
+```json
+{
+  "ticker": "AAPL",
+  "fiscal_year": 2025,
+  "form_type": "10-K",
+  "sections": {"item_1a_risk_factors": "...", "item_7_mdna": "..."},
+  "prior_sections": {"item_1a_risk_factors": "..."},
+  "quality": {"item_1a_risk_factors": {"word_count": 8420, "extraction_confidence": 0.92}},
+  "accession_number": "0000320193-25-000079",
+  "cik": "0000320193"
+}
+```
+
+Run matrix gates (v2, production thresholds):
+
+```bash
+python scripts/validate_matrix_gates.py \
+  --corpus data/validation/corpus/sp500_matrix_fy2025.jsonl \
+  --scoring-version v2
+```
+
 Fixture: `tests/fixtures/validation/matrix_mini_corpus.jsonl`  
 Modules: `validation/matrix_corpus.py`, `validation/matrix_gates.py`
 

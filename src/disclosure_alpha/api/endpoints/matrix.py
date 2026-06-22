@@ -61,7 +61,10 @@ def disclosure_matrix(
             quarter=q,
             compare_prior=compare_prior,
         )
-        scores = score_deterministic(result.metrics)
+        metrics_for_scope = result.metrics
+        if section_filter:
+            metrics_for_scope = filter_metrics_result(metrics_for_scope, section_filter)
+        scores = score_deterministic(metrics_for_scope)
         scores_payload = shape_matrix_scores(
             scores_dict(scores),
             include_provenance="provenance" in include_set,
@@ -69,10 +72,7 @@ def disclosure_matrix(
         )
         metrics_payload = None
         if "metrics" in include_set:
-            metrics = result.metrics
-            if section_filter:
-                metrics = filter_metrics_result(metrics, section_filter)
-            metrics_payload = asdict(metrics)
+            metrics_payload = asdict(metrics_for_scope)
         return MatrixResponse(
             filing=result.filing,
             metrics=metrics_payload,

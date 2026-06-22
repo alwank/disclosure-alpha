@@ -39,6 +39,7 @@ exclude_patterns = [
     "postman",
     "README.md",
     "readthedocs-public-docs-improvement-plan.md",
+    "codebase-audit-report.md",  # repo-only audit; not public RTD nav
     # Contributor / repo-only (not public RTD pages)
     "CONTRIBUTING_DOCS.md",
     "developer/**",

@@ -26,6 +26,21 @@ DEAD_AGGREGATE_KEYS = frozenset({"hidden_risk_score"})
 DEAD_TOP_LEVEL = frozenset({"top_hidden_risks", "evidence"})
 
 
+def _round_floats(obj: Any, *, ndigits: int = 6) -> Any:
+    """Stabilize fixture JSON across Python/sklearn minor versions."""
+    if isinstance(obj, float):
+        return round(obj, ndigits)
+    if isinstance(obj, dict):
+        return {k: _round_floats(v, ndigits=ndigits) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_round_floats(item, ndigits=ndigits) for item in obj]
+    return obj
+
+
+def _dump_json(obj: Any) -> str:
+    return json.dumps(_round_floats(obj), indent=2) + "\n"
+
+
 def _scores_block(result) -> dict[str, Any]:
     scores = result.scores
     return {
@@ -84,13 +99,10 @@ def generate() -> dict[str, str]:
     full_coverage = with_prior
 
     outputs = {
-        "score-minimal-10k.json": json.dumps(minimal.to_dict(), indent=2) + "\n",
-        "score-with-prior-snippet.json": json.dumps(_scores_block(with_prior), indent=2) + "\n",
-        "score-full-coverage-snippet.json": json.dumps(
-            _scores_block(full_coverage), indent=2
-        )
-        + "\n",
-        "panel-response-snippet.json": json.dumps(_panel_snippet(), indent=2) + "\n",
+        "score-minimal-10k.json": _dump_json(minimal.to_dict()),
+        "score-with-prior-snippet.json": _dump_json(_scores_block(with_prior)),
+        "score-full-coverage-snippet.json": _dump_json(_scores_block(full_coverage)),
+        "panel-response-snippet.json": _dump_json(_panel_snippet()),
     }
     for name, text in outputs.items():
         _assert_no_dead_keys(json.loads(text))

@@ -9,12 +9,19 @@ from disclosure_alpha.api.helpers import (
     parse_compare_param,
     parse_fields_param,
     parse_include_param,
+    parse_scoring_model_version,
     parse_sections_param,
     shape_matrix_scores,
 )
 from disclosure_alpha.api.schemas import ErrorResponse, MatrixResponse
 from disclosure_alpha.api.shapes import apply_tier_preset
-from disclosure_alpha.pipeline import filter_metrics_result, metrics_filing_ticker, score_deterministic
+from disclosure_alpha.pipeline import (
+    filter_metrics_result,
+    metrics_filing_ticker,
+    score_deterministic,
+    score_deterministic_v2,
+)
+from disclosure_alpha.version import SCORING_MODEL_VERSION, SCORING_MODEL_VERSION_V2
 
 router = APIRouter(tags=["matrix"])
 
@@ -41,10 +48,15 @@ def disclosure_matrix(
         None,
         description="Response tier preset (lite|standard|analyst); overrides include/fields when set",
     ),
+    scoring_model_version: str = Query(
+        SCORING_MODEL_VERSION,
+        description="Scoring model: deterministic_scoring_v1 (default) or deterministic_scoring_v2",
+    ),
 ) -> MatrixResponse:
     base, q = parse_form_quarter(form_type, quarter)
     try:
         compare_prior = parse_compare_param(compare)
+        scoring_version = parse_scoring_model_version(scoring_model_version)
         section_filter = parse_sections_param(sections, form_type=base)
         if tier is not None:
             include, fields = apply_tier_preset(tier, include=include, fields=fields)
@@ -64,7 +76,12 @@ def disclosure_matrix(
         metrics_for_scope = result.metrics
         if section_filter:
             metrics_for_scope = filter_metrics_result(metrics_for_scope, section_filter)
-        scores = score_deterministic(metrics_for_scope)
+        score_fn = (
+            score_deterministic_v2
+            if scoring_version == SCORING_MODEL_VERSION_V2
+            else score_deterministic
+        )
+        scores = score_fn(metrics_for_scope)
         scores_payload = shape_matrix_scores(
             scores_dict(scores),
             include_provenance="provenance" in include_set,
@@ -73,11 +90,13 @@ def disclosure_matrix(
         metrics_payload = None
         if "metrics" in include_set:
             metrics_payload = asdict(metrics_for_scope)
+        versions = dict(result.versions)
+        versions["scoring_model_version"] = scoring_version
         return MatrixResponse(
             filing=result.filing,
             metrics=metrics_payload,
             scores=scores_payload,
-            versions=result.versions,
+            versions=versions,
         )
 
     return run_edgar(_fetch)

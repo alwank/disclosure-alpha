@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from disclosure_alpha.api.routes import app
 from disclosure_alpha.pipeline import FilingMetricsResult, MetricsResult, score_filing_html
-from disclosure_alpha.version import SCORING_MODEL_VERSION
+from disclosure_alpha.version import SCORING_MODEL_VERSION, SCORING_MODEL_VERSION_V2
 from html_fixtures import minimal_10k_html
 
 pytest.importorskip("fastapi")
@@ -141,5 +141,46 @@ def test_invalid_tier_param():
     resp = client.get(
         "/v1/company/AAPL/disclosure-matrix",
         params={"fiscal_year": 2025, "tier": "enterprise"},
+    )
+    assert resp.status_code == 422
+
+
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+def test_matrix_default_scoring_version_v1(mock_metrics):
+    mock_metrics.return_value = _minimal_metrics_result()
+    resp = client.get(
+        "/v1/company/AAPL/disclosure-matrix",
+        params={"fiscal_year": 2025, "tier": "standard"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["versions"]["scoring_model_version"] == SCORING_MODEL_VERSION
+
+
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+def test_matrix_scoring_model_version_v2(mock_metrics):
+    mock_metrics.return_value = _minimal_metrics_result()
+    resp = client.get(
+        "/v1/company/AAPL/disclosure-matrix",
+        params={
+            "fiscal_year": 2025,
+            "tier": "analyst",
+            "scoring_model_version": "deterministic_scoring_v2",
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["versions"]["scoring_model_version"] == SCORING_MODEL_VERSION_V2
+    assert body["scores"]["aggregates"]["static_disclosure_risk_score"] is not None
+
+
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+def test_matrix_invalid_scoring_model_version(mock_metrics):
+    mock_metrics.return_value = _minimal_metrics_result()
+    resp = client.get(
+        "/v1/company/AAPL/disclosure-matrix",
+        params={
+            "fiscal_year": 2025,
+            "scoring_model_version": "deterministic_scoring_v3",
+        },
     )
     assert resp.status_code == 422

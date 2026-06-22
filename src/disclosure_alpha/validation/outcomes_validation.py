@@ -8,17 +8,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from disclosure_alpha.pipeline import compute_section_metrics, score_deterministic
+from disclosure_alpha.pipeline import compute_section_metrics, score_deterministic, score_deterministic_v2
 from disclosure_alpha.section_extractor import ExtractedSection
 from disclosure_alpha.validation.monotonicity import (
     MonotonicityGateResult,
     evaluate_quintile_monotonicity,
     overall_l3_pass,
 )
+from disclosure_alpha.validation.scoring_version import normalize_scoring_version
 from disclosure_alpha.version import (
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
     SCORING_MODEL_VERSION,
+    SCORING_MODEL_VERSION_V2,
 )
 
 
@@ -27,6 +29,7 @@ class OutcomesValidationConfig:
     min_n: int = 50
     min_per_quintile: int = 5
     min_l3_pass_count: int = 1  # ponytail: 2-of-4 when flag gates exist; 1-of-2 for vol+earnings only
+    scoring_model_version: str = SCORING_MODEL_VERSION
 
 
 @dataclass
@@ -78,7 +81,11 @@ def load_corpus_by_ticker(path: Path) -> dict[str, dict[str, Any]]:
     return out
 
 
-def score_item1a_from_corpus_row(row: dict[str, Any]) -> dict[str, float | None]:
+def score_item1a_from_corpus_row(
+    row: dict[str, Any],
+    *,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
+) -> dict[str, float | None]:
     text = str(row.get("cleaned_text") or "")
     word_count = int(row.get("word_count") or len(text.split()))
     section = ExtractedSection(
@@ -93,8 +100,10 @@ def score_item1a_from_corpus_row(row: dict[str, Any]) -> dict[str, float | None]
         PARSER_VERSION,
         warnings=[],
     )
+    version = normalize_scoring_version(scoring_model_version)
     metrics = compute_section_metrics([section], prior_sections=None)
-    scores = score_deterministic(metrics)
+    score_fn = score_deterministic_v2 if version == SCORING_MODEL_VERSION_V2 else score_deterministic
+    scores = score_fn(metrics)
     return {
         "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
         "disclosure_change_score": scores.components.disclosure_change_score,
@@ -103,7 +112,12 @@ def score_item1a_from_corpus_row(row: dict[str, Any]) -> dict[str, float | None]
     }
 
 
-def score_from_edgar(ticker: str, fiscal_year: int) -> dict[str, float | None]:
+def score_from_edgar(
+    ticker: str,
+    fiscal_year: int,
+    *,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
+) -> dict[str, float | None]:
     from disclosure_alpha.pipeline import score_filing_ticker
 
     result = score_filing_ticker(
@@ -113,6 +127,15 @@ def score_from_edgar(ticker: str, fiscal_year: int) -> dict[str, float | None]:
         use_cache=True,
         compare_prior=True,
     )
+    if normalize_scoring_version(scoring_model_version) == SCORING_MODEL_VERSION_V2:
+        metrics = result.metrics
+        scores = score_deterministic_v2(metrics)
+        return {
+            "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
+            "disclosure_change_score": scores.components.disclosure_change_score,
+            "risk_factor_intensity_score": scores.components.risk_factor_intensity_score,
+            "score_coverage_ratio": scores.score_coverage_ratio,
+        }
     return {
         "overall_disclosure_risk_score": result.scores.overall_disclosure_risk_score,
         "disclosure_change_score": result.scores.components.disclosure_change_score,
@@ -130,6 +153,7 @@ def run_outcomes_validation(
     limit: int | None = None,
 ) -> OutcomesValidationReport:
     cfg = config or OutcomesValidationConfig()
+    scoring_model_version = normalize_scoring_version(cfg.scoring_model_version)
     outcomes = load_jsonl(outcomes_path)
     if limit is not None:
         outcomes = outcomes[:limit]
@@ -156,13 +180,20 @@ def run_outcomes_validation(
         }
         if score_mode == "edgar" and fiscal_year is not None:
             try:
-                score_fields = score_from_edgar(ticker, fiscal_year)
+                score_fields = score_from_edgar(
+                    ticker,
+                    fiscal_year,
+                    scoring_model_version=scoring_model_version,
+                )
             except Exception as exc:
                 out = {**out, "score_error": str(exc)}
             if score_mode == "edgar" and i % 25 == 0:
                 print(f"  score progress: {i}/{total}", flush=True)
         elif ticker in corpus:
-            score_fields = score_item1a_from_corpus_row(corpus[ticker])
+            score_fields = score_item1a_from_corpus_row(
+                corpus[ticker],
+                scoring_model_version=scoring_model_version,
+            )
 
         joined.append({**out, **score_fields})
     if score_mode == "edgar" and total:
@@ -234,7 +265,7 @@ def run_outcomes_validation(
         versions={
             "parser_version": PARSER_VERSION,
             "metrics_engine_version": METRICS_ENGINE_VERSION,
-            "scoring_model_version": SCORING_MODEL_VERSION,
+            "scoring_model_version": scoring_model_version,
         },
         inputs={
             "outcomes_path": str(outcomes_path),

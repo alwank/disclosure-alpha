@@ -24,10 +24,12 @@ def test_matrix_gates_smoke():
         min_extraction_rate=0.3,
         min_median_confidence=0.5,
         min_component_coverage=0.2,
+        scoring_model_version="v1",
     )
     assert report.n_filings == 2
     assert report.gates["non_empty_corpus"].status == "pass"
     assert report.component_coverage
+    assert report.versions["scoring_model_version"] == "deterministic_scoring_v1"
 
 
 def test_sections_for_form():

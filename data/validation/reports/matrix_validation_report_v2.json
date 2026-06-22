@@ -1,0 +1,56 @@
+{
+  "validation_level": "matrix",
+  "generated_at": "2026-06-22T18:14:14.506000+00:00",
+  "versions": {
+    "parser_version": "section_extractor_v1",
+    "metrics_engine_version": "text_metrics_v2",
+    "scoring_model_version": "deterministic_scoring_v2",
+    "dictionary_version": "built_in_dictionaries_v2"
+  },
+  "corpus": {
+    "path": "tests/fixtures/validation/matrix_mini_corpus.jsonl",
+    "n_filings": 2
+  },
+  "gates": {
+    "non_empty_corpus": {
+      "name": "non_empty_corpus",
+      "status": "pass",
+      "value": 2.0,
+      "threshold": null,
+      "message": ""
+    },
+    "required_section_extraction_rate": {
+      "name": "required_section_extraction_rate",
+      "status": "pass",
+      "value": 0.7,
+      "threshold": 0.3,
+      "message": ""
+    },
+    "median_extraction_confidence": {
+      "name": "median_extraction_confidence",
+      "status": "pass",
+      "value": 0.88,
+      "threshold": 0.5,
+      "message": ""
+    },
+    "component_coverage": {
+      "name": "component_coverage",
+      "status": "pass",
+      "value": 0.5556,
+      "threshold": 0.2,
+      "message": ""
+    }
+  },
+  "component_coverage": {
+    "risk_factor_intensity_score": 0.5,
+    "disclosure_change_score": 0.5,
+    "mdna_uncertainty_score": 0.5,
+    "legal_regulatory_risk_score": 1.0,
+    "liquidity_stress_score": 0.5,
+    "boilerplate_risk_score": 0.5,
+    "internal_controls_risk_score": 0.5,
+    "event_severity_score": 0.5,
+    "tone_negativity_score": 0.5
+  },
+  "overall_pass": true
+}

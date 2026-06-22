@@ -117,6 +117,14 @@ python -m pytest tests/test_matrix_validation.py -q
 Fixture: `tests/fixtures/validation/matrix_mini_corpus.jsonl`  
 Modules: `validation/matrix_corpus.py`, `validation/matrix_gates.py`
 
+```bash
+# v2 smoke report (CI fixture, relaxed thresholds)
+python scripts/validate_matrix_gates.py \
+  --corpus tests/fixtures/validation/matrix_mini_corpus.jsonl \
+  --scoring-version v2 \
+  --min-extraction-rate 0.3 --min-median-confidence 0.5 --min-component-coverage 0.2
+```
+
 ## Dictionary distribution shift (v2+)
 
 After dictionary or matching changes, compare metrics and component scores against the frozen baseline:

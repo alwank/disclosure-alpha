@@ -12,18 +12,24 @@ from disclosure_alpha.validation.outcomes_validation import (
     run_outcomes_validation,
     write_outcomes_report,
 )
+from disclosure_alpha.validation.scoring_version import SCORING_VERSION_CHOICES, normalize_scoring_version
+from disclosure_alpha.version import SCORING_MODEL_VERSION_V2
 
 DEFAULT_OUTCOMES = Path("data/validation/outcomes/sp500_outcomes.jsonl")
 DEFAULT_CORPUS = Path("data/validation/corpus/sp500_item1a.jsonl")
-DEFAULT_REPORT = Path("data/validation/reports/l3_outcomes_report.json")
 
 
-def _paths_for_fy(fiscal_year: int | None) -> tuple[Path, Path]:
+def _paths_for_fy(fiscal_year: int | None, scoring_version: str) -> tuple[Path, Path]:
+    v2 = normalize_scoring_version(scoring_version) == SCORING_MODEL_VERSION_V2
+    suffix = "_v2" if v2 else ""
     if fiscal_year is None:
-        return DEFAULT_OUTCOMES, DEFAULT_REPORT
+        return (
+            DEFAULT_OUTCOMES,
+            Path(f"data/validation/reports/l3_outcomes_report{suffix}.json"),
+        )
     return (
         Path(f"data/validation/outcomes/sp500_outcomes_fy{fiscal_year}.jsonl"),
-        Path(f"data/validation/reports/l3_outcomes_report_fy{fiscal_year}.json"),
+        Path(f"data/validation/reports/l3_outcomes_report_fy{fiscal_year}{suffix}.json"),
     )
 
 
@@ -38,6 +44,12 @@ def main() -> None:
         choices=("corpus", "edgar"),
         default="corpus",
         help="corpus=Item 1A-only (fast); edgar=full 10-K+prior (slow, enables change-score gate)",
+    )
+    parser.add_argument(
+        "--scoring-version",
+        choices=SCORING_VERSION_CHOICES,
+        default="v1",
+        help="Scoring model for corpus/edgar scoring (default: v1)",
     )
     parser.add_argument("--min-n", type=int, default=50)
     parser.add_argument("--limit", type=int, default=None, help="Score first N outcome rows only")
@@ -59,7 +71,7 @@ def main() -> None:
         print("validation report versions OK")
         sys.exit(0)
 
-    default_outcomes, default_report = _paths_for_fy(args.fiscal_year)
+    default_outcomes, default_report = _paths_for_fy(args.fiscal_year, args.scoring_version)
     if args.outcomes is None:
         args.outcomes = default_outcomes
     if args.out is None:
@@ -80,12 +92,16 @@ def main() -> None:
 
     print(f"Outcomes: {args.outcomes}", flush=True)
     print(f"Score mode: {args.score_mode}", flush=True)
+    print(f"Scoring version: {args.scoring_version}", flush=True)
 
     report = run_outcomes_validation(
         args.outcomes,
         corpus_path=args.corpus if args.score_mode == "corpus" else None,
         score_mode=args.score_mode,
-        config=OutcomesValidationConfig(min_n=args.min_n),
+        config=OutcomesValidationConfig(
+            min_n=args.min_n,
+            scoring_model_version=args.scoring_version,
+        ),
         limit=args.limit,
     )
     out_path = args.out

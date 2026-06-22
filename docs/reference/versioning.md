@@ -6,7 +6,7 @@ How package, parser, metrics, dictionary, and scoring versions relate — and wh
 
 | Layer | Where it appears | Example |
 |-------|------------------|---------|
-| **Package** | `pip show disclosure-alpha` | `1.0.1` |
+| **Package** | `pip show disclosure-alpha` | `1.1.0` |
 | **Parser** | JSON `versions.parser_version` | `section_extractor_v1` |
 | **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v2` |
 | **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v2` |
@@ -17,8 +17,8 @@ Bump any artifact version can change scores for the same filing. Record all vers
 ## Pin a release
 
 ```bash
-pip install "disclosure-alpha==1.0.1"
-pip install "disclosure-alpha==1.0.1[api,mcp]"
+pip install "disclosure-alpha==1.1.0"
+pip install "disclosure-alpha==1.1.0[api,mcp]"
 ```
 
 See {doc}`../getting-started/installation`.

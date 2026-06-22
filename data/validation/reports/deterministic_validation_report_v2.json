@@ -1,0 +1,108 @@
+{
+  "validation_level": "L2",
+  "generated_at": "2026-06-22T18:14:08.225177+00:00",
+  "versions": {
+    "parser_version": "section_extractor_v1",
+    "metrics_engine_version": "text_metrics_v2",
+    "scoring_model_version": "deterministic_scoring_v2",
+    "dictionary_version": "built_in_dictionaries_v2"
+  },
+  "corpus": {
+    "path": "tests/fixtures/validation/mini_corpus.jsonl",
+    "n_input": 3,
+    "n_after_filters": 3,
+    "n_skipped": 0,
+    "fiscal_years": [
+      2025,
+      2026
+    ],
+    "holdout_excluded": [],
+    "filter_breakdown": {
+      "parse_error": 0,
+      "holdout": 0,
+      "wrong_section": 0,
+      "short_text": 0,
+      "low_confidence": 0
+    },
+    "filtered_tickers_sample": []
+  },
+  "pairs": {
+    "specificity_vs_ner": {
+      "name": "specificity_vs_ner",
+      "status": "fail",
+      "spearman_rho": 0.5,
+      "threshold": 0.6,
+      "n": 3,
+      "ours_field": "company_specificity_per_word",
+      "ref_field": "ner_entity_density",
+      "message": ""
+    },
+    "boilerplate_vs_ls4gram": {
+      "name": "boilerplate_vs_ls4gram",
+      "status": "fail",
+      "spearman_rho": -0.5,
+      "threshold": 0.5,
+      "n": 3,
+      "ours_field": "boilerplate_phrase_ratio",
+      "ref_field": "ls_boilerplate_word_ratio",
+      "message": ""
+    }
+  },
+  "edgar_gates": {
+    "E1_fetch_rate": {
+      "name": "E1_fetch_rate",
+      "status": "fail",
+      "value": null,
+      "threshold": 0.9,
+      "message": "missing value"
+    },
+    "E2_analysis_rate": {
+      "name": "E2_analysis_rate",
+      "status": "fail",
+      "value": null,
+      "threshold": 0.85,
+      "message": "missing value"
+    },
+    "E3_filter_retention": {
+      "name": "E3_filter_retention",
+      "status": "pass",
+      "value": 1.0,
+      "threshold": 0.85,
+      "message": ""
+    },
+    "E4_median_confidence": {
+      "name": "E4_median_confidence",
+      "status": "pass",
+      "value": 0.95,
+      "threshold": 0.75,
+      "message": ""
+    },
+    "E5_min_analysis_n": {
+      "name": "E5_min_analysis_n",
+      "status": "fail",
+      "value": 3,
+      "threshold": 80,
+      "message": ""
+    }
+  },
+  "edgar_pass": false,
+  "edgar_gates_pass": false,
+  "construct_pass": false,
+  "construct_pairs_pass": false,
+  "overall_l2_pass": false,
+  "discordant_tickers": {
+    "specificity_vs_ner": [
+      "TGT",
+      "AMZN",
+      "AAPL"
+    ],
+    "boilerplate_vs_ls4gram": [
+      "TGT",
+      "AMZN",
+      "AAPL"
+    ]
+  },
+  "diagnostics": {
+    "specificity_compare": "company_specificity_per_word vs ner_entity_density"
+  }
+}

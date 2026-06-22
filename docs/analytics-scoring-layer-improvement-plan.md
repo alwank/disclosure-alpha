@@ -1,5 +1,7 @@
 # Analytics and Scoring Layer Improvement Plan
 
+> **Status (2026-06-23):** P0–P2 items in this brief are implemented on `main`. This document is retained as historical implementation context; active validation claims live in `docs/validation/evidence-and-limitations.md`.
+
 Cursor agent brief for addressing the analytics and deterministic scoring audit.
 
 This plan is intentionally implementation-oriented. Each work item includes the problem, target files, recommended change, tests, acceptance criteria, and sequencing notes. Do not implement every item in one PR. Start with P0/P1 correctness and validation work, then move into scoring model version changes.

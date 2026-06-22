@@ -4,45 +4,50 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 from disclosure_alpha.version import (
     DICTIONARY_VERSION,
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
     SCORING_MODEL_VERSION,
+    SCORING_MODEL_VERSION_V2,
 )
 
-RUNTIME_VERSIONS: dict[str, str] = {
-    "parser_version": PARSER_VERSION,
-    "metrics_engine_version": METRICS_ENGINE_VERSION,
-    "scoring_model_version": SCORING_MODEL_VERSION,
-    "dictionary_version": DICTIONARY_VERSION,
-}
-
 # ponytail: only reports that ship in-repo and claim artifact versions
-COMMITTED_REPORTS: dict[str, list[str]] = {
-    "data/validation/reports/deterministic_validation_report.json": [
-        "parser_version",
-        "metrics_engine_version",
-        "scoring_model_version",
-        "dictionary_version",
-    ],
-    "data/validation/reports/l3_outcomes_report.json": [
-        "parser_version",
-        "metrics_engine_version",
-        "scoring_model_version",
-    ],
-    "data/validation/reports/l3_outcomes_report_edgar.json": [
-        "parser_version",
-        "metrics_engine_version",
-        "scoring_model_version",
-    ],
-    "data/validation/reports/l3_outcomes_report_edgar_fy2024.json": [
-        "parser_version",
-        "metrics_engine_version",
-        "scoring_model_version",
-    ],
+COMMITTED_REPORTS: dict[str, dict[str, str]] = {
+    "data/validation/reports/deterministic_validation_report.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION,
+        "dictionary_version": DICTIONARY_VERSION,
+    },
+    "data/validation/reports/deterministic_validation_report_v2.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION_V2,
+        "dictionary_version": DICTIONARY_VERSION,
+    },
+    "data/validation/reports/matrix_validation_report_v2.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION_V2,
+        "dictionary_version": DICTIONARY_VERSION,
+    },
+    "data/validation/reports/l3_outcomes_report.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION,
+    },
+    "data/validation/reports/l3_outcomes_report_edgar.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION,
+    },
+    "data/validation/reports/l3_outcomes_report_edgar_fy2024.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION,
+    },
 }
 
 
@@ -57,12 +62,12 @@ def _load_report_versions(path: Path) -> dict[str, str]:
 def check_report_versions(
     repo_root: Path | None = None,
     *,
-    reports: dict[str, list[str]] | None = None,
+    reports: dict[str, dict[str, str]] | None = None,
 ) -> list[str]:
     """Return human-readable errors for stale or missing committed reports."""
     root = repo_root or Path(__file__).resolve().parents[3]
     errors: list[str] = []
-    for rel_path, keys in (reports or COMMITTED_REPORTS).items():
+    for rel_path, expected_versions in (reports or COMMITTED_REPORTS).items():
         path = root / rel_path
         if not path.exists():
             errors.append(f"missing committed report: {rel_path}")
@@ -72,10 +77,7 @@ def check_report_versions(
         except (json.JSONDecodeError, ValueError) as exc:
             errors.append(f"{rel_path}: {exc}")
             continue
-        for key in keys:
-            expected = RUNTIME_VERSIONS.get(key)
-            if expected is None:
-                continue
+        for key, expected in expected_versions.items():
             actual = reported.get(key)
             if actual is None:
                 errors.append(f"{rel_path}: missing {key}")

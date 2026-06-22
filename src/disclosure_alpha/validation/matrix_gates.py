@@ -3,13 +3,27 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import asdict, dataclass
+import json
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
-from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix
+from disclosure_alpha.deterministic_scoring import (
+    aggregate_deterministic_matrix,
+    aggregate_deterministic_matrix_v2,
+)
 from disclosure_alpha.pipeline import compute_section_metrics
 from disclosure_alpha.section_extractor import ExtractedSection
 from disclosure_alpha.validation.matrix_corpus import MatrixCorpusRow, sections_for_form
+from disclosure_alpha.validation.scoring_version import normalize_scoring_version
+from disclosure_alpha.version import (
+    DICTIONARY_VERSION,
+    METRICS_ENGINE_VERSION,
+    PARSER_VERSION,
+    SCORING_MODEL_VERSION,
+    SCORING_MODEL_VERSION_V2,
+)
 
 COMPONENT_FIELDS = (
     "risk_factor_intensity_score",
@@ -38,14 +52,21 @@ class MatrixGateResult:
 
 @dataclass
 class MatrixValidationReport:
-    n_filings: int
-    gates: dict[str, MatrixGateResult]
-    component_coverage: dict[str, float]
-    overall_pass: bool
+    validation_level: str = "matrix"
+    generated_at: str = ""
+    versions: dict[str, str] = field(default_factory=dict)
+    corpus_path: str = ""
+    n_filings: int = 0
+    gates: dict[str, MatrixGateResult] = field(default_factory=dict)
+    component_coverage: dict[str, float] = field(default_factory=dict)
+    overall_pass: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "n_filings": self.n_filings,
+            "validation_level": self.validation_level,
+            "generated_at": self.generated_at,
+            "versions": self.versions,
+            "corpus": {"path": self.corpus_path, "n_filings": self.n_filings},
             "gates": {k: v.to_dict() for k, v in self.gates.items()},
             "component_coverage": self.component_coverage,
             "overall_pass": self.overall_pass,
@@ -87,13 +108,34 @@ def _sections_from_row(row: MatrixCorpusRow) -> tuple[list[ExtractedSection], li
     return current, prior
 
 
+def _aggregate_scores(metrics, *, scoring_model_version: str):
+    if scoring_model_version == SCORING_MODEL_VERSION_V2:
+        return aggregate_deterministic_matrix_v2(
+            section_metrics=metrics.section_metrics,
+            section_diffs=metrics.section_diffs,
+            section_flags=metrics.section_flags,
+            language_deltas=metrics.language_deltas,
+            section_densities=metrics.section_densities,
+            section_diffs_v2=metrics.section_diffs_v2,
+        )
+    return aggregate_deterministic_matrix(
+        section_metrics=metrics.section_metrics,
+        section_diffs=metrics.section_diffs,
+        section_flags=metrics.section_flags,
+        language_deltas=metrics.language_deltas,
+        section_densities=metrics.section_densities,
+    )
+
+
 def evaluate_matrix_gates(
     rows: list[MatrixCorpusRow],
     *,
     min_extraction_rate: float = 0.5,
     min_median_confidence: float = 0.6,
     min_component_coverage: float = 0.4,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> MatrixValidationReport:
+    scoring_model_version = normalize_scoring_version(scoring_model_version)
     if not rows:
         return MatrixValidationReport(
             n_filings=0,
@@ -123,13 +165,7 @@ def evaluate_matrix_gates(
 
         current, prior = _sections_from_row(row)
         metrics = compute_section_metrics(current, prior)
-        scores = aggregate_deterministic_matrix(
-            section_metrics=metrics.section_metrics,
-            section_diffs=metrics.section_diffs,
-            section_flags=metrics.section_flags,
-            language_deltas=metrics.language_deltas,
-            section_densities=metrics.section_densities,
-        )
+        scores = _aggregate_scores(metrics, scoring_model_version=scoring_model_version)
         for name in COMPONENT_FIELDS:
             if getattr(scores.components, name) is not None:
                 component_hits[name] += 1
@@ -163,8 +199,43 @@ def evaluate_matrix_gates(
     }
     overall = all(g.status == "pass" for g in gates.values())
     return MatrixValidationReport(
+        generated_at=datetime.now(timezone.utc).isoformat(),
+        versions={
+            "parser_version": PARSER_VERSION,
+            "metrics_engine_version": METRICS_ENGINE_VERSION,
+            "scoring_model_version": scoring_model_version,
+            "dictionary_version": DICTIONARY_VERSION,
+        },
         n_filings=len(rows),
         gates=gates,
         component_coverage={k: round(v, 4) for k, v in component_coverage.items()},
         overall_pass=overall,
     )
+
+
+def run_matrix_validation(
+    corpus_path: Path,
+    *,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
+    min_extraction_rate: float = 0.5,
+    min_median_confidence: float = 0.6,
+    min_component_coverage: float = 0.4,
+) -> MatrixValidationReport:
+    from disclosure_alpha.validation.matrix_corpus import load_matrix_corpus
+
+    rows, _ = load_matrix_corpus(corpus_path)
+    report = evaluate_matrix_gates(
+        rows,
+        min_extraction_rate=min_extraction_rate,
+        min_median_confidence=min_median_confidence,
+        min_component_coverage=min_component_coverage,
+        scoring_model_version=scoring_model_version,
+    )
+    report.corpus_path = str(corpus_path)
+    return report
+
+
+def write_matrix_validation_report(report: MatrixValidationReport, out_path: Path) -> Path:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(report.to_dict(), indent=2) + "\n", encoding="utf-8")
+    return out_path

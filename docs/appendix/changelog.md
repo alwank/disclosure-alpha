@@ -31,11 +31,11 @@ Introduced an **opt-in** scoring model (`SCORING_MODEL_VERSION_V2` / `determinis
 | Scoring (default) | `deterministic_scoring_v1` |
 | Scoring (opt-in) | `deterministic_scoring_v2` |
 
-Committed validation reports remain on **v1**. See {doc}`../reference/versioning` and {doc}`../validation/evidence-and-limitations`.
+Committed validation reports remain on **v1** for production claims. v2 **smoke** reports on CI fixtures ship in `data/validation/reports/*_v2.json` — see {doc}`../validation/evidence-and-limitations`.
 
-### In v2 (opt-in, unvalidated)
+### In v2 (opt-in, smoke-validated only)
 
-Available via `score_deterministic_v2()` only — not on HTTP/MCP, not in committed validation reports:
+Available via `score_deterministic_v2()` only — not on HTTP/MCP, not validated at SP500 scale:
 
 - `static_disclosure_quality_score`, `static_disclosure_risk_score`, `disclosure_change_risk_score` (score product split)
 - `cybersecurity_incident_risk_score`, `event_materiality_score` (excluded from v1 headline weights)
@@ -44,8 +44,8 @@ Available via `score_deterministic_v2()` only — not on HTTP/MCP, not in commit
 
 ### Still deferred
 
-- HTTP `scoring_model_version` query parameter
-- v2 validation reports and headline migration
+- HTTP `scoring_model_version` query parameter (matrix endpoint)
+- v2 full-corpus validation and headline migration
 
 ## 1.1.0 (2026-06-22)
 

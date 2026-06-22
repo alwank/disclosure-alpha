@@ -23,6 +23,7 @@ from disclosure_alpha.validation.references.boilerplate import compute_ls_boiler
 from disclosure_alpha.validation.references.ner import compute_ner_densities
 from disclosure_alpha.validation.universe import load_universe
 from disclosure_alpha.validation.types import ConstructPairResult, CorpusRow, ValidationReport
+from disclosure_alpha.validation.scoring_version import normalize_scoring_version
 from disclosure_alpha.version import (
     DICTIONARY_VERSION,
     METRICS_ENGINE_VERSION,
@@ -42,6 +43,7 @@ class ConstructConfig:
     universe_path: Path | None = None
     manifest_path: Path | None = None
     edgar_gates: EdgarGatesConfig | None = None
+    scoring_model_version: str = SCORING_MODEL_VERSION
 
 
 def spearman_rho(x: list[float], y: list[float]) -> float | None:
@@ -167,6 +169,7 @@ def run_construct_validation(
     config: ConstructConfig | None = None,
 ) -> ValidationReport:
     cfg = config or ConstructConfig()
+    scoring_model_version = normalize_scoring_version(cfg.scoring_model_version)
     holdout = load_holdout_tickers(cfg.holdout_path)
     load_cfg = CorpusLoadConfig(
         min_word_count=cfg.min_word_count,
@@ -271,7 +274,7 @@ def run_construct_validation(
         versions={
             "parser_version": PARSER_VERSION,
             "metrics_engine_version": METRICS_ENGINE_VERSION,
-            "scoring_model_version": SCORING_MODEL_VERSION,
+            "scoring_model_version": scoring_model_version,
             "dictionary_version": DICTIONARY_VERSION,
         },
         corpus=corpus_meta,

@@ -1,5 +1,7 @@
 # Read the Docs Public Documentation Improvement Plan
 
+> **Historical — June 2026 implementation complete;** see [codebase-audit-report](codebase-audit-report.md) for remaining gaps.
+
 > **Status (2026-06):** Main items in this plan were implemented in June 2026 (public nav cleanup, claim centralization, onboarding flow, OpenAPI examples, composite/OSS doc cleanup). Remaining repo hygiene is tracked separately — not duplicated here.
 
 Audit date: 2026-06-22
@@ -25,8 +27,8 @@ Highest impact improvements:
   - DOI links in `docs/methodology/research-foundation.md` return 403 or redirects under linkcheck.
   - SEC links in `docs/legal.md` return 403 under linkcheck.
   - The MCP homepage redirects to a deeper docs URL.
-- `docs/index.md` includes a hidden toctree for `CONTRIBUTING_DOCS`, `developer/architecture`, and `developer/testing`, so repo-maintainer pages are public-build pages even though they are not visible in the main nav.
-- `docs/developer/architecture.md` and `docs/developer/testing.md` contain `TBD` / `TODO` placeholder content.
+- `docs/conf.py` excludes `developer/**` and `CONTRIBUTING_DOCS.md` from the public RTD build (R1 done); contributor pages remain in-repo only.
+- `docs/developer/architecture.md` and `docs/developer/testing.md` are contributor-facing stubs without `TBD` / `TODO` placeholders.
 - Several endpoint and schema stub files exist under excluded paths:
   - `docs/guides/http/endpoints/**`
   - `docs/reference/http/schemas/**`
@@ -200,7 +202,7 @@ Acceptance criteria:
 
 ## REMOVE
 
-### R1. Remove contributor/developer hidden pages from the public build
+### R1. Remove contributor/developer hidden pages from the public build — **done (2026-06-22)**
 
 Edit `docs/index.md` and remove this hidden toctree from public docs:
 

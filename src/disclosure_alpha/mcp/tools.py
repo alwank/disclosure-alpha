@@ -35,7 +35,7 @@ def _section_dicts(sections) -> list[dict[str, Any]]:
 
 
 def extract_sections(html: str, form_type: str) -> str:
-    """Extract SEC filing sections from HTML for a form type (10-K, 10-Q, 8-K)."""
+    """Extract SEC filing sections from HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
     sections = extract_sections_from_html(html, form_type)
     return json.dumps(
         {
@@ -98,7 +98,7 @@ def score_filing_html_tool(
     form_type: str,
     prior_html: str | None = None,
 ) -> str:
-    """Run full deterministic pipeline on filing HTML (optional prior HTML for diffs)."""
+    """Run full pipeline on filing HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
     result = score_filing_html(html, form_type, prior_html=prior_html)
     return json.dumps(result.to_dict(), indent=2, default=str)
 

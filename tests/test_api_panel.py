@@ -1,4 +1,4 @@
-"""Panel batch API tests — Track C owns implementation."""
+"""Panel batch API tests."""
 
 from __future__ import annotations
 

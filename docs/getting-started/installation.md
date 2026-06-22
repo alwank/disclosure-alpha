@@ -19,7 +19,7 @@ pip install "disclosure-alpha[api,mcp]"
 Pin a release when reproducibility matters — see {doc}`../reference/versioning`:
 
 ```bash
-pip install "disclosure-alpha==1.0.1[api,mcp]"
+pip install "disclosure-alpha==1.1.0[api,mcp]"
 ```
 
 ## Optional extras

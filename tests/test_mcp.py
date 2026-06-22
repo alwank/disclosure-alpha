@@ -11,7 +11,7 @@ import pytest
 pytest.importorskip("mcp")
 
 from disclosure_alpha.scoring_types import COMPONENT_WEIGHTS
-from disclosure_alpha.mcp.server import (
+from disclosure_alpha.mcp.tools import (
     compute_section_metrics_tool,
     diff_sections,
     extract_sections,
@@ -19,7 +19,7 @@ from disclosure_alpha.mcp.server import (
     score_company_filing,
     score_deterministic_tool,
     score_filing_html_tool,
-    taxonomy,
+    taxonomy_payload,
 )
 from disclosure_alpha.pipeline import extract_sections_from_html, score_filing_html
 from disclosure_alpha.version import PARSER_VERSION, SCORING_MODEL_VERSION
@@ -109,5 +109,5 @@ def test_mcp_list_company_filings(mock_list):
 
 
 def test_mcp_taxonomy_resource():
-    payload = json.loads(taxonomy())
+    payload = json.loads(taxonomy_payload())
     assert set(payload["component_weights"]) == set(COMPONENT_WEIGHTS)

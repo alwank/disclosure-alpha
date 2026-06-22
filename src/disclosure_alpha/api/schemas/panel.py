@@ -1,4 +1,4 @@
-"""Panel batch response models — Track C owns implementation."""
+"""Panel batch response models."""
 
 from __future__ import annotations
 

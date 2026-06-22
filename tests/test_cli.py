@@ -62,6 +62,20 @@ def test_cli_score_ticker_requires_fiscal_year():
     assert result.returncode != 0
 
 
+def test_cli_score_ticker_rejects_unsupported_form():
+    result = _run_cli(
+        "score", "--ticker", "AAPL", "--fiscal-year", "2025", "--form", "8-K"
+    )
+    assert result.returncode != 0
+    assert "Unsupported form_type" in result.stderr
+
+
+def test_cli_extract_bad_html_path():
+    result = _run_cli("extract", "--html", "/nonexistent/filing.html", "--form", "10-K")
+    assert result.returncode != 0
+    assert "No such file or directory" in result.stderr
+
+
 def test_cli_score_html_stdin():
     result = subprocess.run(
         [sys.executable, "-m", "disclosure_alpha.cli", "score", "--html", "-", "--form", "10-K"],

@@ -1,10 +1,13 @@
 import hashlib
+import logging
 import re
 import warnings
 from dataclasses import dataclass, field, replace
 
 from disclosure_alpha.dictionaries import REQUIRED_SECTIONS, sections_for_form_type
 from disclosure_alpha.text_cleaner import clean_html_text, normalize_whitespace
+
+logger = logging.getLogger(__name__)
 
 ANALYSIS_MIN_WORDS = 200
 
@@ -141,7 +144,13 @@ def _parse_blocks(html: str) -> list[ParserBlock]:
         warnings.simplefilter("ignore")
         try:
             elements = sp.Edgar10QParser().parse(html or "")
-        except Exception:
+        except ImportError as exc:
+            logger.warning("sec_parser dependency unavailable during parse: %s", exc)
+            return []
+        except Exception as exc:
+            if not type(exc).__module__.startswith("sec_parser"):
+                raise
+            logger.warning("sec_parser parse failed: %s", exc)
             return []
 
     blocks: list[ParserBlock] = []

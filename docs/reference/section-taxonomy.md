@@ -24,13 +24,13 @@ Section names are stable identifiers used in extraction, HTTP `sections=` filter
 
 ## 8-K sections
 
-| Section name | Display name |
-|--------------|--------------|
-| `item_1_01` | Item 1.01 Entry into Material Agreement |
-| `item_1_05` | Item 1.05 Material Cybersecurity Incidents |
-| `item_2_02` | Item 2.02 Results of Operations |
-| `item_5_02` | Item 5.02 Departure of Directors |
-| `item_8_01` | Item 8.01 Other Events |
+| Section name | Display name | Required for scoring |
+|--------------|--------------|----------------------|
+| `item_1_01` | Item 1.01 Entry into Material Agreement | No |
+| `item_1_05` | Item 1.05 Material Cybersecurity Incidents | No |
+| `item_2_02` | Item 2.02 Results of Operations | Yes |
+| `item_5_02` | Item 5.02 Departure of Directors | No |
+| `item_8_01` | Item 8.01 Other Events | No |
 
 ## HTTP usage
 

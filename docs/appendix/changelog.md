@@ -7,6 +7,7 @@ Version history for parser, metrics engine, dictionary packs, and scoring model.
 - **Breaking:** removed `view` from `/disclosure-matrix` and panel `/disclosure-matrix` request/response (deterministic scoring only).
 - **Fix:** `disclosure_quality_score` is correct when `boilerplate_risk_score` is `0.0` (no longer treated as missing).
 - **Internal:** unified `confidence_score` via `score_deterministic`; removed unused `llm_confidences` parameter.
+- **Deprecation intent:** `disclosure-alpha-mcp` (legacy shim to the analyst bundle) remains for backward compatibility; prefer `disclosure-alpha-mcp-analyst` or `disclosure-alpha-mcp-builder` for new deployments. No removal planned in 1.1.x.
 
 ## Score catalog cleanup (2026-06-22)
 

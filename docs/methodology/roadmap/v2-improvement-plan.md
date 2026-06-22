@@ -1,5 +1,7 @@
 # 06 — v2 Improvement Plan
 
+> **Internal / historical — excluded from public RTD build.** Pre-1.1.0 API shapes (`--phase deterministic`, `view=deterministic`, LLM/matrix split paths) were **removed in 1.1.0** — see {doc}`../../appendix/changelog`.
+
 Prioritized upgrades from literature review and production gaps. Each item has an effort estimate and dependency.
 
 ## Priority matrix
@@ -25,7 +27,7 @@ S = days, M = 1–2 weeks, L = multi-week
 
 ### 1. Matrix without LLM
 
-**Problem:** `--phase deterministic` computes metrics but returns no matrix.
+**Problem:** ~~`--phase deterministic`~~ *(removed in 1.1.0)* computed metrics but returned no matrix.
 
 **Target:**
 
@@ -38,7 +40,7 @@ persist_deterministic_matrix(run_id, det)  # no LLM required
 **Acceptance:**
 
 - `deterministic_scores_json` populated after deterministic-only run
-- `ingest_universe.py --phase deterministic` does not error expecting matrix from LLM path
+- ~~`ingest_universe.py --phase deterministic`~~ *(removed in 1.1.0)* does not error expecting matrix from LLM path
 
 ### 2. Component provenance
 
@@ -46,7 +48,7 @@ persist_deterministic_matrix(run_id, det)  # no LLM required
 
 **Target:** `deterministic_provenance_json` on `score_outputs` / matrix with per-component input breakdown (see [aggregation spec](../aggregation.md)).
 
-**Acceptance:** API `view=deterministic` includes provenance when `include_provenance=true`.
+**Acceptance:** ~~API `view=deterministic`~~ *(removed in 1.1.0; deterministic scoring only)* includes provenance when `include_provenance=true`.
 
 ---
 
@@ -180,7 +182,7 @@ When implementing v2:
 - [ ] Update `metrics_engine_version` in `app/config.py`
 - [ ] Add the next deterministic scoring version to `scoring_model_version`
 - [ ] Alembic migration if new JSON columns (provenance)
-- [ ] Backfill: `ingest_universe.py --phase deterministic --resume`
+- [ ] Backfill: ~~`ingest_universe.py --phase deterministic --resume`~~ *(removed in 1.1.0)*
 - [ ] Re-aggregate without LLM
 - [ ] Run validation harness (`data/validation/README.md`)
 - [ ] Update API schema docs

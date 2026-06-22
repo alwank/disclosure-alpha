@@ -62,7 +62,7 @@ print(result.scores.overall_disclosure_risk_score)
 
 ## What it is
 
-Open-source, deterministic SEC filing analytics for **10-K, 10-Q, and 8-K** HTML. Reproducible JSON scores from text metrics, boolean risk flags, and section diffs — one pipeline across CLI, Python SDK, HTTP API, and MCP.
+Open-source, deterministic SEC filing analytics for **10-K and 10-Q** HTML. Reproducible JSON scores from text metrics, boolean risk flags, and section diffs — one pipeline across CLI, Python SDK, HTTP API, and MCP. **8-K** is supported via local `--html` or the MCP Builder bundle only (not `--ticker`, EDGAR, or HTTP ticker routes).
 
 **What it is not:**
 
@@ -83,7 +83,7 @@ Five entry points, one deterministic pipeline. Not sure which to pick? See [Choo
 | Cursor / Claude (ticker scoring) | `disclosure-alpha-mcp-analyst` | `[mcp]` |
 | Agent with raw HTML | `disclosure-alpha-mcp-builder` | `[mcp]` |
 
-HTTP matrix tiers: `tier=lite` (headline score), `tier=standard` (components + metrics), `tier=analyst` (provenance for audit).
+HTTP matrix tiers on `GET /v1/company/{ticker}/disclosure-matrix` only: `tier=lite` (headline score), `tier=standard` (components + metrics), `tier=analyst` (provenance for audit). See [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html).
 
 ```bash
 disclosure-alpha-api              # HTTP on :8000
@@ -133,7 +133,7 @@ Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/lates
     }
   },
   "versions": {
-    "parser_version": "sec_parser_v1",
+    "parser_version": "section_extractor_v1",
     "metrics_engine_version": "text_metrics_v2",
     "dictionary_version": "built_in_dictionaries_v2"
   }

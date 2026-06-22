@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -13,6 +14,7 @@ SEC_BASE = "https://www.sec.gov"
 DATA_BASE = "https://data.sec.gov"
 _MIN_INTERVAL = 0.11  # ponytail: ~9 req/s global lock; fine for single-user self-host
 _last_request_at = 0.0
+_throttle_lock = threading.Lock()
 
 
 def _user_agent() -> str:
@@ -26,10 +28,11 @@ def _user_agent() -> str:
 
 def _throttle() -> None:
     global _last_request_at
-    elapsed = time.monotonic() - _last_request_at
-    if elapsed < _MIN_INTERVAL:
-        time.sleep(_MIN_INTERVAL - elapsed)
-    _last_request_at = time.monotonic()
+    with _throttle_lock:
+        elapsed = time.monotonic() - _last_request_at
+        if elapsed < _MIN_INTERVAL:
+            time.sleep(_MIN_INTERVAL - elapsed)
+        _last_request_at = time.monotonic()
 
 
 def fetch_json(url: str) -> Any:

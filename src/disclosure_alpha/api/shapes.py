@@ -20,7 +20,7 @@ def _flag_label(flag_name: str) -> str:
 
 
 def shape_flags_payload(metrics: MetricsResult) -> dict[str, Any]:
-    """Track A: boolean risk flags only."""
+    """Boolean risk flags only."""
     flags = metrics.section_flags
     active_flags: list[dict[str, str]] = []
     for section, section_flags in flags.items():
@@ -40,7 +40,7 @@ def shape_changes_payload(
     metrics: MetricsResult,
     scores: DeterministicAggregationResult | None,
 ) -> dict[str, Any]:
-    """Track B: section diffs and change score without full rescore noise."""
+    """Section diffs and change score without full rescore noise."""
     change_value: float | None = None
     missing_reason: str | None = None
     if scores is None:
@@ -62,7 +62,7 @@ def apply_tier_preset(
     include: str | None,
     fields: str | None,
 ) -> tuple[str | None, str | None]:
-    """Track D: map tier=lite|standard|analyst to include/fields overrides."""
+    """Map tier=lite|standard|analyst to include/fields overrides."""
     if tier not in TIER_PRESETS:
         valid = ", ".join(sorted(TIER_PRESETS))
         raise ValueError(f"tier must be one of: {valid}")

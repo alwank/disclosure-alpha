@@ -22,6 +22,7 @@ from disclosure_alpha.text_metrics import (
     compute_text_metrics,
     detect_section_flags,
 )
+from disclosure_alpha.edgar.types import EdgarError
 from disclosure_alpha.version import (
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
@@ -452,7 +453,7 @@ def score_panel_tickers(
                 )
             )
             ok += 1
-        except Exception as exc:
+        except (EdgarError, ValueError, FileNotFoundError) as exc:
             results.append(
                 PanelTickerResult(
                     ticker=ticker,

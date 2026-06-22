@@ -1,4 +1,4 @@
-"""MCP Analyst bundle tests — Track E owns implementation."""
+"""MCP Analyst bundle tests."""
 
 from __future__ import annotations
 
@@ -18,3 +18,12 @@ def test_analyst_exposes_two_tools():
 def test_analyst_has_taxonomy_resource():
     resources = list(mcp._resource_manager._resources.keys())
     assert "disclosure://taxonomy/v1" in resources
+
+
+def test_analyst_main_invokes_run(monkeypatch):
+    from disclosure_alpha.mcp import analyst
+
+    called: list[str] = []
+    monkeypatch.setattr(analyst.mcp, "run", lambda: called.append("run"))
+    analyst.main()
+    assert called == ["run"]

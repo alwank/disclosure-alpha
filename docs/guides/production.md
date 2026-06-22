@@ -31,6 +31,18 @@ Full list: {doc}`../reference/environment-variables`.
 
 Legal summary: {doc}`../legal`.
 
+## SEC rate limits and workers
+
+The EDGAR client enforces a per-process throttle (~9 requests/second) using a global lock on `_last_request_at`. That protects a single worker from hammering SEC, but it does **not** coordinate across processes.
+
+| Deployment | Guidance |
+|------------|----------|
+| Single worker | One `SEC_USER_AGENT`; built-in throttle is sufficient |
+| Multiple workers | **One SEC identity per worker** (separate `SEC_USER_AGENT` values), **or** enforce a shared rate limit at your reverse proxy / API gateway |
+| Shared identity | Do not run many workers behind one User-Agent without external throttling — effective request rate scales with worker count |
+
+Panel POST and batch ticker jobs should serialize fetches within each worker. Scale horizontally with dedicated SEC identities per worker, not by disabling or bypassing the client throttle.
+
 ## Request sizing
 
 - **Panel POST:** maximum **25** tickers per request (422 if exceeded)

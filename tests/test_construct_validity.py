@@ -7,8 +7,11 @@ import pytest
 
 from disclosure_alpha.validation.construct import (
     ConstructConfig,
+    _discordant_tickers,
+    _pair_result,
     run_construct_validation,
     spearman_rho,
+    write_validation_report,
 )
 from disclosure_alpha.validation.corpus import CorpusLoadConfig, load_corpus
 from disclosure_alpha.validation.edgar_gates import EdgarGatesConfig, evaluate_edgar_gates
@@ -180,6 +183,101 @@ def test_edgar_gates_pass_fail():
 def test_spearman_perfect_correlation():
     xs = [1.0, 2.0, 3.0, 4.0, 5.0]
     assert spearman_rho(xs, xs) == pytest.approx(1.0)
+
+
+def test_discordant_tickers_empty_on_length_mismatch():
+    rows = [
+        CorpusRow("A", 2025, "item_1a_risk_factors", "x", 10, 0.9),
+        CorpusRow("B", 2025, "item_1a_risk_factors", "y", 10, 0.9),
+    ]
+    assert _discordant_tickers(rows, [1.0], [1.0, 2.0]) == []
+
+
+def test_pair_result_skips_on_single_paired_row():
+    rows = [CorpusRow("A", 2025, "item_1a_risk_factors", "word " * 250, 250, 0.9)]
+    ours = {"A": {"score": 0.1}}
+    refs = {"A": 0.2}
+    pair, discordant = _pair_result(
+        "test_pair",
+        rows,
+        ours,
+        refs,
+        ours_field="score",
+        ref_field="ref",
+        threshold=0.5,
+    )
+    assert pair.status == "skipped"
+    assert pair.n == 1
+    assert pair.message == "insufficient paired rows"
+    assert discordant == []
+
+
+def test_spearman_rho_returns_none_for_short_or_mismatched_lists():
+    assert spearman_rho([1.0], [1.0]) is None
+    assert spearman_rho([1.0, 2.0], [1.0]) is None
+
+
+def test_pair_result_skipped_without_reference_map():
+    rows = [
+        CorpusRow("A", 2025, "item_1a_risk_factors", "word " * 250, 250, 0.9),
+        CorpusRow("B", 2025, "item_1a_risk_factors", "word " * 250, 250, 0.9),
+    ]
+    ours = {
+        "A": {"company_specificity_per_word": 0.5},
+        "B": {"company_specificity_per_word": 0.6},
+    }
+    result, discordant = _pair_result(
+        "test_pair",
+        rows,
+        ours,
+        None,
+        ours_field="company_specificity_per_word",
+        ref_field="ner_entity_density",
+        threshold=0.60,
+        skip_message="reference unavailable",
+    )
+    assert result.status == "skipped"
+    assert result.message == "reference unavailable"
+    assert discordant == []
+
+
+def test_pair_result_fails_when_correlation_below_threshold():
+    rows = [
+        CorpusRow("A", 2025, "item_1a_risk_factors", "word " * 250, 250, 0.9),
+        CorpusRow("B", 2025, "item_1a_risk_factors", "word " * 250, 250, 0.9),
+        CorpusRow("C", 2025, "item_1a_risk_factors", "word " * 250, 250, 0.9),
+    ]
+    ours = {
+        "A": {"company_specificity_per_word": 0.1},
+        "B": {"company_specificity_per_word": 0.5},
+        "C": {"company_specificity_per_word": 0.9},
+    }
+    ref_map = {"A": 0.9, "B": 0.5, "C": 0.1}
+    result, discordant = _pair_result(
+        "inverse_pair",
+        rows,
+        ours,
+        ref_map,
+        ours_field="company_specificity_per_word",
+        ref_field="ner_entity_density",
+        threshold=0.60,
+    )
+    assert result.status == "fail"
+    assert result.spearman_rho is not None
+    assert result.spearman_rho < 0.60
+    assert discordant
+
+
+def test_write_validation_report_roundtrip(tmp_path: Path):
+    report = run_construct_validation(
+        MINI_CORPUS,
+        config=ConstructConfig(min_n=3, boilerplate_min_docs=2),
+    )
+    out_path = tmp_path / "report.json"
+    write_validation_report(report, out_path)
+    payload = json.loads(out_path.read_text(encoding="utf-8"))
+    assert payload["validation_level"] == "L2"
+    assert set(payload["pairs"]) == {"specificity_vs_ner", "boilerplate_vs_ls4gram"}
 
 
 def test_ner_pair_runs_when_spacy_available():

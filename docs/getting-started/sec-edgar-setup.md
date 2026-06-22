@@ -32,7 +32,7 @@ Default cache path: `data/cache/sec_filings`
 export DISCLOSURE_ALPHA_CACHE_DIR="/path/to/cache"
 ```
 
-Cached filings speed up repeat lookups.
+When set, filings are cached automatically on first fetch — no extra flag needed. Cached filings speed up repeat lookups.
 
 ## Fair access
 

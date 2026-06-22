@@ -1,4 +1,4 @@
-"""MCP Builder bundle tests — Track E owns implementation."""
+"""MCP Builder bundle tests."""
 
 from __future__ import annotations
 
@@ -26,3 +26,12 @@ def test_builder_does_not_expose_analyst_tools():
     analyst_tools = set(analyst_mcp._tool_manager._tools.keys())
     builder_tools = set(builder_mcp._tool_manager._tools.keys())
     assert analyst_tools.isdisjoint(builder_tools)
+
+
+def test_builder_main_invokes_run(monkeypatch):
+    from disclosure_alpha.mcp import builder
+
+    called: list[str] = []
+    monkeypatch.setattr(builder.mcp, "run", lambda: called.append("run"))
+    builder.main()
+    assert called == ["run"]

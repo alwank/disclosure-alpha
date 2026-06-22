@@ -22,7 +22,7 @@ mcp = FastMCP("disclosure-alpha-builder")
 
 @mcp.tool()
 def extract_sections_tool(html: str, form_type: str) -> str:
-    """Extract SEC filing sections from HTML for a form type (10-K, 10-Q, 8-K)."""
+    """Extract SEC filing sections from HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
     return extract_sections(html, form_type)
 
 
@@ -55,7 +55,7 @@ def score_filing_html_tool_wrapper(
     form_type: str,
     prior_html: str | None = None,
 ) -> str:
-    """Run full deterministic pipeline on filing HTML (optional prior HTML for diffs)."""
+    """Run full pipeline on filing HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
     return score_filing_html_tool(html, form_type, prior_html=prior_html)
 
 

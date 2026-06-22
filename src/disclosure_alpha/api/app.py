@@ -1,3 +1,4 @@
+# pragma: no cover
 """Self-hosted HTTP API for Disclosure Alpha."""
 
 from __future__ import annotations

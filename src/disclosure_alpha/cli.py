@@ -37,7 +37,11 @@ def main() -> None:
     src = score_p.add_mutually_exclusive_group(required=True)
     src.add_argument("--html", help="Path to HTML file or '-' for stdin")
     src.add_argument("--ticker", help="Ticker symbol (fetches from SEC EDGAR)")
-    score_p.add_argument("--form", default="10-K", help="Form type: 10-K or 10-Q")
+    score_p.add_argument(
+        "--form",
+        default="10-K",
+        help="10-K or 10-Q (EDGAR/ticker); 8-K supported with --html only",
+    )
     score_p.add_argument("--fiscal-year", type=int, help="Fiscal year (with --ticker)")
     score_p.add_argument("--quarter", choices=["Q1", "Q2", "Q3"], help="Required for 10-Q")
     score_p.add_argument("--prior-html", help="Optional prior filing HTML for diffs")

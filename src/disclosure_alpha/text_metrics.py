@@ -120,7 +120,7 @@ METRIC_FAMILIES = ("tone", "specificity", "boilerplate", "liquidity", "internal_
 
 
 def compute_metric_families(inp: SectionTextInput) -> list[dict[str, float | str]]:
-    """Return normalized metric family rows per Doc 04."""
+    """Return metric family rows (tone, specificity, boilerplate, liquidity, internal_controls) with raw and normalized values."""
     base = compute_text_metrics(inp)
     return [
         {"metric_family": "tone", "metric_name": "negative_word_ratio", "raw_value": base.negative_word_ratio, "normalized_value": base.negative_word_ratio * 100},

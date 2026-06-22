@@ -1,4 +1,4 @@
-"""Disclosure flags API tests — Track A owns implementation."""
+"""Disclosure flags API tests."""
 
 from __future__ import annotations
 

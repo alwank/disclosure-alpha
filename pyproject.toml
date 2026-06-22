@@ -39,7 +39,7 @@ mcp = ["mcp>=1.0.0", "pydantic>=2.5.0"]
 semantic = ["sentence-transformers>=2.2.0"]
 validation = ["spacy>=3.7.0"]
 outcomes = ["yfinance>=0.2.0"]
-dev = ["pytest>=7.4.0", "pytest-asyncio>=0.23.0", "pytest-cov>=4.1.0", "httpx2>=2.4.0,<3"]
+dev = ["pytest>=7.4.0", "pytest-cov>=4.1.0"]
 
 [project.scripts]
 disclosure-alpha = "disclosure_alpha.cli:main"
@@ -58,7 +58,6 @@ markers = ["integration: live network / external API"]
 
 [tool.coverage.run]
 source = ["disclosure_alpha"]
-omit = ["*/disclosure_alpha/validation/*"]
 
 [tool.coverage.report]
 fail_under = 75

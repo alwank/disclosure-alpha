@@ -1,5 +1,7 @@
 """Deterministic SEC filing analytics — parse, metrics, diff, score."""
 
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
+
 from disclosure_alpha.deterministic_scoring import (
     DeterministicAggregationResult,
     aggregate_deterministic_matrix,
@@ -46,4 +48,7 @@ __all__ = [
     "score_filing_ticker",
 ]
 
-__version__ = "1.0.1"
+try:
+    __version__ = _pkg_version("disclosure-alpha")
+except PackageNotFoundError:
+    __version__ = "1.1.0"  # editable install fallback

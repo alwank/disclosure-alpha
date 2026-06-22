@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 
+import disclosure_alpha
 from disclosure_alpha.api.routes import app
 from disclosure_alpha.edgar.types import FilingNotFoundError, FilingRef, SecFetchError
 from disclosure_alpha.pipeline import (
@@ -54,6 +55,12 @@ def test_health():
     resp = client.get("/health")
     assert resp.status_code == 200
     assert resp.json()["status"] == "ok"
+
+
+def test_openapi_version_matches_package():
+    resp = client.get("/openapi.json")
+    assert resp.status_code == 200
+    assert resp.json()["info"]["version"] == disclosure_alpha.__version__
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")

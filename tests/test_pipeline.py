@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from disclosure_alpha.pipeline import score_filing_html
 from disclosure_alpha.version import PARSER_VERSION
 
@@ -219,3 +221,41 @@ def test_compute_section_metrics_item_1a_flags():
     assert "item_1a_risk_factors" in metrics.section_metrics
     assert "negative_word_ratio" in metrics.section_metrics["item_1a_risk_factors"]
     assert "investigation_flag" in metrics.section_flags["item_1a_risk_factors"]
+
+
+def test_score_panel_tickers_handles_expected_errors(monkeypatch):
+    from disclosure_alpha.edgar.types import FilingNotFoundError
+    from disclosure_alpha.pipeline import score_panel_tickers
+
+    ok_html = (
+        "<html><body><p>Item 1A. Risk Factors</p>"
+        "<p>We may face litigation.</p></body></html>"
+    )
+    good = score_filing_html(ok_html, "10-K")
+
+    def fake_score(ticker, fiscal_year, **kwargs):
+        if ticker == "BAD":
+            raise FilingNotFoundError("No 10-K for BAD FY2025")
+        result = good
+        result.filing = {"ticker": ticker, "fiscal_year": fiscal_year}
+        return result
+
+    monkeypatch.setattr("disclosure_alpha.pipeline.score_filing_ticker", fake_score)
+    batch = score_panel_tickers(["GOOD", "BAD", "GOOD2"], 2025)
+    assert batch.summary == {"ok": 2, "failed": 1}
+    by_ticker = {r.ticker: r for r in batch.results}
+    assert by_ticker["GOOD"].status == "ok"
+    assert by_ticker["BAD"].status == "error"
+    assert "BAD" in by_ticker["BAD"].error
+    assert by_ticker["GOOD2"].status == "ok"
+
+
+def test_score_panel_tickers_propagates_unexpected_errors(monkeypatch):
+    from disclosure_alpha.pipeline import score_panel_tickers
+
+    def fake_score(ticker, fiscal_year, **kwargs):
+        raise RuntimeError("unexpected bug")
+
+    monkeypatch.setattr("disclosure_alpha.pipeline.score_filing_ticker", fake_score)
+    with pytest.raises(RuntimeError, match="unexpected bug"):
+        score_panel_tickers(["AAPL"], 2025)

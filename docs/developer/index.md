@@ -1,6 +1,6 @@
 # Developer Guide
 
-Architecture, testing, and contribution notes. This section is under development — see the repository `CONTRIBUTING` docs for now.
+Architecture, testing, and contribution notes. Contributor-only — excluded from the public Read the Docs build (see `docs/conf.py`). See the repository `CONTRIBUTING` docs for contribution workflow.
 
 ```{toctree}
 :hidden:

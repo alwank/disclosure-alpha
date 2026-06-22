@@ -1,9 +1,23 @@
+import logging
 import os
 from functools import lru_cache
 
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
+_logger = logging.getLogger(__name__)
+_tfidf_fallback_warned = False
+
+
+def _warn_tfidf_fallback() -> None:
+    global _tfidf_fallback_warned
+    if not _tfidf_fallback_warned:
+        _tfidf_fallback_warned = True
+        _logger.warning(
+            "sentence-transformers unavailable; using TF-IDF embeddings "
+            "(install disclosure-alpha[semantic] or set EMBEDDING_BACKEND=tfidf)"
+        )
 
 
 @lru_cache(maxsize=1)
@@ -16,6 +30,7 @@ def _get_sentence_model():
 
         return SentenceTransformer("all-MiniLM-L6-v2")
     except Exception:
+        _warn_tfidf_fallback()
         return None
 
 

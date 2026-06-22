@@ -1,4 +1,4 @@
-"""Disclosure changes response models — Track B owns implementation."""
+"""Disclosure changes response models."""
 
 from __future__ import annotations
 

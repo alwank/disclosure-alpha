@@ -34,6 +34,7 @@ jobs:
       - run: pytest -q -m "not integration" --cov=disclosure_alpha --cov-fail-under=75
         env:
           EMBEDDING_BACKEND: tfidf
+      # Advisory until dictionary cohort stabilizes; does not block merge on shift warnings.
       - name: Dictionary distribution shift (non-blocking)
         run: python scripts/validate_dictionary_shift.py --allow-fail
         continue-on-error: true

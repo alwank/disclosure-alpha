@@ -1,4 +1,4 @@
-"""Disclosure changes API tests — Track B owns implementation."""
+"""Disclosure changes API tests."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Panel batch endpoint — Track C owns implementation."""
+"""Panel batch endpoint."""
 
 from __future__ import annotations
 

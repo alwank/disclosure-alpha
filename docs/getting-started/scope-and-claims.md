@@ -6,10 +6,20 @@ Canonical scope statement for public docs. Other pages link here instead of repe
 
 Disclosure Alpha **does**:
 
-- Parse **10-K, 10-Q, and 8-K** HTML and extract named sections (Item 1A, MD&A, controls, etc.)
+- Parse **10-K and 10-Q** HTML and extract named sections (Item 1A, MD&A, controls, etc.); **8-K** via local HTML or MCP Builder only (see surface matrix below)
 - Compute **deterministic** text metrics, boolean flags, and section diffs — **no LLM required**
 - Produce reproducible **0–100 disclosure risk scores** with versioned artifact strings in every response
 - Expose the same pipeline via **CLI, Python SDK, HTTP API, and MCP**
+
+### Form-type support by surface
+
+| Surface | 10-K / 10-Q | 8-K |
+|---------|-------------|-----|
+| CLI `--html` | Yes | Yes |
+| CLI `--ticker` / EDGAR | Yes | No |
+| HTTP ticker routes | Yes | No |
+| MCP Analyst | Yes | No |
+| MCP Builder | Yes | Yes (local HTML) |
 
 Scores summarize **language and change signals** in filings. They are research and integration tools, not trading signals.
 

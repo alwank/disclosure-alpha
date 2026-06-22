@@ -13,7 +13,7 @@ from disclosure_alpha.pipeline import (
     PanelTickerResult,
     score_filing_html,
 )
-from disclosure_alpha.version import SCORING_MODEL_VERSION
+from disclosure_alpha.version import SCORING_MODEL_VERSION, SCORING_MODEL_VERSION_V2
 
 pytest.importorskip("fastapi")
 
@@ -90,3 +90,66 @@ def test_panel_passes_compare(mock_score):
     assert resp.status_code == 200
     mock_score.assert_called_once()
     assert mock_score.call_args.kwargs["compare_prior"] is False
+
+
+@patch("disclosure_alpha.api.endpoints.panel.score_panel_tickers")
+def test_panel_default_scoring_version_v1(mock_score):
+    mock_score.return_value = PanelBatchResult(
+        results=[_ok_panel_result("AAPL")],
+        summary={"ok": 1, "failed": 0},
+        versions={"scoring_model_version": SCORING_MODEL_VERSION},
+    )
+    resp = client.post(
+        "/v1/panel/disclosure-matrix",
+        json={"tickers": ["AAPL"], "fiscal_year": 2025},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["versions"]["scoring_model_version"] == SCORING_MODEL_VERSION
+
+
+@patch("disclosure_alpha.api.endpoints.panel.score_panel_tickers")
+def test_panel_scoring_model_version_v2(mock_score):
+    scored = score_filing_html(
+        "<html><body><p>Item 1A. Risk Factors</p><p>Risk text.</p></body></html>",
+        "10-K",
+    )
+    from disclosure_alpha.pipeline import score_deterministic_v2
+
+    v2_scores = score_deterministic_v2(scored.metrics)
+    mock_score.return_value = PanelBatchResult(
+        results=[
+            PanelTickerResult(
+                ticker="AAPL",
+                status="ok",
+                filing={"ticker": "AAPL", "fiscal_year": 2025},
+                scores=v2_scores,
+            )
+        ],
+        summary={"ok": 1, "failed": 0},
+        versions={"scoring_model_version": SCORING_MODEL_VERSION_V2},
+    )
+    resp = client.post(
+        "/v1/panel/disclosure-matrix",
+        json={
+            "tickers": ["AAPL"],
+            "fiscal_year": 2025,
+            "scoring_model_version": "deterministic_scoring_v2",
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["versions"]["scoring_model_version"] == SCORING_MODEL_VERSION_V2
+    mock_score.assert_called_once()
+    assert mock_score.call_args.kwargs["scoring_model_version"] == SCORING_MODEL_VERSION_V2
+
+
+def test_panel_invalid_scoring_model_version():
+    resp = client.post(
+        "/v1/panel/disclosure-matrix",
+        json={
+            "tickers": ["AAPL"],
+            "fiscal_year": 2025,
+            "scoring_model_version": "deterministic_scoring_v3",
+        },
+    )
+    assert resp.status_code == 422

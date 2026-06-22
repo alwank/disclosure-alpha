@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 
 class PanelRequest(BaseModel):
@@ -15,6 +17,10 @@ class PanelRequest(BaseModel):
     compare: str = "prior"
     include: str | None = None
     fields: str | None = None
+    scoring_model_version: str = Field(
+        default=SCORING_MODEL_VERSION,
+        description="Scoring model: deterministic_scoring_v1 (default) or deterministic_scoring_v2",
+    )
 
 
 class PanelResult(BaseModel):

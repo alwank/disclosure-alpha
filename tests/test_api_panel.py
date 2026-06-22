@@ -93,6 +93,21 @@ def test_panel_passes_compare(mock_score):
 
 
 @patch("disclosure_alpha.api.endpoints.panel.score_panel_tickers")
+def test_panel_default_scoring_version_v1(mock_score):
+    mock_score.return_value = PanelBatchResult(
+        results=[_ok_panel_result("AAPL")],
+        summary={"ok": 1, "failed": 0},
+        versions={"scoring_model_version": SCORING_MODEL_VERSION},
+    )
+    resp = client.post(
+        "/v1/panel/disclosure-matrix",
+        json={"tickers": ["AAPL"], "fiscal_year": 2025},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["versions"]["scoring_model_version"] == SCORING_MODEL_VERSION
+
+
+@patch("disclosure_alpha.api.endpoints.panel.score_panel_tickers")
 def test_panel_scoring_model_version_v2(mock_score):
     scored = score_filing_html(
         "<html><body><p>Item 1A. Risk Factors</p><p>Risk text.</p></body></html>",

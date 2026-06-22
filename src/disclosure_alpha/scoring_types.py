@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Any
 
 COMPONENT_WEIGHTS = {
     "risk_factor_intensity_score": 0.20,
@@ -25,12 +26,34 @@ class ComponentScores:
     event_severity_score: float | None = None
     specificity_quality_score: float | None = None
     tone_negativity_score: float | None = None
+    cybersecurity_incident_risk_score: float | None = None
+    event_materiality_score: float | None = None
 
 
 @dataclass
 class AggregateScores:
     disclosure_quality_score: float | None = None
     disclosure_deterioration_score: float | None = None
+    static_disclosure_quality_score: float | None = None
+    static_disclosure_risk_score: float | None = None
+    disclosure_change_risk_score: float | None = None
+
+
+STATIC_RISK_COMPONENTS = (
+    "tone_negativity_score",
+    "boilerplate_risk_score",
+    "mdna_uncertainty_score",
+    "legal_regulatory_risk_score",
+    "liquidity_stress_score",
+    "internal_controls_risk_score",
+)
+
+CHANGE_RISK_COMPONENTS = (
+    "disclosure_change_score",
+    "event_severity_score",
+)
+
+QUALITY_COMPONENTS = ("specificity_quality_score",)
 
 
 @dataclass
@@ -67,3 +90,49 @@ def overall_from_components(
         total_w = sum(weights[k] for k in present)
         overall = clamp_score(sum(comp_map[k] * weights[k] for k in present) / total_w)
     return overall, coverage, missing
+
+
+@dataclass
+class ScoreEvidence:
+    name: str
+    value: float | None
+    weight: float
+    section: str | None = None
+    raw_value: float | bool | None = None
+    reason: str = ""
+
+
+def blend_evidence(evidence: list[ScoreEvidence]) -> tuple[float | None, dict[str, Any]]:
+    pairs = [(e.value, e.weight, e) for e in evidence if e.value is not None]
+    if not pairs:
+        return None, {}
+    total_w = sum(w for _, w, _ in pairs)
+    score = sum(v * w for v, w, _ in pairs) / total_w
+    inputs = {
+        e.name: {
+            "value": e.value,
+            "weight": e.weight,
+            "section": e.section,
+            "raw_value": e.raw_value,
+            "reason": e.reason,
+        }
+        for _, _, e in pairs
+    }
+    return score, inputs
+
+
+def aggregate_split_scores(components: ComponentScores) -> AggregateScores:
+    """Split static quality, static risk, and change risk from component scores."""
+    comp = components.__dict__
+    static_risk = blend_scores(*(comp.get(k) for k in STATIC_RISK_COMPONENTS))
+    change_risk = blend_scores(*(comp.get(k) for k in CHANGE_RISK_COMPONENTS))
+    quality = blend_scores(*(comp.get(k) for k in QUALITY_COMPONENTS))
+    if quality is None and comp.get("boilerplate_risk_score") is not None:
+        quality = clamp_score(100 - comp["boilerplate_risk_score"])
+    return AggregateScores(
+        disclosure_quality_score=quality,
+        disclosure_deterioration_score=comp.get("disclosure_change_score"),
+        static_disclosure_quality_score=quality,
+        static_disclosure_risk_score=clamp_score(static_risk) if static_risk is not None else None,
+        disclosure_change_risk_score=clamp_score(change_risk) if change_risk is not None else None,
+    )

@@ -397,3 +397,120 @@ def test_confidence_bounds():
     assert 0.0 <= empty.confidence_score <= 1.0
     assert 0.0 <= full.confidence_score <= 1.0
     assert full.confidence_score > empty.confidence_score
+
+
+def test_blend_evidence_weighted_average():
+    from disclosure_alpha.scoring_types import ScoreEvidence, blend_evidence
+
+    score, inputs = blend_evidence(
+        [
+            ScoreEvidence("a", 40.0, 0.5, section="s1", raw_value=0.4),
+            ScoreEvidence("b", 80.0, 0.5, section="s2", raw_value=0.8),
+        ]
+    )
+    assert score == 60.0
+    assert "a" in inputs and inputs["a"]["section"] == "s1"
+
+
+def test_v2_material_weakness_without_item_1a():
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    agg = aggregate_deterministic_matrix_v2(
+        section_metrics={},
+        section_diffs={},
+        section_flags={"item_9a_controls": {"material_weakness_flag": True}},
+    )
+    assert agg.components.internal_controls_risk_score is not None
+    assert "internal_controls_risk_score" not in agg.missing_components
+
+
+def test_v2_legal_flag_without_item_1a():
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    agg = aggregate_deterministic_matrix_v2(
+        section_metrics={},
+        section_diffs={},
+        section_flags={"item_3_legal_proceedings": {"investigation_flag": True}},
+    )
+    assert agg.components.legal_regulatory_risk_score is not None
+
+
+def test_v2_going_concern_without_mdna():
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    agg = aggregate_deterministic_matrix_v2(
+        section_metrics={},
+        section_diffs={},
+        section_flags={"item_7_mdna": {"going_concern_flag": True}},
+    )
+    assert agg.components.liquidity_stress_score is not None
+
+
+def test_v1_unchanged_flag_without_base_stays_null():
+    agg = aggregate_deterministic_matrix(
+        section_metrics={},
+        section_diffs={},
+        section_flags={"item_9a_controls": {"material_weakness_flag": True}},
+    )
+    assert agg.components.internal_controls_risk_score is None
+
+
+def test_aggregate_split_scores():
+    agg = aggregate_deterministic_matrix(
+        section_metrics=_BASE_METRICS,
+        section_diffs=_BASE_DIFFS,
+    )
+    assert agg.aggregates.static_disclosure_risk_score is not None
+    assert agg.aggregates.disclosure_change_risk_score is not None
+    assert agg.aggregates.static_disclosure_quality_score is not None
+    assert agg.overall_disclosure_risk_score is not None
+
+
+def test_v2_cyber_incident_score_item_105():
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    agg = aggregate_deterministic_matrix_v2(
+        section_metrics={},
+        section_diffs={},
+        section_flags={"item_1_05": {"cybersecurity_incident_flag": True}},
+    )
+    assert agg.components.cybersecurity_incident_risk_score is not None
+    # item_1c is governance-only scope; incident flag there must not score
+    agg_gov = aggregate_deterministic_matrix_v2(
+        section_metrics={},
+        section_diffs={},
+        section_flags={"item_1c_cybersecurity": {"cybersecurity_incident_flag": True}},
+    )
+    assert agg_gov.components.cybersecurity_incident_risk_score is None
+
+
+def test_v2_cyber_governance_item_1c_no_incident_score():
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    agg = aggregate_deterministic_matrix_v2(
+        section_metrics={
+            "item_1c_cybersecurity": {
+                "negative_word_ratio": 0.01,
+                "uncertainty_word_ratio": 0.01,
+            }
+        },
+        section_diffs={},
+        section_flags={"item_1c_cybersecurity": {"cybersecurity_incident_flag": False}},
+    )
+    assert agg.components.cybersecurity_incident_risk_score is None
+
+
+def test_v2_event_materiality_8k():
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    agg = aggregate_deterministic_matrix_v2(
+        section_metrics={
+            "item_8_01": {
+                "uncertainty_word_ratio": 0.08,
+                "negative_word_ratio": 0.05,
+            }
+        },
+        section_diffs={},
+        section_flags={"item_8_01": {"investigation_flag": True}},
+    )
+    assert agg.components.event_materiality_score is not None

@@ -26,7 +26,9 @@
           "internal_controls_risk_score": 3.4483,
           "event_severity_score": null,
           "specificity_quality_score": 36.2069,
-          "tone_negativity_score": 5.2956
+          "tone_negativity_score": 5.2956,
+          "cybersecurity_incident_risk_score": null,
+          "event_materiality_score": null
         }
       }
     },

@@ -29,7 +29,23 @@ def main() -> None:
     parser.add_argument("--boilerplate-min-docs", type=int, default=10)
     parser.add_argument("--boilerplate-min-doc-frac", type=float, default=0.25)
     parser.add_argument("--holdout", type=Path, default=None)
+    parser.add_argument(
+        "--check-versions",
+        action="store_true",
+        help="Exit 1 if committed validation reports have stale artifact versions",
+    )
     args = parser.parse_args()
+
+    if args.check_versions:
+        from disclosure_alpha.validation.report_versions import check_report_versions
+
+        errors = check_report_versions()
+        if errors:
+            for err in errors:
+                print(err, file=sys.stderr)
+            sys.exit(1)
+        print("validation report versions OK")
+        sys.exit(0)
 
     if not args.corpus.exists():
         print(f"corpus not found: {args.corpus}", file=sys.stderr)

@@ -1,9 +1,9 @@
 {
   "validation_level": "L3",
-  "generated_at": "2026-06-19T16:30:12.717261+00:00",
+  "generated_at": "2026-06-22T00:00:00+00:00",
   "versions": {
     "parser_version": "section_extractor_v1",
-    "metrics_engine_version": "text_metrics_v1",
+    "metrics_engine_version": "text_metrics_v2",
     "scoring_model_version": "deterministic_scoring_v1"
   },
   "inputs": {
@@ -41,6 +41,7 @@
     }
   },
   "monotonicity_pass": true,
+  "outcome_gates_pass": true,
   "overall_l3_pass": true,
   "notes": [
     "edgar mode: full 10-K + prior via score_filing_ticker (requires SEC cache)"

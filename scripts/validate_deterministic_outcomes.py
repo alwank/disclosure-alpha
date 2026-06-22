@@ -41,7 +41,23 @@ def main() -> None:
     )
     parser.add_argument("--min-n", type=int, default=50)
     parser.add_argument("--limit", type=int, default=None, help="Score first N outcome rows only")
+    parser.add_argument(
+        "--check-versions",
+        action="store_true",
+        help="Exit 1 if committed validation reports have stale artifact versions",
+    )
     args = parser.parse_args()
+
+    if args.check_versions:
+        from disclosure_alpha.validation.report_versions import check_report_versions
+
+        errors = check_report_versions()
+        if errors:
+            for err in errors:
+                print(err, file=sys.stderr)
+            sys.exit(1)
+        print("validation report versions OK")
+        sys.exit(0)
 
     default_outcomes, default_report = _paths_for_fy(args.fiscal_year)
     if args.outcomes is None:

@@ -95,7 +95,9 @@
     }
   },
   "edgar_pass": false,
+  "edgar_gates_pass": false,
   "construct_pass": true,
+  "construct_pairs_pass": true,
   "overall_l2_pass": false,
   "discordant_tickers": {
     "specificity_vs_ner": [

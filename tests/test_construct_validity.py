@@ -146,7 +146,11 @@ def test_construct_report_shape():
     }
     assert "edgar_gates" in d
     assert "edgar_pass" in d
+    assert "edgar_gates_pass" in d
     assert "construct_pass" in d
+    assert "construct_pairs_pass" in d
+    assert d["construct_pairs_pass"] == d["construct_pass"]
+    assert d["edgar_gates_pass"] == d["edgar_pass"]
     assert d["overall_l2_pass"] == (d["edgar_pass"] and d["construct_pass"])
     assert d["corpus"]["n_after_filters"] == 3
 

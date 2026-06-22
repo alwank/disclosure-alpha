@@ -1,41 +1,43 @@
 # Read the Docs Public Documentation Improvement Plan
 
-> **Historical — June 2026 implementation complete;** see [codebase-audit-report](codebase-audit-report.md) for remaining gaps.
+> **Archive — do not treat as an active backlog.** June 2026 implementation is complete. Remaining gaps are tracked in [codebase-audit-report](codebase-audit-report.md).
 
-> **Status (2026-06):** Main items in this plan were implemented in June 2026 (public nav cleanup, claim centralization, onboarding flow, OpenAPI examples, composite/OSS doc cleanup). Remaining repo hygiene is tracked separately — not duplicated here.
+Audit date: 2026-06-22 · Archived: 2026-06-23
 
-Audit date: 2026-06-22
+Scope (original): public Read the Docs experience for Disclosure Alpha — `docs/index.md`, Getting Started, Guides, Reference, Methodology, Validation, Legal, RTD build config.
 
-Scope: public Read the Docs experience for Disclosure Alpha, including `docs/index.md`, Getting Started, Guides, Reference, Methodology, Validation, Legal, RTD build config, and pages currently built through hidden toctrees.
+This file is excluded from the public RTD build (`docs/conf.py`). The sections below preserve the original audit and plan for context; status markers reflect what shipped on `main`.
 
-## Executive Summary
+## Implementation rollup (June 2026)
 
-The documentation is already structurally usable: the Sphinx build succeeds, the home page gives clear first steps, and the main public sections map to real product surfaces. The main public-readiness issues are not build failures. They are audience separation, claim hygiene, first-run confidence, and overexposed implementation detail.
+| Area | Outcome |
+|------|---------|
+| Public hygiene (R1, R3) | Contributor/developer pages excluded from RTD; composite/OSS scope notes removed |
+| Onboarding (A1–A3) | {doc}`getting-started/first-successful-run`, {doc}`getting-started/scope-and-claims`, {doc}`examples/index` in public nav |
+| Integration reference (A4–A6) | {doc}`reference/http/endpoints`, {doc}`reference/versioning`, {doc}`guides/production` |
+| CI docs gates (A7) | `sphinx-build -E -W` and linkcheck in `.github/workflows/ci.yml` |
+| Endpoint/schema stubs (R2) | Placeholder trees under `guides/http/endpoints/` and `reference/http/schemas/` removed |
+| Claim centralization | Validation counts in {doc}`validation/evidence-and-limitations` and {doc}`getting-started/scope-and-claims` |
 
-Highest impact improvements:
+## Final state (June 2026)
+
+- `sphinx-build -E -W -b html docs docs/_build/html` passes and generates **52** public pages.
+- `sphinx-build -b linkcheck` runs in CI; `linkcheck_ignore` in `docs/conf.py` documents bot-blocked DOI/SEC/MCP URLs.
+- `docs/conf.py` excludes `developer/**`, `CONTRIBUTING_DOCS.md`, and this plan from the public build.
+- `docs/developer/architecture.md` and `docs/developer/testing.md` are contributor-facing pages **without** `TBD` / `TODO` placeholders.
+- Public-build pages contain no accidental `TODO` / `TBD` (verified via `rg` in CI contributor docs).
+- Validation numbers are centralized (n=428 construct validity; n=435 volatility cohort).
+- Score catalog lives at {doc}`reference/score-catalog`; disclaimer duplication trimmed via scope/evidence cross-links.
+
+## Original executive summary (June 2026 audit)
+
+At audit time the docs were structurally usable but needed audience separation, claim hygiene, first-run confidence, and less overexposed implementation detail. Highest-impact items (all implemented):
 
 1. Remove hidden public pages meant for contributors or developer placeholders.
 2. Add a stronger "happy path" onboarding flow with expected outputs and troubleshooting checkpoints.
 3. Centralize validation claims so README, docs, changelog, and contributor guidance do not drift.
 4. Add public API examples generated from the real OpenAPI schema instead of maintaining placeholder endpoint/schema pages.
 5. Trim repeated "not supported / no LLM" language into one canonical limitation block and link to it (`scope-and-claims`, `evidence-and-limitations`).
-
-## Current State Observations
-
-- `sphinx-build -E -W -b html docs docs/_build/html` passes and generates 48 pages.
-- `sphinx-build -b linkcheck docs docs/_build/linkcheck` currently reports external link issues:
-  - DOI links in `docs/methodology/research-foundation.md` return 403 or redirects under linkcheck.
-  - SEC links in `docs/legal.md` return 403 under linkcheck.
-  - The MCP homepage redirects to a deeper docs URL.
-- `docs/conf.py` excludes `developer/**` and `CONTRIBUTING_DOCS.md` from the public RTD build (R1 done); contributor pages remain in-repo only.
-- `docs/developer/architecture.md` and `docs/developer/testing.md` are contributor-facing stubs without `TBD` / `TODO` placeholders.
-- Several endpoint and schema stub files exist under excluded paths:
-  - `docs/guides/http/endpoints/**`
-  - `docs/reference/http/schemas/**`
-  These are excluded from public build today, but they create future publication risk if re-added.
-- Validation numbers are centralized in {doc}`validation/evidence-and-limitations` and {doc}`getting-started/scope-and-claims` (n=428 construct validity; n=435 volatility cohort).
-- Composite/OSS product-scope notes removed from public docs (2026-06-22); score catalog renamed to {doc}`reference/score-catalog`.
-- The public docs repeat similar disclaimers across README, index, methodology, FAQ, HTTP guide, glossary, and legal pages.
 
 ## Audience Model
 
@@ -51,7 +53,7 @@ Read the Docs should primarily serve audiences 1-4. Contributor-only docs can li
 
 ## ADD
 
-### A1. Add a "First Successful Run" page
+### A1. Add a "First Successful Run" page — **done (2026-06)**
 
 Create `docs/getting-started/first-successful-run.md` and add it near the top of `docs/getting-started/index.md`.
 
@@ -75,7 +77,7 @@ Acceptance criteria:
 - The page links to full CLI/Python guides after success, not before.
 - The page uses a stable fixture or local HTML example where possible.
 
-### A2. Add a public "What This Does and Does Not Claim" page
+### A2. Add a public "What This Does and Does Not Claim" page — **done (2026-06)**
 
 Create `docs/getting-started/scope-and-claims.md` or expand `docs/validation/evidence-and-limitations.md` into a more user-facing canonical page.
 
@@ -94,7 +96,7 @@ Acceptance criteria:
 - README, RTD index, methodology overview, FAQ, HTTP guide, legal page, and contributor docs link to this page instead of repeating full disclaimers.
 - Validation counts are pulled from one source of truth or copied from one explicitly named report.
 
-### A3. Add an "Examples Gallery" page
+### A3. Add an "Examples Gallery" page — **done (2026-06)**
 
 Create `docs/examples/index.md` and include it in the public nav, while continuing to exclude raw JSON files from page rendering if desired.
 
@@ -117,7 +119,7 @@ Acceptance criteria:
 - `docs/examples/score-minimal-10k.json`, `score-with-prior-snippet.json`, and `panel-response-snippet.json` are discoverable from RTD navigation.
 - HTTP guide and workflows link to the gallery.
 
-### A4. Add real HTTP endpoint reference generated from FastAPI/OpenAPI
+### A4. Add real HTTP endpoint reference generated from FastAPI/OpenAPI — **done (2026-06)**
 
 Replace the excluded endpoint stubs with generated or semi-generated endpoint reference.
 
@@ -132,7 +134,7 @@ Recommended approach:
   - common errors
   - one curl example per endpoint
 
-Why: the repo contains endpoint stub pages with TODO content, but the public reference only summarizes the API. Public integrators need endpoint-level details that match the running app.
+Why (original): placeholder endpoint stubs existed; public integrators needed endpoint-level details that match the running app. Stubs were removed; {doc}`reference/http/endpoints` is the canonical reference.
 
 Acceptance criteria:
 
@@ -140,7 +142,7 @@ Acceptance criteria:
 - Endpoint docs are generated from or checked against the live FastAPI schema.
 - The generated reference is linked from `docs/reference/http/openapi.md`.
 
-### A5. Add a "Versioning and Reproducibility" page
+### A5. Add a "Versioning and Reproducibility" page — **done (2026-06)**
 
 Create `docs/reference/versioning.md`.
 
@@ -159,7 +161,7 @@ Acceptance criteria:
 - Install docs link to versioning from "Pin a release."
 - Methodology and validation pages link to versioning instead of duplicating artifact tables.
 
-### A6. Add a "Production Notes" page for hosted use
+### A6. Add a "Production Notes" page for hosted use — **done (2026-06)**
 
 Create `docs/guides/production.md` or `docs/guides/deployment.md`.
 
@@ -180,7 +182,7 @@ Acceptance criteria:
 - HTTP guide links to production notes.
 - Legal page links to production notes for EDGAR usage and redistribution caveats.
 
-### A7. Add docs quality checks to CI or contributor workflow
+### A7. Add docs quality checks to CI or contributor workflow — **done (2026-06)**
 
 Add or document a docs-check command that runs:
 
@@ -225,25 +227,9 @@ Acceptance criteria:
 - Fresh Sphinx build no longer reads `CONTRIBUTING_DOCS`, `developer/architecture`, or `developer/testing`.
 - `docs/README.md` remains the repo-facing docs contributor entry point.
 
-### R2. Remove placeholder endpoint/schema pages unless they are actively generated
+### R2. Remove placeholder endpoint/schema pages unless they are actively generated — **done (2026-06)**
 
-Current excluded stubs:
-
-- `docs/guides/http/endpoints/*.md`
-- `docs/reference/http/schemas/*.md`
-- `docs/reference/python/validation.md`
-
-Recommended action:
-
-- Delete the placeholder files, or keep them outside `docs/` until real content exists.
-- If they stay, add a README in the excluded directory that clearly says they are drafts and not public RTD pages.
-
-Why: excluded stubs are easy to accidentally publish later. Public docs should not contain "coming soon" reference pages for core endpoints.
-
-Acceptance criteria:
-
-- `rg -n "TODO|TBD" docs` returns only intentionally excluded repo docs, or returns nothing.
-- No excluded placeholder is referenced by any public toctree.
+Placeholder trees (`docs/guides/http/endpoints/`, `docs/reference/http/schemas/`) were deleted. Endpoint reference lives at {doc}`reference/http/endpoints`.
 
 ### R3. Remove unsupported-product emphasis from high-traffic pages — **done (2026-06-22)**
 

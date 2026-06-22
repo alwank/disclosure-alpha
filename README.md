@@ -83,7 +83,7 @@ Five entry points, one deterministic pipeline. Not sure which to pick? See [Choo
 | Cursor / Claude (ticker scoring) | `disclosure-alpha-mcp-analyst` | `[mcp]` |
 | Agent with raw HTML | `disclosure-alpha-mcp-builder` | `[mcp]` |
 
-HTTP matrix tiers on `GET /v1/company/{ticker}/disclosure-matrix` only: `tier=lite` (headline score), `tier=standard` (components + metrics), `tier=analyst` (provenance for audit). See [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html).
+HTTP matrix tiers apply to **single-ticker GET** `GET /v1/company/{ticker}/disclosure-matrix` only: `tier=lite` (headline score), `tier=standard` (components + metrics), `tier=analyst` (provenance for audit). Panel `POST /v1/panel/disclosure-matrix` has no `tier` param — use `include` / `fields`. See [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html).
 
 ```bash
 disclosure-alpha-api              # HTTP on :8000
@@ -99,7 +99,7 @@ Deterministic scores — ten computed components (nine headline-weighted, 0–10
 | Task | How |
 |------|-----|
 | Score one company | `disclosure-alpha score --ticker AAPL --fiscal-year 2025 --form 10-K` |
-| Screen up to 25 tickers | HTTP `POST /v1/panel/disclosure-matrix` |
+| Screen up to 25 tickers | HTTP `POST /v1/panel/disclosure-matrix` (no `tier`; use `include` / `fields`) |
 | Compare year-over-year | `--prior-html prior.html` or HTTP `compare=prior` |
 | Work offline (no EDGAR) | `disclosure-alpha score --html filing.html --form 10-K` |
 | Inspect raw signals | `disclosure-alpha metrics …` or `GET /disclosure-metrics` |

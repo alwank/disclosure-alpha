@@ -16,9 +16,11 @@ Bump any artifact version can change scores for the same filing. Record all vers
 
 ## Scoring model: v1 (default) vs v2 (opt-in)
 
-**Default:** CLI, HTTP, MCP, `score_filing_html()`, and `score_deterministic()` all use `deterministic_scoring_v1`. The `versions.scoring_model_version` field in responses is `deterministic_scoring_v1` unless you call the v2 entry point yourself.
+**Default:** CLI, HTTP, MCP, `score_filing_html()`, and `score_deterministic()` all use `deterministic_scoring_v1`. The `versions.scoring_model_version` field in responses is `deterministic_scoring_v1` unless you opt into v2.
 
-**Opt-in v2:** `score_deterministic_v2()` in `disclosure_alpha.pipeline` runs `deterministic_scoring_v2`. It is **not** wired to HTTP or MCP today. To score with v2 in Python:
+**Opt-in v2 (HTTP):** `GET /v1/company/{ticker}/disclosure-matrix` accepts `scoring_model_version=deterministic_scoring_v2`. Panel, MCP, and other HTTP routes remain v1-only.
+
+**Opt-in v2 (Python):** `score_deterministic_v2()` in `disclosure_alpha.pipeline` runs `deterministic_scoring_v2`. To score with v2 in Python:
 
 ```python
 from disclosure_alpha.pipeline import compute_section_metrics, score_deterministic_v2

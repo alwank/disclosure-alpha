@@ -4,6 +4,7 @@ from typing import Any
 
 from disclosure_alpha.dictionaries import sections_for_form_type
 from disclosure_alpha.section_extractor import ExtractedSection
+from disclosure_alpha.validation.scoring_version import normalize_scoring_version
 
 _MATRIX_FIELD_MAP = {
     "overall": "overall_disclosure_risk_score",
@@ -30,6 +31,10 @@ def parse_sections_param(
             f"Valid: {', '.join(sorted(known))}"
         )
     return names
+
+
+def parse_scoring_model_version(version: str) -> str:
+    return normalize_scoring_version(version)
 
 
 def parse_compare_param(compare: str) -> bool:

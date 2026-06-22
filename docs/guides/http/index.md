@@ -81,6 +81,7 @@ Optional `tier` query param overrides `include` and `fields`:
 | `tier` | — | `lite`, `standard`, or `analyst` |
 | `include` | `metrics,provenance` | Comma-set: `metrics`, `provenance`. Empty → scores only |
 | `fields` | all | Slim scores, e.g. `fields=overall,components` |
+| `scoring_model_version` | `deterministic_scoring_v1` | Opt-in `deterministic_scoring_v2` for experimental v2 blends (matrix only) |
 
 ## Example requests
 

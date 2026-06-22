@@ -39,6 +39,11 @@ class OutcomesValidationReport:
     monotonicity_pass: bool
     overall_l3_pass: bool
     notes: list[str] = field(default_factory=list)
+    outcome_gates_pass: bool | None = None
+
+    def __post_init__(self) -> None:
+        if self.outcome_gates_pass is None:
+            self.outcome_gates_pass = self.monotonicity_pass
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -48,6 +53,7 @@ class OutcomesValidationReport:
             "inputs": self.inputs,
             "gates": {k: v.to_dict() for k, v in self.gates.items()},
             "monotonicity_pass": self.monotonicity_pass,
+            "outcome_gates_pass": self.outcome_gates_pass,
             "overall_l3_pass": self.overall_l3_pass,
             "notes": self.notes,
         }

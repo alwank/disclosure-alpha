@@ -102,6 +102,21 @@ python scripts/validate_deterministic_construct.py \
   --min-n 3 --boilerplate-min-docs 2
 ```
 
+## Full-matrix validation (CI smoke)
+
+Multi-section matrix gates (Item 1A, MD&A, controls, legal, cyber, 8-K events):
+
+```bash
+# Build from local HTML (optional)
+python scripts/build_matrix_validation_corpus.py --html-dir ./my_html --form 10-K
+
+# CI fixture (committed, no network)
+python -m pytest tests/test_matrix_validation.py -q
+```
+
+Fixture: `tests/fixtures/validation/matrix_mini_corpus.jsonl`  
+Modules: `validation/matrix_corpus.py`, `validation/matrix_gates.py`
+
 ## Dictionary distribution shift (v2+)
 
 After dictionary or matching changes, compare metrics and component scores against the frozen baseline:

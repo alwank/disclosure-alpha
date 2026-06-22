@@ -45,6 +45,14 @@ class ValidationReport:
     overall_l2_pass: bool
     discordant_tickers: dict[str, list[str]] = field(default_factory=dict)
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    construct_pairs_pass: bool | None = None
+    edgar_gates_pass: bool | None = None
+
+    def __post_init__(self) -> None:
+        if self.construct_pairs_pass is None:
+            self.construct_pairs_pass = self.construct_pass
+        if self.edgar_gates_pass is None:
+            self.edgar_gates_pass = self.edgar_pass
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -55,7 +63,9 @@ class ValidationReport:
             "pairs": {k: v.to_dict() for k, v in self.pairs.items()},
             "edgar_gates": self.edgar_gates,
             "edgar_pass": self.edgar_pass,
+            "edgar_gates_pass": self.edgar_gates_pass,
             "construct_pass": self.construct_pass,
+            "construct_pairs_pass": self.construct_pairs_pass,
             "overall_l2_pass": self.overall_l2_pass,
             "discordant_tickers": self.discordant_tickers,
             "diagnostics": self.diagnostics,

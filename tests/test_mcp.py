@@ -10,7 +10,7 @@ import pytest
 
 pytest.importorskip("mcp")
 
-from disclosure_alpha.deterministic_scoring import DETERMINISTIC_COMPONENT_WEIGHTS
+from disclosure_alpha.scoring_types import COMPONENT_WEIGHTS
 from disclosure_alpha.mcp.server import (
     compute_section_metrics_tool,
     diff_sections,
@@ -66,6 +66,7 @@ def test_mcp_score_deterministic_tool():
     )
     payload = json.loads(score_deterministic_tool(json.dumps(metrics)))
     assert payload["overall_disclosure_risk_score"] is not None
+    assert "aggregates" in payload
     assert payload["scoring_model_version"] == SCORING_MODEL_VERSION
 
 
@@ -109,4 +110,4 @@ def test_mcp_list_company_filings(mock_list):
 
 def test_mcp_taxonomy_resource():
     payload = json.loads(taxonomy())
-    assert set(payload["component_weights"]) == set(DETERMINISTIC_COMPONENT_WEIGHTS)
+    assert set(payload["component_weights"]) == set(COMPONENT_WEIGHTS)

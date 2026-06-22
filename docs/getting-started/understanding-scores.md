@@ -7,9 +7,21 @@
 
 How to read Disclosure Alpha's 0–100 disclosure risk scores, component fields, and coverage signals.
 
+## Higher / lower means
+
+| Field | Higher (toward 100) | Lower (toward 0) |
+|-------|---------------------|------------------|
+| `overall_disclosure_risk_score` | More concern from weighted language/change signals | Less concern |
+| `boilerplate_risk_score` | More vague / boilerplate language | More specific language |
+| `specificity_quality_score` | **Better** specificity (directionally opposite of most risk scores) | Weaker specificity |
+| `disclosure_change_score` | Larger year-over-year section change | Smaller change |
+| `score_coverage_ratio` | More headline components computed | More gaps (null components) |
+
+Version and evidence context: {doc}`../reference/versioning`, {doc}`../validation/evidence-and-limitations`.
+
 ## In plain terms
 
-Disclosure Alpha compares filing language patterns and year-over-year section changes to produce reproducible risk scores — no LLM required. The headline number is a weighted blend of nine component scores; lower coverage or missing prior filings show up as null components and a lower `score_coverage_ratio`.
+Disclosure Alpha compares filing language patterns and year-over-year section changes to produce reproducible risk scores — no LLM required. The headline number is a weighted blend of nine headline-weighted component scores; `specificity_quality_score` is also returned but excluded from headline weights. Lower coverage or missing prior filings show up as null components and a lower `score_coverage_ratio`.
 
 ## Problem framing
 
@@ -23,7 +35,7 @@ flowchart TB
   sections["Section extraction"]
   metrics["Text metrics + flags"]
   diffs["Section diffs vs prior"]
-  components["Nine component scores"]
+  components["Ten computed scores (9 headline)"]
   overall["overall_disclosure_risk_score"]
 
   html --> sections
@@ -66,7 +78,13 @@ When a prior filing is available, the scores block looks like this (abbreviated)
 :language: json
 ```
 
-Here `disclosure_change_score` is present (46.9) and coverage rises to 0.78 with only MD&A-related gaps.
+Here `disclosure_change_score` is present and coverage rises when MD&A and prior filing are both available.
+
+Full coverage (all nine headline components) with prior + Item 1A + MD&A:
+
+```{literalinclude} ../examples/score-full-coverage-snippet.json
+:language: json
+```
 
 ## Component guide
 
@@ -91,6 +109,8 @@ See {doc}`faq` for troubleshooting low coverage and null change scores.
 ## Related
 
 - {doc}`concepts` — pipeline vocabulary
+- {doc}`../reference/versioning` — artifact versions
 - {doc}`../methodology/overview` — full specification
+- {doc}`../reference/score-catalog` — component catalog and weights
 - {doc}`../validation/evidence-and-limitations` — supported claims
 - {doc}`../appendix/glossary` — terms and artifact versions

@@ -1,5 +1,13 @@
 # Metrics Engine
 
+**What this page answers:** What raw text signals are computed per section, which artifact versions apply, and which component scores they feed.
+
+| | |
+|--|--|
+| **Inputs** | Extracted section `cleaned_text` per section name |
+| **Outputs** | Per-section ratios, flags, MD&A densities (`TextMetricResult`) |
+| **Version** | `text_metrics_v2`, dictionary `built_in_dictionaries_v2` |
+
 ## In plain terms
 
 The metrics engine counts tone words, boilerplate phrases, specificity proxies, and risk flags in each extracted section. Those per-section numbers feed the diff engine and aggregation — they are the raw signals behind component scores like `mdna_uncertainty_score` and `legal_regulatory_risk_score`.
@@ -11,8 +19,7 @@ The metrics engine counts tone words, boilerplate phrases, specificity proxies, 
 - **HTTP:** `GET /v1/company/{ticker}/disclosure-metrics`
 - **Components affected:** tone-driven scores (`risk_factor_intensity_score`, `mdna_uncertainty_score`, `boilerplate_risk_score`, …) and flag-boosted scores (`legal_regulatory_risk_score`, `liquidity_stress_score`)
 
-Module: `src/disclosure_alpha/text_metrics.py`  
-Dictionary: `src/disclosure_alpha/dictionaries.py` (`built_in_dictionaries_v2`)
+Module: `text_metrics.py` (metrics engine) and the built-in dictionary module (`built_in_dictionaries_v2`).
 
 <details>
 <summary>Full specification</summary>

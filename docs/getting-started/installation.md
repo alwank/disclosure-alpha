@@ -16,7 +16,7 @@ HTTP API and MCP together:
 pip install "disclosure-alpha[api,mcp]"
 ```
 
-Pin a release when reproducibility matters:
+Pin a release when reproducibility matters — see {doc}`../reference/versioning`:
 
 ```bash
 pip install "disclosure-alpha==1.0.1[api,mcp]"
@@ -29,16 +29,29 @@ pip install "disclosure-alpha==1.0.1[api,mcp]"
 | *(base)* | CLI + Python SDK |
 | `api` | HTTP API (`disclosure-alpha-api`) |
 | `mcp` | MCP servers for Cursor / Claude Desktop |
-| `dev` | pytest tooling (contributors) |
 | `semantic` | MiniLM embeddings (default pipeline uses TF-IDF) |
-| `validation` | Construct-validity harness (spaCy) |
-| `outcomes` | L3 outcome fetch (yfinance) |
 
 ```bash
 pip install "disclosure-alpha[api]"
 pip install "disclosure-alpha[mcp]"
 pip install "disclosure-alpha[api,mcp]"
 ```
+
+<details>
+<summary>Contributor-only extras</summary>
+
+| Extra | Purpose |
+|-------|---------|
+| `dev` | pytest tooling |
+| `validation` | Construct-validity harness (spaCy) |
+| `outcomes` | L3 outcome fetch (yfinance) |
+
+```bash
+pip install -e ".[api,mcp,dev,validation,outcomes]"
+```
+
+See `CONTRIBUTING.md` in the repository.
+</details>
 
 ## From source (contributors)
 
@@ -57,6 +70,8 @@ disclosure-alpha-mcp-analyst --help   # requires [mcp]
 ```
 
 ## Next steps
+
+After install, run the exact commands in {doc}`first-successful-run`.
 
 - {doc}`sec-edgar-setup` — required for ticker-based commands
 - {doc}`faq` — common errors and fixes

@@ -48,7 +48,6 @@ def test_panel_mixed_results(mock_score):
         json={
             "tickers": ["AAPL", "BAD"],
             "fiscal_year": 2025,
-            "view": "deterministic",
         },
     )
     assert resp.status_code == 200

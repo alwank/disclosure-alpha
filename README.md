@@ -68,9 +68,8 @@ Open-source, deterministic SEC filing analytics for **10-K, 10-Q, and 8-K** HTML
 
 - Not investment advice or a trading signal
 - Not a substitute for reading the filing
-- Not composite LLM scoring (open-source HTTP API is deterministic only; `view=composite` returns 402)
 
-Full scope and limits: [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html).
+Full scope and limits: [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html).
 
 ## Integration surfaces
 
@@ -95,7 +94,7 @@ Guides, [Postman collections](https://github.com/alwank/disclosure-alpha/tree/ma
 
 ## Capabilities
 
-Deterministic scores (nine weighted components, 0–100), section extraction, year-over-year change detection. Score scale and component guide: [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html). Section names: [section taxonomy](https://disclosure-alpha.readthedocs.io/en/latest/reference/section-taxonomy.html).
+Deterministic scores — ten computed components (nine headline-weighted, 0–100), section extraction, year-over-year change detection. Canonical component list: [Score catalog](https://disclosure-alpha.readthedocs.io/en/latest/reference/score-catalog.html). Score scale: [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html).
 
 | Task | How |
 |------|-----|
@@ -141,18 +140,11 @@ Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/lates
 }
 ```
 
-More examples: [`docs/examples/`](docs/examples/) and [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html).
+More examples: [Examples gallery](https://disclosure-alpha.readthedocs.io/en/latest/examples/index.html) and [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html).
 
 ## Research-backed
 
-Validated on **~425 S&P 500 FY2025 10-Ks** (~84% of the index):
-
-| Check | Result |
-|-------|--------|
-| Language quality | Boilerplate and specificity scores correlate with independent text measures (Spearman ρ ~0.68 / ~0.84) |
-| Real-world signal | Higher disclosure risk scores associate with higher 90-day post-filing volatility in the same cohort |
-
-Partial L3: volatility association only — **earnings-surprise outcome validation not supported**. Metrics draw on finance text-analysis literature. See [Research foundation](https://disclosure-alpha.readthedocs.io/en/latest/methodology/research-foundation.html) and **[Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html)**.
+Validated on **428 S&P 500 FY2025 Item 1A 10-Ks** (analysis cohort). Construct validity and partial L3 volatility association — details in **[Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html)** and **[Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html)**.
 
 ## MCP in Cursor
 
@@ -179,12 +171,14 @@ Full MCP guide: [MCP](https://disclosure-alpha.readthedocs.io/en/latest/guides/m
 
 | I want to… | Start here |
 |------------|------------|
-| Copy-paste recipes | [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html) |
-| Interpret scores | [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html) |
-| Score from terminal | [Quickstart CLI](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-cli.html) |
-| Build a screener | [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html) |
+| Prove it works in five minutes | [First successful run](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/first-successful-run.html) |
+| Evaluate whether to trust this | [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html) |
+| Understand the numbers | [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html) |
+| Score in terminal | [Quickstart CLI](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-cli.html) |
+| Build a screener | [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html) → [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html) |
+| Use in Python | [Quickstart Python](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-python.html) |
 | Wire an agent | [MCP guide](https://disclosure-alpha.readthedocs.io/en/latest/guides/mcp/index.html) |
-| See methodology | [Methodology overview](https://disclosure-alpha.readthedocs.io/en/latest/methodology/overview.html) |
+| Copy-paste examples | [Examples gallery](https://disclosure-alpha.readthedocs.io/en/latest/examples/index.html) |
 
 ## License
 

@@ -1,4 +1,4 @@
-"""Composite/full matrix view and tier preset tests — Track D owns implementation."""
+"""Matrix tier preset tests."""
 
 from __future__ import annotations
 
@@ -27,32 +27,6 @@ def _minimal_metrics_result() -> FilingMetricsResult:
         filing={"ticker": "AAPL", "fiscal_year": 2025},
         versions={"scoring_model_version": SCORING_MODEL_VERSION},
     )
-
-
-def test_composite_view_returns_402_unsupported():
-    resp = client.get(
-        "/v1/company/AAPL/disclosure-matrix",
-        params={"fiscal_year": 2025, "view": "composite"},
-    )
-    assert resp.status_code == 402
-    body = resp.json()
-    assert body["available_views"] == ["deterministic"]
-    assert body["scoring_model_version"] == SCORING_MODEL_VERSION
-    assert "composite" in body["detail"]
-    assert "open-source" in body["detail"]
-    assert "Pro" not in body["detail"]
-
-
-def test_full_view_returns_402_unsupported():
-    resp = client.get(
-        "/v1/company/AAPL/disclosure-matrix",
-        params={"fiscal_year": 2025, "view": "full"},
-    )
-    assert resp.status_code == 402
-    body = resp.json()
-    assert body["available_views"] == ["deterministic"]
-    assert "open-source" in body["detail"]
-    assert "Pro" not in body["detail"]
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")

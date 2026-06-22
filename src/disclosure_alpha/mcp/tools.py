@@ -7,7 +7,6 @@ from dataclasses import asdict
 from typing import Any
 
 from disclosure_alpha.diff_engine import compute_section_diff
-from disclosure_alpha.deterministic_scoring import DETERMINISTIC_COMPONENT_WEIGHTS
 from disclosure_alpha.pipeline import (
     compute_section_metrics,
     extract_sections_from_html,
@@ -86,6 +85,7 @@ def score_deterministic_tool(metrics_json: str) -> str:
             "confidence_score": scores.confidence_score,
             "missing_components": scores.missing_components,
             "components": asdict(scores.components),
+            "aggregates": asdict(scores.aggregates),
             "provenance": [p.to_dict() for p in scores.provenance],
             "scoring_model_version": SCORING_MODEL_VERSION,
         },
@@ -152,8 +152,7 @@ def taxonomy_payload() -> str:
             "parser_version": PARSER_VERSION,
             "metrics_engine_version": METRICS_ENGINE_VERSION,
             "scoring_model_version": SCORING_MODEL_VERSION,
-            "component_weights": DETERMINISTIC_COMPONENT_WEIGHTS,
-            "all_component_weights": COMPONENT_WEIGHTS,
+            "component_weights": COMPONENT_WEIGHTS,
         },
         indent=2,
     )

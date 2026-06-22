@@ -19,7 +19,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tickers\": [\"AAPL\", \"MSFT\", \"GOOGL\"],\n  \"fiscal_year\": 2025,\n  \"form_type\": \"10-K\",\n  \"view\": \"deterministic\",\n  \"compare\": \"prior\"\n}"
+              "raw": "{\n  \"tickers\": [\"AAPL\", \"MSFT\", \"GOOGL\"],\n  \"fiscal_year\": 2025,\n  \"form_type\": \"10-K\",\n  \"compare\": \"prior\"\n}"
             },
             "url": "{{baseUrl}}/v1/panel/disclosure-matrix"
           }

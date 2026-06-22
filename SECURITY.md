@@ -18,3 +18,5 @@ This policy covers the open-source codebase (CLI, Python SDK, HTTP API, MCP serv
 ## Not investment advice
 
 Disclosure Alpha produces deterministic analytics from SEC filing text. Output is for research and integration testing — not investment, legal, or accounting advice.
+
+Full scope, validation limits, and legal disclaimers: [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html) · [Legal](https://disclosure-alpha.readthedocs.io/en/latest/legal.html)

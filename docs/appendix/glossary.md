@@ -7,7 +7,7 @@ Terms used across CLI, HTTP, Python, and methodology docs.
 | Term | Meaning |
 |------|---------|
 | **Overall disclosure risk score** | Weighted headline score (0–100) from nine deterministic components. Higher = more disclosure risk / deterioration. See {doc}`../getting-started/understanding-scores` for the scale. |
-| **Component score** | One of nine blended signals (e.g. `risk_factor_intensity_score`, `liquidity_stress_score`). See {doc}`../methodology/overview`. |
+| **Component score** | One of nine headline-weighted blended signals (e.g. `risk_factor_intensity_score`, `liquidity_stress_score`). See {doc}`../reference/score-catalog`. |
 
 ### Component scores
 
@@ -29,7 +29,6 @@ Terms used across CLI, HTTP, Python, and methodology docs.
 | Term | Meaning |
 |------|---------|
 | **Deterministic scoring** | Scores from word lists, diffs, flags, and densities only — no LLM. |
-| **Composite scoring** | LLM-blended matrix — **not** available in the open-source HTTP API (returns HTTP 402). |
 | **Prior filing** | Earlier comparable filing (same form type) used for section diffs. |
 | **Language delta** | Change in a tone ratio vs the prior section (percentage points). |
 | **Boilerplate** | Fixed-phrase repetition proxy in Item 1A (see {doc}`../methodology/research-foundation`). |

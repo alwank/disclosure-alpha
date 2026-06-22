@@ -196,7 +196,6 @@ def score_deterministic(metrics: MetricsResult) -> DeterministicAggregationResul
     )
     result.confidence_score = compute_overall_confidence(
         extraction_confidences=metrics.extraction_confs,
-        llm_confidences=[],
         coverage_ratio=result.score_coverage_ratio,
         diff_confidence=avg_diff_conf,
     )

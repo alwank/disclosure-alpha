@@ -14,7 +14,10 @@ Run `disclosure-alpha score` to print deterministic score JSON to stdout.
 **Goal:** Score a filing you already have on disk — no network required.
 
 ```bash
-disclosure-alpha extract --html filing.html --form 10-K
+# Committed fixture (from repo root)
+disclosure-alpha score --html tests/fixtures/sample_10k.html --form 10-K
+
+# Your own filing
 disclosure-alpha score --html filing.html --form 10-K
 disclosure-alpha score --html current.html --form 10-K --prior-html prior.html
 ```
@@ -40,7 +43,7 @@ Low coverage or null change scores: {doc}`faq`.
 
 ## By ticker + fiscal year
 
-**Goal:** Fetch from EDGAR and score in one command.
+**Goal:** Fetch from EDGAR and score in one command. **Requires** `SEC_USER_AGENT` and network access.
 
 ```bash
 export SEC_USER_AGENT="YourName your@email.com"

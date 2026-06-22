@@ -53,8 +53,7 @@ curl -s -X POST "http://localhost:8000/v1/panel/disclosure-matrix" \
   -d '{
     "tickers": ["AAPL", "MSFT", "GOOGL"],
     "fiscal_year": 2025,
-    "form_type": "10-K",
-    "view": "deterministic"
+    "form_type": "10-K"
   }' | jq '.results[] | {ticker, status, overall: .scores.overall_disclosure_risk_score}'
 ```
 
@@ -149,6 +148,7 @@ No network or `SEC_USER_AGENT` required when both files are local.
 
 ## Related
 
+- {doc}`../../examples/index`
 - {doc}`../../getting-started/choose-your-surface`
 - {doc}`../../getting-started/understanding-scores`
 - {doc}`../python/index`

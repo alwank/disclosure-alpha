@@ -16,10 +16,13 @@ Import `score_filing_html` or `score_filing_ticker` and read `.scores` from the 
 ```python
 from disclosure_alpha import score_filing_html
 
-result = score_filing_html(open("filing.html").read(), "10-K")
+with open("filing.html", encoding="utf-8") as f:
+    result = score_filing_html(f.read(), "10-K")
 print(result.scores.overall_disclosure_risk_score)
-print(result.to_dict())
+print(list(result.to_dict().keys()))
 ```
+
+`score_filing_html` returns a structured result object; `result.to_dict()` is the full JSON-serializable dict (sections, metrics, scores, versions).
 
 ### Sample output
 

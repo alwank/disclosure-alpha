@@ -2,16 +2,24 @@
 
 Parse SEC filing HTML, compute deterministic text metrics, diff sections, and produce reproducible disclosure risk scores — **no LLM required**.
 
+```{admonition} Scope
+:class: note
+
+Not investment advice. Scores summarize language and change signals in filings. Full claims and limits: {doc}`getting-started/scope-and-claims`.
+```
+
 ## Start here
 
 | I want to… | Start here |
 |------------|------------|
+| Prove it works in five minutes | {doc}`getting-started/first-successful-run` |
+| Evaluate whether to trust this | {doc}`getting-started/scope-and-claims` |
 | Understand the numbers | {doc}`getting-started/understanding-scores` |
 | Score in terminal | {doc}`getting-started/quickstart-cli` |
 | Build a screener | {doc}`guides/http/index` → {doc}`guides/workflows/index` |
 | Use in Python | {doc}`getting-started/quickstart-python` |
 | Wire an agent | {doc}`guides/mcp/index` |
-| Know what we claim | {doc}`validation/evidence-and-limitations` |
+| Copy-paste examples | {doc}`examples/index` |
 
 ## Get started in three steps
 
@@ -28,6 +36,8 @@ export SEC_USER_AGENT="YourName your@email.com"
 disclosure-alpha score --ticker AAPL --fiscal-year 2025 --form 10-K
 ```
 
+Or score local HTML with no network: {doc}`getting-started/first-successful-run`.
+
 **3. Pick your integration surface**
 
 CLI, Python SDK, HTTP API, or MCP — see {doc}`getting-started/choose-your-surface`.
@@ -36,35 +46,58 @@ Full install options: {doc}`getting-started/installation`.
 
 ## What you get
 
-- **Deterministic scores** — nine weighted component scores (0–100) plus an overall disclosure risk score
+- **Deterministic scores** — ten computed components (nine headline-weighted, 0–100) plus an overall disclosure risk score; see {doc}`reference/score-catalog`
 - **Section extraction** — Item 1A, MD&A, controls, and more from 10-K / 10-Q / 8-K HTML
 - **Change detection** — lexical and semantic diffs vs the prior comparable filing
 - **Multiple surfaces** — terminal CLI, Python imports, REST API, and MCP tools for agents
-
-Not investment advice. Scores summarize language and change signals in filings — they do not predict returns. See {doc}`validation/evidence-and-limitations` and {doc}`legal`.
 
 ## Documentation
 
 ```{toctree}
 :maxdepth: 2
-:caption: User guide
+:caption: Start Here
 
 getting-started/index
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: Guides
+
 guides/index
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Examples
+
+examples/index
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: Reference
+
 reference/index
 ```
 
 ```{toctree}
 :maxdepth: 2
-:caption: Methodology & evidence
+:caption: Methodology
 
 methodology/index
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: Evidence and Limitations
+
 validation/index
 ```
 
 ```{toctree}
 :maxdepth: 1
-:caption: Release notes
+:caption: Appendix
 
 appendix/changelog
 appendix/glossary
@@ -80,11 +113,3 @@ legal
 ## License
 
 Apache-2.0. Details: {doc}`legal`.
-
-```{toctree}
-:hidden:
-
-CONTRIBUTING_DOCS
-developer/architecture
-developer/testing
-```

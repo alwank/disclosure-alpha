@@ -4,8 +4,22 @@ SEC fair-access policy requires a descriptive `User-Agent` header on all EDGAR r
 
 ## User-Agent (required)
 
+**macOS / Linux (bash, zsh):**
+
 ```bash
 export SEC_USER_AGENT="YourName your@email.com"
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:SEC_USER_AGENT = "YourName your@email.com"
+```
+
+**Process manager / `.env` file:**
+
+```bash
+SEC_USER_AGENT=YourName your@email.com
 ```
 
 Use your real name and contact email. Requests without a proper User-Agent may be blocked.
@@ -24,7 +38,7 @@ Cached filings speed up repeat lookups.
 
 - Respect SEC rate limits; the client includes polite delays.
 - Do not distribute bulk-scraped filings without reviewing SEC terms of use.
-- For production deployments, set `SEC_USER_AGENT` in the process environment for the HTTP API or MCP server.
+- For production deployments, set `SEC_USER_AGENT` in the process environment for the HTTP API or MCP server — see {doc}`../guides/production`.
 
 See {doc}`../reference/environment-variables` for all configuration options.
 

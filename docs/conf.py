@@ -33,18 +33,28 @@ templates_path = ["_templates"]
 exclude_patterns = [
     "_build",
     "_includes/**",
-    "examples/**",
+    "examples/*.json",  # raw fixtures; gallery page links to them
     "Thumbs.db",
     ".DS_Store",
     "postman",
     "README.md",
-    "developer/index.md",
+    "readthedocs-public-docs-improvement-plan.md",
+    # Contributor / repo-only (not public RTD pages)
+    "CONTRIBUTING_DOCS.md",
+    "developer/**",
+    # Draft or internal methodology (not public until complete)
     "methodology/roadmap/**",
     "methodology/dictionaries/**",
-    "reference/python/validation.md",
-    "reference/http/schemas/**",
-    "guides/http/endpoints/**",
     "appendix/index.md",
+]
+
+linkcheck_ignore = [
+    # DOI resolvers block automated clients (403)
+    r"https://doi\.org/.*",
+    # SEC pages block linkcheck bots (403)
+    r"https://www\.sec\.gov/.*",
+    # MCP docs redirect to a deeper URL
+    r"https://modelcontextprotocol\.io/.*",
 ]
 
 source_suffix = {
@@ -114,4 +124,5 @@ rediraffe_redirects = {
     "08_dictionary_enrichment_research.md": "methodology/metrics-engine.md",
     "09_product_surfaces.md": "getting-started/choose-your-surface.md",
     "getting-started/hosted-vs-self-hosted.md": "getting-started/choose-your-surface.md",
+    "reference/oss-score-catalog.md": "reference/score-catalog.md",
 }

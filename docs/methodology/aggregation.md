@@ -1,5 +1,13 @@
 # Aggregation
 
+**What this page answers:** How section-level signals become nine component scores and the headline `overall_disclosure_risk_score`.
+
+| | |
+|--|--|
+| **Inputs** | Section metrics, diffs, flags, language deltas, MD&A densities |
+| **Outputs** | `components`, `overall_disclosure_risk_score`, coverage, confidence |
+| **Version** | `deterministic_scoring_v1` |
+
 ## In plain terms
 
 Aggregation blends section-level metrics, diffs, flags, and language deltas into nine filing-level component scores (0–100), then computes the weighted headline `overall_disclosure_risk_score`, coverage, and confidence. This is the last stage before JSON reaches CLI, Python, or HTTP clients.
@@ -11,8 +19,7 @@ Aggregation blends section-level metrics, diffs, flags, and language deltas into
 - **Fields you read:** `overall_disclosure_risk_score`, `components`, `score_coverage_ratio`, `missing_components`, `confidence_score`
 - **Audit:** request `include=provenance` on the matrix route for per-component input breakdowns
 
-Module: `src/disclosure_alpha/deterministic_scoring.py`  
-Function: `aggregate_deterministic_matrix()`
+Implemented in `deterministic_scoring.py` (`aggregate_deterministic_matrix()`).
 
 <details>
 <summary>Full specification</summary>
@@ -118,7 +125,7 @@ blend(negative×100 from 1A, uncertainty×100 from MD&A; weights 0.5, 0.5)
 
 ## Headline score
 
-Weights (`DETERMINISTIC_COMPONENT_WEIGHTS` — nine components, excludes `cybersecurity_risk_score`):
+Weights (`COMPONENT_WEIGHTS` — nine headline components):
 
 | Component | Weight |
 |-----------|-------:|

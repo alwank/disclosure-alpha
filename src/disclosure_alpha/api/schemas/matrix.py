@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class MatrixResponse(BaseModel):
@@ -10,4 +10,3 @@ class MatrixResponse(BaseModel):
     metrics: dict[str, Any] | None = None
     scores: dict[str, Any]
     versions: dict[str, str]
-    view: str = Field(default="deterministic")

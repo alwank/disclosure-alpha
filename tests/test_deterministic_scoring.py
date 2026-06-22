@@ -1,5 +1,5 @@
 from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix
-from disclosure_alpha.deterministic_scoring import DETERMINISTIC_COMPONENT_WEIGHTS
+from disclosure_alpha.scoring_types import COMPONENT_WEIGHTS
 
 
 _BASE_METRICS = {
@@ -31,7 +31,6 @@ def test_deterministic_without_llm():
     assert agg.overall_disclosure_risk_score is not None
     assert agg.components.disclosure_change_score is not None
     assert agg.components.specificity_quality_score is not None
-    assert agg.components.business_model_fragility_score is None
     assert len(agg.provenance) == 10
     assert agg.provenance[0].score_name == "risk_factor_intensity_score"
 
@@ -67,7 +66,7 @@ def test_empty_metrics_have_no_weighted_coverage():
 
     assert agg.overall_disclosure_risk_score is None
     assert agg.score_coverage_ratio == 0.0
-    assert set(agg.missing_components) == set(DETERMINISTIC_COMPONENT_WEIGHTS)
+    assert set(agg.missing_components) == set(COMPONENT_WEIGHTS)
 
 
 def test_missing_item_1a_does_not_synthesize_item_1a_scores():
@@ -200,7 +199,7 @@ def test_coverage_math_partial_components():
     assert abs(agg.score_coverage_ratio - expected_coverage) < 0.01
 
 
-def test_deterministic_coverage_excludes_llm_only():
+def test_deterministic_coverage_partial_without_mdna():
     agg = aggregate_deterministic_matrix(
         section_metrics={
             "item_1a_risk_factors": {
@@ -318,3 +317,83 @@ def test_flag_boost_raises_liquidity_not_wildly():
     delta = boosted.components.liquidity_stress_score - base.components.liquidity_stress_score
     assert 0 < delta <= 15
     assert abs(boosted.overall_disclosure_risk_score - base.overall_disclosure_risk_score) < 5
+
+
+def test_10q_mdna_section_used():
+    agg = aggregate_deterministic_matrix(
+        section_metrics={
+            "item_1a_risk_factors": _BASE_METRICS["item_1a_risk_factors"],
+            "item_2_mdna": _BASE_METRICS["item_7_mdna"],
+        },
+        section_diffs={"item_1a_risk_factors": 10, "item_2_mdna": 20},
+    )
+    assert agg.components.mdna_uncertainty_score is not None
+    assert agg.components.liquidity_stress_score is not None
+
+
+def test_guidance_withdrawal_flag_boosts_mdna():
+    base = aggregate_deterministic_matrix(
+        section_metrics=_BASE_METRICS,
+        section_diffs=_BASE_DIFFS,
+    )
+    flagged = aggregate_deterministic_matrix(
+        section_metrics=_BASE_METRICS,
+        section_diffs=_BASE_DIFFS,
+        section_flags={"item_7_mdna": {"guidance_withdrawal_flag": True}},
+    )
+    assert flagged.components.mdna_uncertainty_score is not None
+    assert base.components.mdna_uncertainty_score is not None
+    assert flagged.components.mdna_uncertainty_score > base.components.mdna_uncertainty_score
+
+
+def test_disclosure_quality_score_zero_boilerplate():
+    agg = aggregate_deterministic_matrix(
+        section_metrics={
+            "item_1a_risk_factors": {
+                "boilerplate_phrase_ratio": 0.0,
+                "numeric_specificity_score": 100.0,
+                "company_specificity_score": 100.0,
+            },
+        },
+        section_diffs={},
+    )
+
+    assert agg.components.boilerplate_risk_score == 0.0
+    assert agg.aggregates.disclosure_quality_score == 100.0
+
+
+def test_disclosure_quality_aggregate():
+    agg = aggregate_deterministic_matrix(
+        section_metrics=_BASE_METRICS,
+        section_diffs=_BASE_DIFFS,
+    )
+    assert agg.aggregates.disclosure_quality_score is not None
+    assert agg.aggregates.disclosure_deterioration_score is not None
+
+
+def test_confidence_bounds():
+    from disclosure_alpha.pipeline import MetricsResult, score_deterministic
+
+    empty = score_deterministic(
+        MetricsResult(
+            section_metrics={},
+            section_diffs={},
+            section_flags={},
+            section_densities={},
+            language_deltas={},
+        )
+    )
+    full = score_deterministic(
+        MetricsResult(
+            section_metrics=_BASE_METRICS,
+            section_diffs=_BASE_DIFFS,
+            section_flags={},
+            section_densities={},
+            language_deltas={},
+            extraction_confs=[0.85, 0.9],
+            diff_confs=[0.8, 0.75],
+        )
+    )
+    assert 0.0 <= empty.confidence_score <= 1.0
+    assert 0.0 <= full.confidence_score <= 1.0
+    assert full.confidence_score > empty.confidence_score

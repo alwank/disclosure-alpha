@@ -26,24 +26,23 @@ Each section folder is owned by one workstream. Edit files **inside your section
 
 ## Claim boundaries
 
-Match language in [methodology/overview](methodology/overview.md) and [validation/evidence-and-limitations](validation/evidence-and-limitations.md):
+Match language in [scope-and-claims](getting-started/scope-and-claims.md) and [validation/evidence-and-limitations](validation/evidence-and-limitations.md):
 
-- **Supported:** deterministic Item 1A on ~425 S&P 500 FY2025 10-Ks; partial L2 construct; partial L3 vol association
-- **Do not claim:** full-index L2/L3 pass, earnings-surprise prediction, buy/sell signals, composite LLM scoring in OSS API
+- **Supported:** deterministic Item 1A on **428** S&P 500 FY2025 10-Ks (analysis cohort); partial L2 construct; partial L3 vol association (n=435)
+- **Do not claim:** full-index L2/L3 pass, earnings-surprise prediction, buy/sell signals
 
-## Stub pages
-
-Phase 2 pages contain ````{note} TODO` blocks. Replace the note with content; do not remove the page from the toctree.
-
-## Local build
+## Docs quality checks
 
 ```bash
 pip install -e ".[api,mcp,dev]"
 pip install -r docs/requirements.txt
-sphinx-build -W -b html docs docs/_build/html
+python scripts/generate_http_endpoints_docs.py
+sphinx-build -E -W -b html docs docs/_build/html
+sphinx-build -b linkcheck docs docs/_build/linkcheck
+rg -n "TODO|TBD|FIXME" docs --glob '!readthedocs-public-docs-improvement-plan.md'
 ```
 
-CI runs the same command on every PR.
+CI runs HTML build and placeholder scan on every PR.
 
 ## Page template
 

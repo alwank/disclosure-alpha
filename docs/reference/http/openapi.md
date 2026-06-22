@@ -2,6 +2,21 @@
 
 The REST API is a FastAPI application. Schema definitions are generated automatically at runtime.
 
+## Export OpenAPI JSON
+
+With the server running:
+
+```bash
+curl -s http://localhost:8000/openapi.json -o openapi.json
+```
+
+Or without starting the server (from a dev checkout):
+
+```bash
+python scripts/generate_http_endpoints_docs.py   # also refreshes endpoint reference
+python -c "from disclosure_alpha.api.app_factory import create_app; import json; print(json.dumps(create_app().openapi(), indent=2))" > openapi.json
+```
+
 ## Interactive documentation
 
 Start the server:
@@ -21,17 +36,9 @@ Then open:
 
 Default bind: `0.0.0.0:8000` — override with `HOST` and `PORT` env vars.
 
-## Response models
+## Endpoint reference
 
-Pydantic models in `disclosure_alpha.api.schemas`:
-
-| Module | Primary models |
-|--------|----------------|
-| `schemas.matrix` | `MatrixResponse` |
-| `schemas.flags` | Flags payload |
-| `schemas.changes` | Changes payload |
-| `schemas.panel` | Panel batch response |
-| `schemas.common` | Shared filing metadata |
+Per-route parameters, responses, and curl examples: {doc}`endpoints` (generated from the live FastAPI schema).
 
 User-facing endpoint semantics: {doc}`../../guides/http/index`.
 
@@ -41,20 +48,8 @@ User-facing endpoint semantics: {doc}`../../guides/http/index`.
 |------|------|
 | **200** | Success |
 | **404** | Filing not found for ticker / fiscal year / form |
-| **402** | `view=composite` or `view=full` on matrix (not supported in OSS) |
 | **422** | Invalid request (e.g. panel with more than 25 tickers) |
 | **500** | Unexpected server error |
-
-### 402 — composite not in open source
-
-```bash
-curl "http://localhost:8000/v1/company/AAPL/disclosure-matrix?view=composite"
-# HTTP 402 — use view=deterministic
-```
-
-### 422 — panel limit
-
-Panel POST accepts at most **25** tickers per request.
 
 ### SEC / EDGAR errors
 
@@ -62,6 +57,8 @@ Ticker routes require `SEC_USER_AGENT`. Missing or invalid User-Agent may cause 
 
 ## Related
 
+- {doc}`endpoints`
 - {doc}`../../guides/http/index`
+- {doc}`../../guides/production`
 - {doc}`../environment-variables`
 - {doc}`../section-taxonomy`

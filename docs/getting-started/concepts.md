@@ -9,7 +9,7 @@ What Disclosure Alpha does and how scores flow from filing HTML to JSON — with
 
 ## In plain terms
 
-Disclosure Alpha reads SEC filing HTML and compares language patterns and year-over-year section changes to produce reproducible disclosure risk scores. You get JSON with an overall score, nine component scores, and coverage signals — no LLM required.
+Disclosure Alpha reads SEC filing HTML and compares language patterns and year-over-year section changes to produce reproducible disclosure risk scores. You get JSON with an overall score, ten computed component scores (nine headline-weighted plus `specificity_quality_score`), and coverage signals — no LLM required.
 
 ## Pipeline
 

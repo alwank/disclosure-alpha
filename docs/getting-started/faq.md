@@ -55,13 +55,9 @@ Required sections for the form type were not extracted (e.g. missing Item 7 MD&A
 
 **Q: Scores differ from a previous run**
 
-Compare `versions` in the JSON output (`parser_version`, `metrics_engine_version`, `scoring_model_version`, dictionary version). Bump any of these when formulas or word lists change — see {doc}`../appendix/changelog`.
+Compare `versions` in the JSON output (`parser_version`, `metrics_engine_version`, `scoring_model_version`, dictionary version). See {doc}`../reference/versioning`.
 
 ## HTTP API
-
-**Q: HTTP 402 on `/disclosure-matrix`**
-
-The open-source API supports `view=deterministic` only. `view=composite` and `view=full` return HTTP 402 — composite LLM scoring is not included in this repository.
 
 **Q: Panel request returns `422`**
 
@@ -73,7 +69,7 @@ Panel requests do not fail-fast. Per-ticker errors (missing filing, bad ticker) 
 
 **Q: Where is the OpenAPI spec?**
 
-Start `disclosure-alpha-api`, then open `http://localhost:8000/docs` (Swagger UI) or `http://localhost:8000/openapi.json`. See {doc}`../reference/http/openapi`.
+Start `disclosure-alpha-api`, then open `http://localhost:8000/docs` (Swagger UI) or `http://localhost:8000/openapi.json`. See {doc}`../reference/http/openapi` and {doc}`../reference/http/endpoints`.
 
 ## MCP
 
@@ -90,7 +86,7 @@ See {doc}`../guides/mcp/index` and {doc}`choose-your-surface`.
 
 **Q: Can I use scores as buy/sell signals?**
 
-No. Scores summarize disclosure language and change — they are not investment advice and are not validated to predict returns. See {doc}`../validation/evidence-and-limitations` and {doc}`../legal`.
+No. Scores summarize disclosure language and change — they are not investment advice and are not validated to predict returns. See {doc}`scope-and-claims` and {doc}`../legal`.
 
 ## Related
 

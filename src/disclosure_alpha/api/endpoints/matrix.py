@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import asdict
 
 from fastapi import APIRouter, HTTPException, Query
-from fastapi.responses import JSONResponse
 
 from disclosure_alpha.api.endpoints.deps import parse_form_quarter, run_edgar, scores_dict
 from disclosure_alpha.api.helpers import (
@@ -16,32 +15,14 @@ from disclosure_alpha.api.helpers import (
 from disclosure_alpha.api.schemas import ErrorResponse, MatrixResponse
 from disclosure_alpha.api.shapes import apply_tier_preset
 from disclosure_alpha.pipeline import filter_metrics_result, metrics_filing_ticker, score_deterministic
-from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 router = APIRouter(tags=["matrix"])
-
-_UNSUPPORTED_VIEWS = frozenset({"composite", "full"})
-
-
-def _unsupported_view_response(view: str) -> JSONResponse:
-    return JSONResponse(
-        status_code=402,
-        content={
-            "detail": (
-                f"view={view} is not supported in the open-source API "
-                "(only view=deterministic is available; composite LLM scoring is not included)"
-            ),
-            "available_views": ["deterministic"],
-            "scoring_model_version": SCORING_MODEL_VERSION,
-        },
-    )
 
 
 @router.get(
     "/v1/company/{ticker}/disclosure-matrix",
     response_model=MatrixResponse,
     responses={
-        402: {"model": ErrorResponse},
         404: {"model": ErrorResponse},
         422: {"model": ErrorResponse},
         502: {"model": ErrorResponse},
@@ -52,7 +33,6 @@ def disclosure_matrix(
     fiscal_year: int = Query(..., ge=1994, le=2100),
     form_type: str = Query("10-K"),
     quarter: str | None = Query(None),
-    view: str = Query("deterministic"),
     compare: str = Query("prior"),
     sections: str | None = Query(None),
     include: str | None = Query("metrics,provenance"),
@@ -61,11 +41,7 @@ def disclosure_matrix(
         None,
         description="Response tier preset (lite|standard|analyst); overrides include/fields when set",
     ),
-) -> MatrixResponse | JSONResponse:
-    if view in _UNSUPPORTED_VIEWS:
-        return _unsupported_view_response(view)
-    if view != "deterministic":
-        raise HTTPException(status_code=422, detail="view must be deterministic, composite, or full")
+) -> MatrixResponse:
     base, q = parse_form_quarter(form_type, quarter)
     try:
         compare_prior = parse_compare_param(compare)
@@ -102,7 +78,6 @@ def disclosure_matrix(
             metrics=metrics_payload,
             scores=scores_payload,
             versions=result.versions,
-            view=view,
         )
 
     return run_edgar(_fetch)

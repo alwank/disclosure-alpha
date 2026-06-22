@@ -12,9 +12,11 @@ Ticker-based commands fetch data from [SEC EDGAR](https://www.sec.gov/edgar). Yo
 - Comply with SEC [fair access](https://www.sec.gov/os/webmaster-faq#code-support) policy
 - Review SEC terms of use before redistributing bulk-downloaded filings
 
+Production deployment notes: {doc}`guides/production`.
+
 ## Validation scope
 
-Empirical checks on the current release are summarized in {doc}`validation/evidence-and-limitations`. Do not claim full-index validation, return prediction, or earnings-surprise outcomes unless your own analysis supports it.
+Empirical checks on the current release are summarized in {doc}`validation/evidence-and-limitations` and {doc}`getting-started/scope-and-claims`.
 
 ## Open-source license
 
@@ -29,4 +31,6 @@ This repository ships CLI, Python SDK, HTTP API, and MCP entry points you run lo
 ## Related
 
 - {doc}`validation/evidence-and-limitations`
+- {doc}`getting-started/scope-and-claims`
+- {doc}`guides/production`
 - {doc}`getting-started/faq`

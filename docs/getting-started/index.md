@@ -5,12 +5,14 @@ Install Disclosure Alpha, run your first score, and choose the right product sur
 ```{toctree}
 :maxdepth: 2
 
+first-successful-run
 installation
+scope-and-claims
 quickstart-cli
 quickstart-python
 sec-edgar-setup
-concepts
 understanding-scores
+concepts
 choose-your-surface
 faq
 ```

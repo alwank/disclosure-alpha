@@ -32,7 +32,7 @@ Set `SEC_USER_AGENT="YourName your@email.com"` for EDGAR-backed tests.
 
 ```bash
 pip install -r docs/requirements.txt
-sphinx-build -W -b html docs docs/_build/html
+sphinx-build -E -W -b html docs docs/_build/html
 ```
 
 Documentation-only edits: see [docs/CONTRIBUTING_DOCS.md](docs/CONTRIBUTING_DOCS.md).
@@ -41,8 +41,8 @@ Documentation-only edits: see [docs/CONTRIBUTING_DOCS.md](docs/CONTRIBUTING_DOCS
 
 When writing docs or examples, match [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html):
 
-- **Supported:** deterministic Item 1A on ~425 S&P 500 FY2025 10-Ks; partial L2 construct validity; partial L3 volatility association
-- **Do not claim:** full-index validation, earnings-surprise prediction, buy/sell signals, or composite LLM scoring in the open-source API
+- **Supported:** deterministic Item 1A on **428** S&P 500 FY2025 10-Ks (analysis cohort); partial L2 construct validity; partial L3 volatility association (n=435) — see `docs/validation/evidence-and-limitations.md`
+- **Do not claim:** full-index validation, earnings-surprise prediction, or buy/sell signals
 
 ## Pull requests
 

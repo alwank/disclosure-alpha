@@ -30,12 +30,6 @@ def panel_disclosure_matrix(body: PanelRequest) -> PanelResponse:
             status_code=422,
             detail=f"Maximum {MAX_PANEL_TICKERS} tickers per request",
         )
-    if body.view != "deterministic":
-        raise HTTPException(
-            status_code=422,
-            detail="Only view=deterministic is supported in self-hosted open-source API",
-        )
-    base, q = parse_form_quarter(body.form_type, body.quarter)
     try:
         compare_prior = parse_compare_param(body.compare)
         include_set = parse_include_param(body.include)
@@ -43,6 +37,7 @@ def panel_disclosure_matrix(body: PanelRequest) -> PanelResponse:
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+    base, q = parse_form_quarter(body.form_type, body.quarter)
     batch = score_panel_tickers(
         body.tickers,
         body.fiscal_year,
@@ -80,5 +75,4 @@ def panel_disclosure_matrix(body: PanelRequest) -> PanelResponse:
         results=results,
         summary=batch.summary,
         versions=batch.versions,
-        view=body.view,
     )

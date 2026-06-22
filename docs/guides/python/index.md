@@ -54,7 +54,7 @@ scores = score_deterministic(metrics)
 `score_filing_*` returns a `ScoreResult` with:
 
 - `scores.overall_disclosure_risk_score` — weighted headline (0–100)
-- `scores.components` — nine component scores (some may be `None` if sections are missing)
+- `scores.components` — ten computed scores (nine headline-weighted plus `specificity_quality_score`; some may be `None` if sections are missing)
 - `scores.confidence_score` — derived from component coverage
 - `scores.missing_components` — list of components that could not be computed
 

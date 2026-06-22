@@ -178,13 +178,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-matrix?fiscal_year={{fiscalYear}}&form_type=10-K&view=deterministic",
+              "raw": "{{baseUrl}}/v1/company/{{ticker}}/disclosure-matrix?fiscal_year={{fiscalYear}}&form_type=10-K",
               "host": ["{{baseUrl}}"],
               "path": ["v1", "company", "{{ticker}}", "disclosure-matrix"],
               "query": [
                 { "key": "fiscal_year", "value": "{{fiscalYear}}" },
-                { "key": "form_type", "value": "10-K" },
-                { "key": "view", "value": "deterministic" }
+                { "key": "form_type", "value": "10-K" }
               ]
             }
           }

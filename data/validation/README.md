@@ -127,20 +127,20 @@ CI runs the compare step as a non-blocking check.
 | Metric | Value |
 |--------|-------|
 | Universe | 503 |
-| Fetched / analysis cohort | **425** (~84.5%) |
+| Fetched / analysis cohort | **436** fetched / **428** analysis (~85%) |
 | `construct_pass` | **true** |
 | `edgar_pass` | **false** |
 | `overall_l2_pass` | **false** (accepted for MVP) |
 
 | Gate / pair | Protocol | Achieved | Status |
 |-------------|----------|----------|--------|
-| E1 fetch rate | >= 0.90 | 0.84 (425/503) | fail |
-| E2 analysis rate | >= 0.85 | 0.84 (425/503) | fail |
-| E3 filter retention | >= 0.85 | 1.00 (425/425) | pass |
+| E1 fetch rate | >= 0.90 | 0.87 (436/503) | fail |
+| E2 analysis rate | >= 0.85 | 0.85 (428/503) | pass |
+| E3 filter retention | >= 0.85 | 0.98 (428/436) | pass |
 | E4 median confidence | >= 0.75 | 0.95 | pass |
-| E5 min analysis n | >= 80 | 425 | pass |
-| `specificity_vs_ner` | rho >= 0.60 | rho 0.79 (n=425) | pass |
-| `boilerplate_vs_ls4gram` | rho >= 0.50 | rho 0.68 (n=425) | pass |
+| E5 min analysis n | >= 80 | 428 | pass |
+| `specificity_vs_ner` | rho >= 0.60 | rho 0.84 (n=428) | pass |
+| `boilerplate_vs_ls4gram` | rho >= 0.50 | rho 0.69 (n=428) | pass |
 
 Re-run `scripts/audit_validation_corpus.py` after corpus changes to refresh figures.
 
@@ -235,6 +235,8 @@ Reports:
 ### L3 achieved (partial, accepted MVP — vol only)
 
 L3 validation **closed for MVP**. External vol claim uses FY2025 corpus only (Q5/Q1 ~1.11).
+
+**Cohort note:** L2 construct validity uses **428** post-filter Item 1A rows (`deterministic_validation_report.json`). L3 volatility monotonicity uses **435** tickers with valid vol outcomes (`l3_outcomes_report.json`) — a separate pairing cohort, not the L2 analysis count.
 
 | Gate | FY2025 corpus | FY2025 EDGAR | FY2024 EDGAR | MVP status |
 |------|---------------|--------------|--------------|------------|

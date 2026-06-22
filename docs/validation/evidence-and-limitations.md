@@ -1,18 +1,22 @@
 # Evidence & Limitations
 
-Disclosure Alpha is research-oriented open-source software. This page summarizes what the current release supports — and what it does not.
+Canonical validation source for public claims. Other docs link here for cohort counts and supported limits.
+
+See also {doc}`../getting-started/scope-and-claims` for product scope in plain language.
 
 ## What is supported today
 
-Deterministic Item 1A analytics on **~425 S&P 500 FY2025 10-Ks** (~84% of the index):
+Deterministic Item 1A analytics on **428 S&P 500 FY2025 10-Ks** (analysis cohort after quality filters; ~84% of index universe in manifest audits):
 
-| Check | Result |
-|-------|--------|
-| Construct validity (boilerplate proxy) | Spearman ρ ~ 0.68 vs literature measure |
-| Construct validity (specificity proxy) | Spearman ρ ~ 0.84 vs NER-based specificity (v2) |
-| Post-filing volatility association | Q5/Q1 ~ 1.11 on ~435-firm cohort (90-day window) |
+| Check | Result | Source |
+|-------|--------|--------|
+| Construct validity (boilerplate proxy) | Spearman ρ ≈ 0.69 vs literature measure (n=428) | `data/validation/reports/deterministic_validation_report.json` |
+| Construct validity (specificity proxy) | Spearman ρ ≈ 0.84 vs NER-based specificity (n=428) | same |
+| Post-filing volatility association | Q5/Q1 ≈ 1.11 on **435**-firm cohort (90-day window) | `data/validation/reports/l3_outcomes_report.json` |
 
-These results come from automated validation on a fixed corpus. Scores in the open-source product use the same deterministic engine (`deterministic_scoring_v1`).
+**Last validated:** 2026-06-21. Package artifact versions in that report: `section_extractor_v1`, `text_metrics_v2`, `deterministic_scoring_v1`, `built_in_dictionaries_v2`.
+
+Scores use the deterministic engine (`deterministic_scoring_v1`).
 
 ## Limitations
 
@@ -22,7 +26,6 @@ These results come from automated validation on a fixed corpus. Scores in the op
 - Buy/sell signals or return prediction
 - Earnings-surprise outcome validation (FY2024 gate did not pass)
 - Full S&P 500 validation coverage (corpus fetch rate ~84%, not 100%)
-- Composite LLM scoring in the open-source HTTP API (`view=composite` returns HTTP 402)
 ```
 
 **Scope note:** validation runs used **Item 1A text** for corpus scoring, not the full multi-section matrix. Missing filing sections reduce score coverage and confidence.
@@ -31,15 +34,6 @@ These results come from automated validation on a fixed corpus. Scores in the op
 
 ## Score versioning
 
-Reproducibility is tied to artifact version strings:
+Artifact version strings and pinning guidance: {doc}`../reference/versioning`.
 
-| Artifact | Version |
-|----------|---------|
-| Parser | `section_extractor_v1` |
-| Metrics | `text_metrics_v2` |
-| Scoring | `deterministic_scoring_v1` |
-| Dictionary | `built_in_dictionaries_v2` |
-
-See {doc}`../getting-started/concepts` for how these fit in the pipeline.
-
-Corpus layout and reproduction scripts live in the repository under `data/validation/`.
+Corpus layout and reproduction scripts: `data/validation/README.md` in the repository.

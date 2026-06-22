@@ -2,6 +2,21 @@
 
 Version history for parser, metrics engine, dictionary packs, and scoring model.
 
+## 1.1.0 (2026-06-22)
+
+- **Breaking:** removed `view` from `/disclosure-matrix` and panel `/disclosure-matrix` request/response (deterministic scoring only).
+- **Fix:** `disclosure_quality_score` is correct when `boilerplate_risk_score` is `0.0` (no longer treated as missing).
+- **Internal:** unified `confidence_score` via `score_deterministic`; removed unused `llm_confidences` parameter.
+
+## Score catalog cleanup (2026-06-22)
+
+Public docs and examples aligned with the deterministic scoring surface:
+
+- **Removed dead fields** from documentation and generated fixtures: `business_model_fragility_score`, `cybersecurity_risk_score`, `hidden_risk_score`.
+- **Ten computed components** — nine headline-weighted scores plus supplementary `specificity_quality_score`; canonical list: {doc}`../reference/score-catalog`.
+- **Validation cohorts** — construct validity n=428; L3 volatility n=435 (distinct cohorts). See {doc}`../validation/evidence-and-limitations`.
+- **Doc scope cleanup** — removed composite/OSS product-scope notes from public pages; renamed score catalog page to {doc}`../reference/score-catalog`.
+
 ## built_in_dictionaries_v2 / text_metrics_v2 (2026-06-21)
 
 Shipped the built-in dictionary enrichment documented in {doc}`../methodology/metrics-engine`.
@@ -39,17 +54,9 @@ v2 flag phrase additions: `material weaknesses in internal control over financia
 | `METRICS_ENGINE_VERSION` | `text_metrics_v1` | `text_metrics_v2` |
 | `SCORING_MODEL_VERSION` | unchanged | `deterministic_scoring_v1` |
 
-### Validation (S&P 500 FY2025 Item 1A, n=428)
+### Validation (S&P 500 FY2025 Item 1A)
 
-| Gate | Result |
-|------|--------|
-| Unit + snippet matrix | 227 tests passed (`tests/test_dictionary_snippets.py`, 50 curated near-miss fixtures) |
-| Distribution shift vs baseline | `large_score_shift_frac=0.0` (gate ≤ 5%) |
-| `boilerplate_vs_ls4gram` | Spearman ρ ≈ 0.69 (threshold ≥ 0.50) |
-| `specificity_vs_ner` | Spearman ρ ≈ 0.84 (threshold ≥ 0.60) |
-
-Baseline snapshot: `data/validation/baselines/dictionary_shift_baseline.json`.  
-Shift report: `data/validation/reports/dictionary_shift_report.json`.
+See {doc}`../validation/evidence-and-limitations` for canonical cohort counts and gate results (n=428 construct validity; n=435 volatility cohort).
 
 ### Out of scope (deferred)
 

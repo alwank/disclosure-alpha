@@ -15,12 +15,6 @@ from disclosure_alpha.scoring_types import (
     overall_from_components,
 )
 
-# ponytail: subset of COMPONENT_WEIGHTS for deterministic headline; excludes LLM-only components
-DETERMINISTIC_COMPONENT_WEIGHTS = {
-    k: v for k, v in COMPONENT_WEIGHTS.items() if k != "cybersecurity_risk_score"
-}
-
-
 @dataclass
 class DeterministicComponentProvenance:
     score_name: str
@@ -372,14 +366,13 @@ def aggregate_deterministic_matrix(
         tone_negativity_score=provenance[9].value,
     )
 
-    comp_map = {k: v for k, v in components.__dict__.items() if k in DETERMINISTIC_COMPONENT_WEIGHTS}
-    overall, coverage, missing = overall_from_components(comp_map, DETERMINISTIC_COMPONENT_WEIGHTS)
-    confidence = max(0.3, min(0.95, 0.5 + coverage * 0.4))
+    comp_map = {k: v for k, v in components.__dict__.items() if k in COMPONENT_WEIGHTS}
+    overall, coverage, missing = overall_from_components(comp_map, COMPONENT_WEIGHTS)
 
     aggregates = AggregateScores(
         disclosure_deterioration_score=components.disclosure_change_score,
         disclosure_quality_score=(
-            clamp_score(100 - (components.boilerplate_risk_score or 50))
+            clamp_score(100 - components.boilerplate_risk_score)
             if components.boilerplate_risk_score is not None
             else None
         ),
@@ -388,7 +381,7 @@ def aggregate_deterministic_matrix(
     return DeterministicAggregationResult(
         overall_disclosure_risk_score=overall,
         score_coverage_ratio=round(coverage, 4),
-        confidence_score=round(confidence, 4),
+        confidence_score=0.3,  # ponytail: placeholder; score_deterministic overwrites
         missing_components=missing,
         components=components,
         aggregates=aggregates,

@@ -7,6 +7,9 @@ Lookups for integrators: environment variables, section taxonomy, Python API, an
 
 environment-variables
 section-taxonomy
+versioning
+score-catalog
 python/index
 http/openapi
+http/endpoints
 ```

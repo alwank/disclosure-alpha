@@ -16,14 +16,13 @@ No LLM. Fully reproducible given the same version strings and input text.
 - Not a buy/sell signal or investment advice
 - Not a substitute for reading the filing
 - Not full S&P 500 validation coverage — see {doc}`../validation/evidence-and-limitations`
-- Not composite LLM scoring in the open-source HTTP API (`view=composite` returns HTTP 402)
 
 ## Pipeline
 
 ```{include} ../_includes/pipeline-diagram.md
 ```
 
-CLI, Python SDK, HTTP API, and MCP all call this same pipeline (`src/disclosure_alpha/pipeline.py`).
+CLI, Python SDK, HTTP API, and MCP all call this same pipeline.
 
 ## How to read a score
 
@@ -31,7 +30,7 @@ Before diving into formulas, see {doc}`../getting-started/understanding-scores` 
 
 ## Artifact versions
 
-Version strings appear in every score response. Canonical lookup: {doc}`../appendix/glossary` and {doc}`../appendix/changelog` — not duplicated here.
+Version strings appear in every score response. Canonical lookup: {doc}`../reference/versioning` and {doc}`../appendix/changelog` — not duplicated here.
 
 ## Score scale
 
@@ -43,7 +42,7 @@ Version strings appear in every score response. Canonical lookup: {doc}`../appen
 ```{include} ../_includes/component-plain-english.md
 ```
 
-**Headline score:** weighted mean of nine components listed in `DETERMINISTIC_COMPONENT_WEIGHTS` (excludes `cybersecurity_risk_score`). `specificity_quality_score` and `event_severity_score` are computed and returned in `components` but are not in the headline weights.
+**Headline score:** weighted mean of nine components listed in `COMPONENT_WEIGHTS`. `specificity_quality_score` is computed and returned in `components` but is not in the headline weights.
 
 Blend formulas and weights: {doc}`aggregation`.
 
@@ -81,9 +80,7 @@ Missing sections → lower `score_coverage_ratio`, component `null`s, reduced co
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /v1/company/{ticker}/disclosure-metrics` | Raw metrics, flags, diffs |
-| `GET /v1/company/{ticker}/disclosure-matrix` | Component scores (`view=deterministic`) |
-
-Only `view=deterministic` is supported in the open-source API.
+| `GET /v1/company/{ticker}/disclosure-matrix` | Component scores from deterministic scoring |
 
 ## Related
 

@@ -2,7 +2,14 @@
 
 This section explains how Disclosure Alpha computes deterministic disclosure risk scores from SEC filing text — what the open-source pipeline does today, not planned features.
 
-For supported claims and limitations, see {doc}`../validation/evidence-and-limitations`.
+**Read this order:**
+
+1. {doc}`overview`
+2. {doc}`../getting-started/understanding-scores`
+3. {doc}`../validation/evidence-and-limitations`
+4. Detailed specs below (metrics, diff, aggregation)
+
+For supported claims and limitations, see {doc}`../getting-started/scope-and-claims`.
 
 ```{toctree}
 :maxdepth: 2

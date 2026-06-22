@@ -63,11 +63,10 @@ def test_disclosure_matrix(mock_score, mock_metrics):
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
     resp = client.get(
         "/v1/company/AAPL/disclosure-matrix",
-        params={"fiscal_year": 2025, "form_type": "10-K", "view": "deterministic"},
+        params={"fiscal_year": 2025, "form_type": "10-K"},
     )
     assert resp.status_code == 200
     body = resp.json()
-    assert body["view"] == "deterministic"
     assert body["filing"]["ticker"] == "AAPL"
     assert "scores" in body
     assert "metrics" in body
@@ -241,18 +240,6 @@ def test_invalid_include_param():
         params={"fiscal_year": 2025, "include": "foo"},
     )
     assert resp.status_code == 422
-
-
-def test_composite_view_returns_402():
-    resp = client.get(
-        "/v1/company/AAPL/disclosure-matrix",
-        params={"fiscal_year": 2025, "view": "composite"},
-    )
-    assert resp.status_code == 402
-    body = resp.json()
-    assert body["available_views"] == ["deterministic"]
-    assert "open-source" in body["detail"]
-    assert "Pro" not in body["detail"]
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")

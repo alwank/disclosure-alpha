@@ -17,6 +17,8 @@ def minimal_prior_html() -> str:
     <html><body>
     <p>Item 1A. Risk Factors</p>
     <p>Stable operations continue without material litigation.</p>
+    <p>Item 7. Management's Discussion and Analysis</p>
+    <p>Revenue remained stable with modest margin improvement.</p>
     </body></html>
     """
 

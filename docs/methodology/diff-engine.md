@@ -1,5 +1,13 @@
 # Diff Engine
 
+**What this page answers:** How year-over-year section diffs are matched, scored, and when change components are null.
+
+| | |
+|--|--|
+| **Inputs** | Current and prior section text (matched by `section_name`) |
+| **Outputs** | Lexical/semantic similarity, change score, language deltas |
+| **Version** | Bundled with `section_extractor_v1` prior matching rules |
+
 ## In plain terms
 
 The diff engine compares each section's text to the same section in a prior comparable filing. It measures lexical and semantic similarity, detects new or intensified risk topics, and produces a 0–100 change score plus language deltas that feed aggregation.
@@ -11,7 +19,7 @@ The diff engine compares each section's text to the same section in a prior comp
 - **Components affected:** `disclosure_change_score`, `event_severity_score`, and diff inputs to `risk_factor_intensity_score` and `internal_controls_risk_score`
 - **Null signal:** no prior section → `disclosure_change_score` is `null`, not zero
 
-Module: `src/disclosure_alpha/diff_engine.py`
+Implemented in the `diff_engine` module.
 
 <details>
 <summary>Full specification</summary>

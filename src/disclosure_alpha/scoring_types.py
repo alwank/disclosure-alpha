@@ -1,5 +1,16 @@
 from dataclasses import dataclass, field
-from typing import Any
+
+COMPONENT_WEIGHTS = {
+    "risk_factor_intensity_score": 0.20,
+    "disclosure_change_score": 0.15,
+    "mdna_uncertainty_score": 0.15,
+    "legal_regulatory_risk_score": 0.10,
+    "liquidity_stress_score": 0.10,
+    "boilerplate_risk_score": 0.10,
+    "internal_controls_risk_score": 0.05,
+    "event_severity_score": 0.05,
+    "tone_negativity_score": 0.05,
+}
 
 
 @dataclass
@@ -10,9 +21,7 @@ class ComponentScores:
     legal_regulatory_risk_score: float | None = None
     liquidity_stress_score: float | None = None
     boilerplate_risk_score: float | None = None
-    business_model_fragility_score: float | None = None
     internal_controls_risk_score: float | None = None
-    cybersecurity_risk_score: float | None = None
     event_severity_score: float | None = None
     specificity_quality_score: float | None = None
     tone_negativity_score: float | None = None
@@ -20,7 +29,6 @@ class ComponentScores:
 
 @dataclass
 class AggregateScores:
-    hidden_risk_score: float | None = None
     disclosure_quality_score: float | None = None
     disclosure_deterioration_score: float | None = None
 
@@ -33,22 +41,6 @@ class MatrixAggregationResult:
     missing_components: list[str] = field(default_factory=list)
     components: ComponentScores = field(default_factory=ComponentScores)
     aggregates: AggregateScores = field(default_factory=AggregateScores)
-    top_hidden_risks: list[dict[str, Any]] = field(default_factory=list)
-    evidence: list[dict[str, Any]] = field(default_factory=list)
-
-
-COMPONENT_WEIGHTS = {
-    "risk_factor_intensity_score": 0.20,
-    "disclosure_change_score": 0.15,
-    "mdna_uncertainty_score": 0.15,
-    "legal_regulatory_risk_score": 0.10,
-    "liquidity_stress_score": 0.10,
-    "boilerplate_risk_score": 0.10,
-    "internal_controls_risk_score": 0.05,
-    "cybersecurity_risk_score": 0.05,
-    "event_severity_score": 0.05,
-    "tone_negativity_score": 0.05,
-}
 
 
 def clamp_score(score: float) -> float:
@@ -75,11 +67,3 @@ def overall_from_components(
         total_w = sum(weights[k] for k in present)
         overall = clamp_score(sum(comp_map[k] * weights[k] for k in present) / total_w)
     return overall, coverage, missing
-
-
-def select_top_hidden_risks(
-    risks: list[dict],
-    *,
-    limit: int = 5,
-) -> list[dict]:
-    return sorted(risks, key=lambda r: r.get("score", 0), reverse=True)[:limit]

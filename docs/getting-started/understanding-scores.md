@@ -7,6 +7,12 @@
 
 How to read Disclosure Alpha's 0–100 disclosure risk scores, component fields, and coverage signals.
 
+```{admonition} Default scoring model
+:class: note
+
+Examples on this page and all committed fixtures use **`deterministic_scoring_v1`**. CLI, HTTP, and MCP default to v1. An opt-in **`deterministic_scoring_v2`** exists for Python (`score_deterministic_v2`); see {doc}`../reference/versioning`. Do not compare v1 and v2 numeric levels without re-scoring.
+```
+
 ## Higher / lower means
 
 | Field | Higher (toward 100) | Lower (toward 0) |
@@ -109,7 +115,7 @@ See {doc}`faq` for troubleshooting low coverage and null change scores.
 ## Related
 
 - {doc}`concepts` — pipeline vocabulary
-- {doc}`../reference/versioning` — artifact versions
+- {doc}`../reference/versioning` — artifact versions and v1 → v2 migration
 - {doc}`../methodology/overview` — full specification
 - {doc}`../reference/score-catalog` — component catalog and weights
 - {doc}`../validation/evidence-and-limitations` — supported claims

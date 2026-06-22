@@ -2,6 +2,51 @@
 
 Version history for parser, metrics engine, dictionary packs, and scoring model.
 
+## deterministic_scoring_v2 (2026-06-22)
+
+Introduced an **opt-in** scoring model (`SCORING_MODEL_VERSION_V2` / `deterministic_scoring_v2`). Default surfaces unchanged — still `deterministic_scoring_v1`.
+
+### What shipped
+
+| Component | Change |
+|-----------|--------|
+| `risk_factor_intensity_score` | Form-aware percentile calibration for Item 1A tone ratios (`calibration.py`) |
+| `legal_regulatory_risk_score` | Multi-section evidence model; flag-only paths |
+| `liquidity_stress_score` | MD&A-first evidence with Item 1A fallback; flag-only paths |
+| `internal_controls_risk_score` | Section-attributed controls diff + evidence-based flags |
+| Confidence (v2 path) | `compute_confidence_detailed()` with explicit penalties |
+
+### Entry points
+
+- **v1 (default):** `score_deterministic()`, `score_filing_html()`, HTTP matrix/panel, MCP
+- **v2 (Python only):** `score_deterministic_v2()` — not wired to HTTP/MCP
+
+### Artifact versions (unchanged in this release)
+
+| Artifact | Version |
+|----------|---------|
+| Parser | `section_extractor_v1` |
+| Metrics engine | `text_metrics_v2` |
+| Dictionary | `built_in_dictionaries_v2` |
+| Scoring (default) | `deterministic_scoring_v1` |
+| Scoring (opt-in) | `deterministic_scoring_v2` |
+
+Committed validation reports remain on **v1**. See {doc}`../reference/versioning` and {doc}`../validation/evidence-and-limitations`.
+
+### In v2 (opt-in, unvalidated)
+
+Available via `score_deterministic_v2()` only — not on HTTP/MCP, not in committed validation reports:
+
+- `static_disclosure_quality_score`, `static_disclosure_risk_score`, `disclosure_change_risk_score` (score product split)
+- `cybersecurity_incident_risk_score`, `event_materiality_score` (excluded from v1 headline weights)
+- `disclosure_change_score_v2` on section diffs (v1 `disclosure_change_score` unchanged)
+- Sector/form baselines via `baselines.py` + `calibration.py`
+
+### Still deferred
+
+- HTTP `scoring_model_version` query parameter
+- v2 validation reports and headline migration
+
 ## 1.1.0 (2026-06-22)
 
 - **Breaking:** removed `view` from `/disclosure-matrix` and panel `/disclosure-matrix` request/response (deterministic scoring only).

@@ -49,7 +49,13 @@ SectionDiffResult(
     new_topics: list[str],
     removed_topics: list[str],
     intensified_topics: list[str],
-    disclosure_change_score: float | None, # 0–100
+    disclosure_change_score: float | None, # 0–100 (v1 formula)
+    disclosure_change_score_v2: float | None, # sentence-aligned v2 formula
+    added_sentence_count: int,
+    removed_sentence_count: int,
+    changed_numeric_count: int,
+    added_risk_language_score: float | None,
+    diff_evidence: dict,
     diff_summary: str,
     confidence_score: float,
     language_deltas: dict[str, float],
@@ -88,6 +94,17 @@ disclosure_change_score =
 
 clamp to [0, 100]
 ```
+
+## V2 sentence alignment (experimental)
+
+`disclosure_change_score_v2` supplements v1 with:
+
+- TF-IDF sentence alignment (`align_sentences` in `text_matching.py`)
+- Added-language risk density on unmatched current sentences
+- Numeric token add/remove/change detection (`extract_numeric_tokens`)
+- Richer `diff_evidence` provenance
+
+v1 `disclosure_change_score` is unchanged for backward compatibility. `score_deterministic_v2` may use v2 diff scores when present.
 
 ## Language deltas
 

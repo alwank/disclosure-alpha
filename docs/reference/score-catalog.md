@@ -2,6 +2,12 @@
 
 Canonical list of deterministic scores returned by CLI, Python, HTTP, and MCP.
 
+```{admonition} Scoring version
+:class: note
+
+**This page describes `deterministic_scoring_v1`**, which is the default for all public surfaces (CLI, HTTP, MCP, `score_filing_html`). For v2 component differences and opt-in usage, see {doc}`versioning` and the v2 section in {doc}`../methodology/aggregation`.
+```
+
 ## Headline score
 
 | Field | Range | Meaning |
@@ -30,7 +36,34 @@ Weights are defined in `COMPONENT_WEIGHTS` (`disclosure_alpha.scoring_types`).
 | `event_severity_score` | 0.05 |
 | `tone_negativity_score` | 0.05 |
 
-Blend formulas: {doc}`../methodology/aggregation`.
+Blend formulas (v1): {doc}`../methodology/aggregation`.
+
+### v2 overrides (opt-in only)
+
+These four components use different blends when you call `score_deterministic_v2()`. Headline weights and component names are unchanged; only the formulas and provenance differ.
+
+| Component | v1 summary | v2 summary |
+|-----------|------------|------------|
+| `risk_factor_intensity_score` | `negative×100`, `uncertainty×100`, diff | Calibrated percentile ranks for tone ratios + diff |
+| `legal_regulatory_risk_score` | Item 1A litigious + legal delta + flag boost | Multi-section litigious evidence, legal delta, flag evidence (no +15 boost) |
+| `liquidity_stress_score` | MD&A constraining + liquidity density + flag boost | MD&A evidence + Item 1A fallback + flag evidence |
+| `internal_controls_risk_score` | Controls diff + Item 1A constraining + flag boost | Controls-section diff + constraining + serious IC flag evidence |
+
+v2 can emit non-null scores from flags alone when required tone metrics are absent. v1 often leaves those components null without Item 1A or MD&A text.
+
+### v2-only supplementary fields (opt-in)
+
+Not in the v1 headline blend; populated by `score_deterministic_v2()` when evidence exists:
+
+| Field | Meaning |
+|-------|---------|
+| `static_disclosure_quality_score` | Specificity / inverse boilerplate (current filing) |
+| `static_disclosure_risk_score` | Tone, legal, liquidity, controls without YoY change |
+| `disclosure_change_risk_score` | Change, event severity, language deltas |
+| `cybersecurity_incident_risk_score` | Incident flags (Item 1.05 / cyber sections) |
+| `event_materiality_score` | 8-K event materiality proxies |
+
+`overall_disclosure_risk_score` weights are unchanged in v1 and v2.
 
 ## Supplementary component
 

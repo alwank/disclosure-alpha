@@ -34,9 +34,16 @@ def score_company_filing_tool(
     fiscal_year: int,
     form_type: str = "10-K",
     quarter: str | None = None,
+    scoring_model_version: str = "deterministic_scoring_v1",
 ) -> str:
     """Score a company filing by ticker and fiscal year (10-K or 10-Q with quarter)."""
-    return score_company_filing(ticker, fiscal_year, form_type=form_type, quarter=quarter)
+    return score_company_filing(
+        ticker,
+        fiscal_year,
+        form_type=form_type,
+        quarter=quarter,
+        scoring_model_version=scoring_model_version,
+    )
 
 
 @mcp.resource("disclosure://taxonomy/v1")

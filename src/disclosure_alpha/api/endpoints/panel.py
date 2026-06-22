@@ -9,6 +9,7 @@ from disclosure_alpha.api.helpers import (
     parse_compare_param,
     parse_fields_param,
     parse_include_param,
+    parse_scoring_model_version,
     shape_matrix_scores,
 )
 from disclosure_alpha.api.schemas import ErrorResponse, PanelRequest, PanelResponse, PanelResult
@@ -32,6 +33,7 @@ def panel_disclosure_matrix(body: PanelRequest) -> PanelResponse:
         )
     try:
         compare_prior = parse_compare_param(body.compare)
+        scoring_version = parse_scoring_model_version(body.scoring_model_version)
         include_set = parse_include_param(body.include)
         field_set = parse_fields_param(body.fields)
     except ValueError as exc:
@@ -44,6 +46,7 @@ def panel_disclosure_matrix(body: PanelRequest) -> PanelResponse:
         form_type=base,
         quarter=q,
         compare_prior=compare_prior,
+        scoring_model_version=scoring_version,
     )
     results: list[PanelResult] = []
     for item in batch.results:

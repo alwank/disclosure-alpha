@@ -22,7 +22,7 @@ from disclosure_alpha.mcp.tools import (
     taxonomy_payload,
 )
 from disclosure_alpha.pipeline import extract_sections_from_html, score_filing_html
-from disclosure_alpha.version import PARSER_VERSION, SCORING_MODEL_VERSION
+from disclosure_alpha.version import PARSER_VERSION, SCORING_MODEL_VERSION, SCORING_MODEL_VERSION_V2
 from html_fixtures import minimal_10k_html, minimal_prior_html
 
 
@@ -68,6 +68,42 @@ def test_mcp_score_deterministic_tool():
     assert payload["overall_disclosure_risk_score"] is not None
     assert "aggregates" in payload
     assert payload["scoring_model_version"] == SCORING_MODEL_VERSION
+
+
+def test_mcp_score_deterministic_tool_v2():
+    metrics = json.loads(
+        compute_section_metrics_tool(_sections_json(minimal_10k_html()))
+    )
+    payload = json.loads(
+        score_deterministic_tool(
+            json.dumps(metrics),
+            scoring_model_version="deterministic_scoring_v2",
+        )
+    )
+    assert payload["scoring_model_version"] == SCORING_MODEL_VERSION_V2
+    assert payload["aggregates"]["static_disclosure_risk_score"] is not None
+
+
+def test_mcp_score_filing_html_tool_v2():
+    payload = json.loads(
+        score_filing_html_tool(
+            minimal_10k_html(),
+            "10-K",
+            scoring_model_version="deterministic_scoring_v2",
+        )
+    )
+    assert payload["versions"]["scoring_model_version"] == SCORING_MODEL_VERSION_V2
+
+
+def test_mcp_score_deterministic_tool_invalid_version():
+    metrics = json.loads(
+        compute_section_metrics_tool(_sections_json(minimal_10k_html()))
+    )
+    with pytest.raises(ValueError, match="unsupported scoring version"):
+        score_deterministic_tool(
+            json.dumps(metrics),
+            scoring_model_version="deterministic_scoring_v3",
+        )
 
 
 def test_mcp_score_filing_html_tool():

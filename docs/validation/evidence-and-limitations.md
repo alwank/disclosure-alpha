@@ -52,7 +52,9 @@ python3 scripts/validate_matrix_gates.py \
   --min-extraction-rate 0.3 --min-median-confidence 0.5 --min-component-coverage 0.2
 ```
 
-**Do not** cite v2 numeric levels or claim SP500-scale construct/outcome validity until v2 is re-run on the full validation corpus. v2 is **not** wired to HTTP/MCP defaults.
+**Do not** cite v2 numeric levels or claim SP500-scale construct/outcome validity until v2 is re-run on the full validation corpus. v2 is **not** the default on HTTP, MCP, or CLI.
+
+**Opt-in v2 on HTTP/MCP:** pass `scoring_model_version=deterministic_scoring_v2` on matrix GET, panel POST body, or MCP scoring tools (`score_company_filing_tool`, `score_deterministic_tool_wrapper`, `score_filing_html_tool_wrapper`). Defaults remain v1.
 
 ## Limitations
 

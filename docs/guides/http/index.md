@@ -81,7 +81,7 @@ Optional `tier` query param overrides `include` and `fields`:
 | `tier` | — | `lite`, `standard`, or `analyst` |
 | `include` | `metrics,provenance` | Comma-set: `metrics`, `provenance`. Empty → scores only |
 | `fields` | all | Slim scores, e.g. `fields=overall,components` |
-| `scoring_model_version` | `deterministic_scoring_v1` | Opt-in `deterministic_scoring_v2` for experimental v2 blends (matrix only) |
+| `scoring_model_version` | `deterministic_scoring_v1` | Opt-in `deterministic_scoring_v2` for experimental v2 blends (matrix GET and panel POST) |
 
 ## Example requests
 
@@ -96,6 +96,7 @@ curl "http://localhost:8000/v1/company/AAPL/sections?fiscal_year=2025&sections=i
 
 - Max **25** tickers per request (422 if exceeded).
 - Per-ticker errors collected (`status: error`); request does not fail-fast.
+- Optional `scoring_model_version` in request body (default `deterministic_scoring_v1`; opt-in `deterministic_scoring_v2`).
 
 Sample panel response: {doc}`../../examples/index`.
 

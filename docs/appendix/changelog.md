@@ -19,7 +19,7 @@ Introduced an **opt-in** scoring model (`SCORING_MODEL_VERSION_V2` / `determinis
 ### Entry points
 
 - **v1 (default):** `score_deterministic()`, `score_filing_html()`, HTTP matrix/panel, MCP
-- **v2 (Python only):** `score_deterministic_v2()` — not wired to HTTP/MCP
+- **v2 (opt-in):** `score_deterministic_v2()`; HTTP matrix/panel via `scoring_model_version`; MCP scoring tools via same parameter
 
 ### Artifact versions (unchanged in this release)
 
@@ -35,7 +35,7 @@ Committed validation reports remain on **v1** for production claims. v2 **smoke*
 
 ### In v2 (opt-in, smoke-validated only)
 
-Available via `score_deterministic_v2()` only — not on HTTP/MCP, not validated at SP500 scale:
+Available via `score_deterministic_v2()` or opt-in `scoring_model_version` on HTTP matrix/panel and MCP scoring tools — not validated at SP500 scale:
 
 - `static_disclosure_quality_score`, `static_disclosure_risk_score`, `disclosure_change_risk_score` (score product split)
 - `cybersecurity_incident_risk_score`, `event_materiality_score` (excluded from v1 headline weights)
@@ -44,7 +44,6 @@ Available via `score_deterministic_v2()` only — not on HTTP/MCP, not validated
 
 ### Still deferred
 
-- HTTP `scoring_model_version` query parameter (matrix endpoint)
 - v2 full-corpus validation and headline migration
 
 ## 1.1.0 (2026-06-22)

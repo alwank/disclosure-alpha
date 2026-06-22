@@ -473,6 +473,7 @@ def score_panel_tickers(
     quarter: str | None = None,
     use_cache: bool = True,
     compare_prior: bool = True,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> PanelBatchResult:
     """Score many tickers sequentially; per-ticker errors do not fail the batch."""
     results: list[PanelTickerResult] = []
@@ -489,12 +490,15 @@ def score_panel_tickers(
                 use_cache=use_cache,
                 compare_prior=compare_prior,
             )
+            scores = scored.scores
+            if scoring_model_version == SCORING_MODEL_VERSION_V2:
+                scores = score_deterministic_v2(scored.metrics)
             results.append(
                 PanelTickerResult(
                     ticker=ticker,
                     status="ok",
                     filing=scored.filing,
-                    scores=scored.scores,
+                    scores=scores,
                 )
             )
             ok += 1
@@ -507,8 +511,10 @@ def score_panel_tickers(
                 )
             )
             failed += 1
+    versions = dict(_VERSIONS)
+    versions["scoring_model_version"] = scoring_model_version
     return PanelBatchResult(
         results=results,
         summary={"ok": ok, "failed": failed},
-        versions=dict(_VERSIONS),
+        versions=versions,
     )

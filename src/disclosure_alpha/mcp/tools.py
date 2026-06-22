@@ -11,13 +11,16 @@ from disclosure_alpha.pipeline import (
     compute_section_metrics,
     extract_sections_from_html,
     score_deterministic,
+    score_deterministic_v2,
     score_filing_html,
 )
 from disclosure_alpha.scoring_types import COMPONENT_WEIGHTS
+from disclosure_alpha.validation.scoring_version import normalize_scoring_version
 from disclosure_alpha.version import (
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
     SCORING_MODEL_VERSION,
+    SCORING_MODEL_VERSION_V2,
 )
 
 
@@ -72,12 +75,21 @@ def diff_sections(current_text: str, prior_text: str, section_name: str = "secti
     return json.dumps(asdict(diff), indent=2, default=str)
 
 
-def score_deterministic_tool(metrics_json: str) -> str:
+def score_deterministic_tool(
+    metrics_json: str,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
+) -> str:
     """Aggregate deterministic component scores from a metrics payload."""
     from disclosure_alpha.pipeline import MetricsResult
 
+    version = normalize_scoring_version(scoring_model_version)
     metrics = MetricsResult(**json.loads(metrics_json))
-    scores = score_deterministic(metrics)
+    score_fn = (
+        score_deterministic_v2
+        if version == SCORING_MODEL_VERSION_V2
+        else score_deterministic
+    )
+    scores = score_fn(metrics)
     return json.dumps(
         {
             "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
@@ -87,7 +99,7 @@ def score_deterministic_tool(metrics_json: str) -> str:
             "components": asdict(scores.components),
             "aggregates": asdict(scores.aggregates),
             "provenance": [p.to_dict() for p in scores.provenance],
-            "scoring_model_version": SCORING_MODEL_VERSION,
+            "scoring_model_version": version,
         },
         indent=2,
     )
@@ -97,9 +109,15 @@ def score_filing_html_tool(
     html: str,
     form_type: str,
     prior_html: str | None = None,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> str:
     """Run full pipeline on filing HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
+    version = normalize_scoring_version(scoring_model_version)
     result = score_filing_html(html, form_type, prior_html=prior_html)
+    if version == SCORING_MODEL_VERSION_V2:
+        result.scores = score_deterministic_v2(result.metrics)
+        result.versions = dict(result.versions)
+        result.versions["scoring_model_version"] = version
     return json.dumps(result.to_dict(), indent=2, default=str)
 
 
@@ -108,13 +126,19 @@ def score_company_filing(
     fiscal_year: int,
     form_type: str = "10-K",
     quarter: str | None = None,
+    scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> str:
     """Score a company filing by ticker and fiscal year (10-K or 10-Q with quarter)."""
     from disclosure_alpha.pipeline import score_filing_ticker
 
+    version = normalize_scoring_version(scoring_model_version)
     result = score_filing_ticker(
         ticker, fiscal_year, form_type=form_type, quarter=quarter
     )
+    if version == SCORING_MODEL_VERSION_V2:
+        result.scores = score_deterministic_v2(result.metrics)
+        result.versions = dict(result.versions)
+        result.versions["scoring_model_version"] = version
     return json.dumps(result.to_dict(), indent=2, default=str)
 
 

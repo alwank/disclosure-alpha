@@ -44,9 +44,12 @@ def diff_sections_tool(
 
 
 @mcp.tool()
-def score_deterministic_tool_wrapper(metrics_json: str) -> str:
+def score_deterministic_tool_wrapper(
+    metrics_json: str,
+    scoring_model_version: str = "deterministic_scoring_v1",
+) -> str:
     """Aggregate deterministic component scores from a metrics payload."""
-    return score_deterministic_tool(metrics_json)
+    return score_deterministic_tool(metrics_json, scoring_model_version=scoring_model_version)
 
 
 @mcp.tool()
@@ -54,9 +57,15 @@ def score_filing_html_tool_wrapper(
     html: str,
     form_type: str,
     prior_html: str | None = None,
+    scoring_model_version: str = "deterministic_scoring_v1",
 ) -> str:
     """Run full pipeline on filing HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
-    return score_filing_html_tool(html, form_type, prior_html=prior_html)
+    return score_filing_html_tool(
+        html,
+        form_type,
+        prior_html=prior_html,
+        scoring_model_version=scoring_model_version,
+    )
 
 
 def main() -> None:

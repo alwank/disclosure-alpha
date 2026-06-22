@@ -72,7 +72,7 @@ Optional `tier` query param overrides `include` and `fields`:
 | Param | Default | Description |
 |-------|---------|-------------|
 | `compare` | `prior` | `prior` loads prior filing for diffs; `none` skips comparison |
-| `sections` | all | Comma-separated section names |
+| `sections` | all | Comma-separated section names; on **disclosure-matrix**, filters both returned metrics and computed scores (not filing-level scores from unfiltered sections). Panel has no section filter. |
 
 **Matrix-only params:**
 

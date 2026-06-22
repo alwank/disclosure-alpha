@@ -1,8 +1,18 @@
 """Shared phrase and token matching helpers for text metrics and diff engine."""
 
+from __future__ import annotations
+
 import re
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
 _SEVERITY_WINDOW = 10
+_NUMERIC_TOKEN = re.compile(
+    r"(?:\$)?\d[\d,]*(?:\.\d+)?%?|\b(?:january|february|march|april|may|june|july|august|"
+    r"september|october|november|december)\s+\d{1,2},?\s+\d{4}\b|\b\d{4}\b",
+    re.IGNORECASE,
+)
 
 
 def tokenize_words(text: str) -> list[str]:
@@ -57,6 +67,58 @@ def _keyword_token_indices(text: str, keyword: str) -> list[int]:
 def topic_phrase_matches(text: str, keywords: list[str]) -> bool:
     lower = (text or "").lower()
     return any(phrase_matches(lower, kw) for kw in keywords)
+
+
+def extract_numeric_tokens(text: str) -> list[str]:
+    """Normalize percentages, dollar amounts, dates, and counts for diff comparison."""
+    tokens: list[str] = []
+    for match in _NUMERIC_TOKEN.finditer(text or ""):
+        raw = match.group(0).lower().replace(",", "").strip()
+        if raw.startswith("$"):
+            raw = raw[1:]
+        if raw.endswith("%"):
+            raw = f"pct:{raw[:-1]}"
+        tokens.append(raw)
+    return tokens
+
+
+def align_sentences(
+    current_sentences: list[str],
+    prior_sentences: list[str],
+    *,
+    match_threshold: float = 0.55,
+) -> tuple[list[str], list[str], list[tuple[int, int, float]]]:
+    """Match sentences via TF-IDF cosine similarity; return added, removed, matched triples."""
+    if not current_sentences and not prior_sentences:
+        return [], [], []
+    if not current_sentences:
+        return [], list(prior_sentences), []
+    if not prior_sentences:
+        return list(current_sentences), [], []
+
+    all_sents = current_sentences + prior_sentences
+    vec = TfidfVectorizer(max_features=2000)
+    matrix = vec.fit_transform(all_sents)
+    n_cur = len(current_sentences)
+    cur_mat = matrix[:n_cur]
+    prior_mat = matrix[n_cur:]
+
+    sims = cosine_similarity(cur_mat, prior_mat)
+    matched_prior: set[int] = set()
+    matched_cur: set[int] = set()
+    pairs: list[tuple[int, int, float]] = []
+
+    for ci in range(n_cur):
+        best_pi = int(sims[ci].argmax())
+        best_sim = float(sims[ci, best_pi])
+        if best_sim >= match_threshold and best_pi not in matched_prior:
+            matched_prior.add(best_pi)
+            matched_cur.add(ci)
+            pairs.append((ci, best_pi, best_sim))
+
+    added = [current_sentences[i] for i in range(n_cur) if i not in matched_cur]
+    removed = [prior_sentences[i] for i in range(len(prior_sentences)) if i not in matched_prior]
+    return added, removed, pairs
 
 
 def topic_intensity(text: str, topic: str, topic_keywords: dict[str, list[str]], severity_words: frozenset[str]) -> float:

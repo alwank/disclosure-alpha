@@ -112,6 +112,7 @@
       }
     },
     "language_deltas": {},
+    "section_diffs_v2": {},
     "extraction_confs": [
       0.35,
       0.35
@@ -119,12 +120,15 @@
     "diff_confs": [
       0.2,
       0.2
-    ]
+    ],
+    "extraction_warnings": [],
+    "required_sections_present": true,
+    "has_prior": false
   },
   "scores": {
     "overall_disclosure_risk_score": 17.837056,
     "score_coverage_ratio": 0.7778,
-    "confidence_score": 0.4426,
+    "confidence_score": 0.3426,
     "missing_components": [
       "disclosure_change_score",
       "event_severity_score"

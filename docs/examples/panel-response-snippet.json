@@ -11,7 +11,7 @@
       "scores": {
         "overall_disclosure_risk_score": 17.837056,
         "score_coverage_ratio": 0.7778,
-        "confidence_score": 0.4426,
+        "confidence_score": 0.3426,
         "missing_components": [
           "disclosure_change_score",
           "event_severity_score"

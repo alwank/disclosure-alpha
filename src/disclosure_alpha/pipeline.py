@@ -5,10 +5,11 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
-from disclosure_alpha.confidence import compute_overall_confidence
+from disclosure_alpha.confidence import ConfidenceInput, compute_confidence_detailed, compute_overall_confidence
 from disclosure_alpha.deterministic_scoring import (
     DeterministicAggregationResult,
     aggregate_deterministic_matrix,
+    aggregate_deterministic_matrix_v2,
 )
 from disclosure_alpha.diff_engine import compute_section_diff
 from disclosure_alpha.section_extractor import (
@@ -27,6 +28,7 @@ from disclosure_alpha.version import (
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
     SCORING_MODEL_VERSION,
+    SCORING_MODEL_VERSION_V2,
 )
 
 _VERSIONS = {
@@ -65,8 +67,12 @@ class MetricsResult:
     section_flags: dict[str, dict[str, bool]]
     section_densities: dict[str, dict[str, float]]
     language_deltas: dict[str, dict[str, float]]
+    section_diffs_v2: dict[str, float | None] = field(default_factory=dict)
     extraction_confs: list[float] = field(default_factory=list)
     diff_confs: list[float] = field(default_factory=list)
+    extraction_warnings: list[str] = field(default_factory=list)
+    required_sections_present: bool = True
+    has_prior: bool = True
 
 
 @dataclass
@@ -148,6 +154,7 @@ def compute_section_metrics(
     section_flags: dict[str, dict[str, bool]] = {}
     section_densities: dict[str, dict[str, float]] = {}
     language_deltas: dict[str, dict[str, float]] = {}
+    section_diffs_v2: dict[str, float | None] = {}
     extraction_confs: list[float] = []
     diff_confs: list[float] = []
 
@@ -168,6 +175,9 @@ def compute_section_metrics(
         )
         if diff.disclosure_change_score is not None:
             section_diffs[section.section_name] = float(diff.disclosure_change_score)
+        change_v2 = getattr(diff, "disclosure_change_score_v2", None)
+        if change_v2 is not None:
+            section_diffs_v2[section.section_name] = float(change_v2)
         if diff.language_deltas:
             language_deltas[section.section_name] = dict(diff.language_deltas)
         if diff.confidence_score is not None:
@@ -179,8 +189,10 @@ def compute_section_metrics(
         section_flags=section_flags,
         section_densities=section_densities,
         language_deltas=language_deltas,
+        section_diffs_v2=section_diffs_v2,
         extraction_confs=extraction_confs,
         diff_confs=diff_confs,
+        has_prior=prior_sections is not None and len(prior_sections) > 0,
     )
 
 
@@ -199,6 +211,35 @@ def score_deterministic(metrics: MetricsResult) -> DeterministicAggregationResul
         extraction_confidences=metrics.extraction_confs,
         coverage_ratio=result.score_coverage_ratio,
         diff_confidence=avg_diff_conf,
+        extraction_warnings=metrics.extraction_warnings,
+        required_sections_present=metrics.required_sections_present,
+        has_prior=metrics.has_prior,
+    )
+    return result
+
+
+def score_deterministic_v2(metrics: MetricsResult) -> DeterministicAggregationResult:
+    """Versioned scoring entry point with evidence model and calibration."""
+    result = aggregate_deterministic_matrix_v2(
+        section_metrics=metrics.section_metrics,
+        section_diffs=metrics.section_diffs,
+        section_flags=metrics.section_flags,
+        language_deltas=metrics.language_deltas,
+        section_densities=metrics.section_densities,
+        section_diffs_v2=metrics.section_diffs_v2,
+    )
+    avg_diff_conf = (
+        sum(metrics.diff_confs) / len(metrics.diff_confs) if metrics.diff_confs else None
+    )
+    result.confidence_score, _ = compute_confidence_detailed(
+        ConfidenceInput(
+            extraction_confidences=metrics.extraction_confs,
+            extraction_warnings=metrics.extraction_warnings,
+            coverage_ratio=result.score_coverage_ratio,
+            required_sections_present=metrics.required_sections_present,
+            diff_confidence=avg_diff_conf,
+            has_prior=metrics.has_prior,
+        )
     )
     return result
 
@@ -258,8 +299,12 @@ def filter_metrics_result(metrics: MetricsResult, section_names: set[str]) -> Me
         section_flags=_filter_section_dict(metrics.section_flags, section_names),
         section_densities=_filter_section_dict(metrics.section_densities, section_names),
         language_deltas=_filter_section_dict(metrics.language_deltas, section_names),
+        section_diffs_v2=_filter_section_dict(metrics.section_diffs_v2, section_names),
         extraction_confs=metrics.extraction_confs,
         diff_confs=metrics.diff_confs,
+        extraction_warnings=metrics.extraction_warnings,
+        required_sections_present=metrics.required_sections_present,
+        has_prior=metrics.has_prior,
     )
 
 

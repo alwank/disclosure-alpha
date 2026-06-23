@@ -164,7 +164,7 @@ Fixture: `tests/fixtures/validation/matrix_mini_corpus.jsonl`
 Modules: `validation/matrix_corpus.py`, `validation/matrix_gates.py`
 
 ```bash
-# v2 smoke report (CI fixture, relaxed thresholds)
+# v2 CI fixture smoke (relaxed thresholds)
 python scripts/validate_matrix_gates.py \
   --corpus tests/fixtures/validation/matrix_mini_corpus.jsonl \
   --scoring-version v2 \

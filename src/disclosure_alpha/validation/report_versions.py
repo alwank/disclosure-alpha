@@ -27,6 +27,11 @@ COMMITTED_REPORTS: dict[str, dict[str, str]] = {
         "scoring_model_version": SCORING_MODEL_VERSION_V2,
         "dictionary_version": DICTIONARY_VERSION,
     },
+    "data/validation/reports/l3_outcomes_report_v2.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION_V2,
+    },
     "data/validation/reports/matrix_validation_report_v2.json": {
         "parser_version": PARSER_VERSION,
         "metrics_engine_version": METRICS_ENGINE_VERSION,
@@ -47,6 +52,23 @@ COMMITTED_REPORTS: dict[str, dict[str, str]] = {
         "parser_version": PARSER_VERSION,
         "metrics_engine_version": METRICS_ENGINE_VERSION,
         "scoring_model_version": SCORING_MODEL_VERSION,
+    },
+    "data/validation/reports/deterministic_validation_report_fy2024.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION,
+        "dictionary_version": DICTIONARY_VERSION,
+    },
+    "data/validation/reports/deterministic_validation_report_fy2024_v2.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION_V2,
+        "dictionary_version": DICTIONARY_VERSION,
+    },
+    "data/validation/reports/l3_outcomes_report_fy2024_v2.json": {
+        "parser_version": PARSER_VERSION,
+        "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "scoring_model_version": SCORING_MODEL_VERSION_V2,
     },
 }
 

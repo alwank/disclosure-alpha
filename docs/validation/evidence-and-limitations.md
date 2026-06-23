@@ -26,35 +26,66 @@ CLI, HTTP, MCP, and `score_deterministic()` all use **`deterministic_scoring_v1`
 | EDGAR gates (`edgar_gates_pass`) | **fail** | E1/E2 fetch and analysis rates missing from manifest; not a construct contradiction |
 | Outcome gates (`outcome_gates_pass`) | **pass** | Volatility monotonicity on overall score; earnings-surprise vs change skipped in corpus mode |
 
-`overall_l2_pass` is false because EDGAR gates failed, not because construct pairs failed. Full multi-section matrix validation at SP500 scale is **not** complete — see scope note below.
+`overall_l2_pass` is false because EDGAR gates failed, not because construct pairs failed. v1 validation used Item 1A text only; see v2 matrix evidence for partial multi-section gates.
 
-## v2 smoke validation (opt-in, not production-grade)
+## v2 FY2025 evidence (opt-in; not the default)
 
-An experimental **`deterministic_scoring_v2`** (`score_deterministic_v2`) has a **committed smoke pass** on local CI fixtures only. This is **not** the same evidence level as the v1 SP500 cohort above.
+**`deterministic_scoring_v2`** (`score_deterministic_v2`) was re-run on the same FY2025 S&P 500 Item 1A corpus as v1 (n=428 analysis rows) plus a **partial** EDGAR full-matrix cohort (330 filings; ingestion incomplete vs ~503 index names). v2 score **levels are not comparable** to v1 — see {doc}`../reference/versioning`.
 
-| Check | Fixture | Result | Source |
-|-------|---------|--------|--------|
-| L2 construct pairs | 3-firm mini corpus | **fail** (n=3; below thresholds) | `data/validation/reports/deterministic_validation_report_v2.json` |
-| Matrix component gates | 2-filing mini corpus | **pass** (relaxed CI thresholds) | `data/validation/reports/matrix_validation_report_v2.json` |
+| Check | Result | Source |
+|-------|--------|--------|
+| Construct validity (boilerplate proxy) | Spearman ρ ≈ 0.69 (n=428) | `data/validation/reports/deterministic_validation_report_v2.json` |
+| Construct validity (specificity proxy) | Spearman ρ ≈ 0.84 (n=428) | same |
+| Full-matrix component gates (production thresholds) | **pass** (median confidence 0.85; component coverage ≈ 0.99) | `data/validation/reports/matrix_validation_report_v2.json` |
+| Post-filing volatility association (v2 overall) | Q5/Q1 ≈ 1.05 (n=435; corpus mode) | `data/validation/reports/l3_outcomes_report_v2.json` |
 
-**v2 artifact versions:** same parser/metrics/dictionary as v1; `scoring_model_version` = `deterministic_scoring_v2`.
+**Last validated:** 2026-06-23. Artifact versions: `section_extractor_v1`, `text_metrics_v2`, `deterministic_scoring_v2`, `built_in_dictionaries_v2`.
 
-Reproduce locally (no network):
+### Gate status — v2 (read separately)
+
+| Gate family | Status | Notes |
+|-------------|--------|-------|
+| Construct pairs (`construct_pairs_pass`) | **pass** | Same Item 1A proxies as v1 at n=428 |
+| EDGAR gates (`edgar_gates_pass`) | **fail** | E1 fetch rate 0.87 vs 0.90 threshold (same corpus as v1) |
+| Matrix `overall_pass` | **pass** | n=330 matrix filings; not full index coverage |
+| Outcome gates (`outcome_gates_pass`) | **pass** | Volatility monotonicity; earnings-surprise vs change skipped in corpus mode |
+
+`overall_l2_pass` is false because EDGAR E1 failed, not because construct pairs failed.
+
+Reproduce FY2025 v2 reports (local corpora under `data/validation/corpus/`, gitignored):
 
 ```bash
 python3 scripts/validate_deterministic_construct.py \
-  --corpus tests/fixtures/validation/mini_corpus.jsonl \
-  --scoring-version v2 --min-n 3 --boilerplate-min-docs 2
+  --corpus data/validation/corpus/sp500_item1a.jsonl \
+  --universe data/universe/sp500.csv \
+  --manifest data/validation/corpus/sp500_item1a.manifest.json \
+  --scoring-version v2
 
 python3 scripts/validate_matrix_gates.py \
-  --corpus tests/fixtures/validation/matrix_mini_corpus.jsonl \
-  --scoring-version v2 \
-  --min-extraction-rate 0.3 --min-median-confidence 0.5 --min-component-coverage 0.2
+  --corpus data/validation/corpus/sp500_matrix_fy2025.jsonl \
+  --scoring-version v2
+
+python3 scripts/validate_deterministic_outcomes.py --scoring-version v2
 ```
 
-**Do not** cite v2 numeric levels or claim SP500-scale construct/outcome validity until v2 is re-run on the full validation corpus. v2 is **not** the default on HTTP, MCP, or CLI.
+CI still runs **fixture smoke** thresholds via `tests/test_matrix_validation.py`; committed SP500 matrix results use **production** defaults in `validate_matrix_gates.py`.
 
 **Opt-in v2 on HTTP/MCP:** pass `scoring_model_version=deterministic_scoring_v2` on matrix GET, panel POST body, or MCP scoring tools (`score_company_filing_tool`, `score_deterministic_tool_wrapper`, `score_filing_html_tool_wrapper`). Defaults remain v1.
+
+## FY2024 robustness (secondary cohort)
+
+**FY2025 remains the canonical primary evidence.** FY2024 is an out-of-sample robustness check on the same S&P 500 universe with FY2024 10-K Item 1A text. Corpus fetch is **partial** until EDGAR ingestion completes (~238/~503 tickers in the committed manifest snapshot; target ≥430 for parity with FY2025 analysis cohort).
+
+| Check | FY2025 (canonical) | FY2024 (robustness) | Source |
+|-------|-------------------|---------------------|--------|
+| E1 fetch rate | 0.87 (fail vs 0.90) | 0.47 (fail; partial corpus) | `deterministic_validation_report.json` vs `deterministic_validation_report_fy2024.json` |
+| Construct: specificity vs NER (ρ) | 0.84 (pass, n≈428) | 0.92 (pass, n=232) | same reports |
+| Construct: boilerplate vs LS4gram (ρ) | 0.69 (pass) | −0.46 (fail; likely partial-cohort artifact) | same reports |
+| L3 volatility Q5/Q1 (v2, corpus mode) | 1.05 (n=435) | 1.24 (n=230) | `l3_outcomes_report_v2.json` vs `l3_outcomes_report_fy2024_v2.json` |
+
+**v2 FY2024 L2:** `deterministic_validation_report_fy2024_v2.json` (regenerated when corpus completes). **Matrix gates:** not run at FY2024 SP500 scale (no `sp500_matrix_fy2024.jsonl` yet).
+
+Do **not** cite FY2024 construct levels as production claims until the FY2024 corpus meets E1/E2 thresholds. No earnings-surprise outcome claims for FY2024 v2 (corpus mode skips change-score gate).
 
 ## Limitations
 
@@ -64,11 +95,11 @@ python3 scripts/validate_matrix_gates.py \
 - Buy/sell signals or return prediction
 - Earnings-surprise outcome validation (FY2024 gate did not pass)
 - Full S&P 500 validation coverage (corpus fetch rate ~84%, not 100%)
-- Full multi-section matrix validation at SP500 scale (Item 1A construct + limited volatility association only)
-- v2 SP500-scale construct or outcome validation (smoke fixtures only)
+- Full S&P 500 **matrix** corpus (330/~503 tickers in the FY2025 EDGAR matrix build at last run)
+- Comparable v1 vs v2 headline levels on the same filing (different score scales)
 ```
 
-**Scope note:** validation runs used **Item 1A text** for corpus scoring, not the full multi-section matrix. Missing filing sections reduce score coverage and confidence.
+**Scope note:** L2/L3 corpus mode scores **Item 1A text** only. Matrix gates use multi-section EDGAR HTML on the partial matrix cohort above; missing sections reduce coverage and confidence.
 
 **Disclaimer:** Output is for research and integration testing. Read the underlying SEC filings before making decisions.
 
@@ -84,4 +115,4 @@ Stale committed reports are detected offline via:
 python3 scripts/validate_deterministic_construct.py --check-versions
 ```
 
-v1 reports are checked against `deterministic_scoring_v1`; committed v2 smoke reports are checked against `deterministic_scoring_v2`.
+v1 reports are checked against `deterministic_scoring_v1`; committed v2 reports are checked against `deterministic_scoring_v2`.

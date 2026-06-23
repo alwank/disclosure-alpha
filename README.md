@@ -1,7 +1,7 @@
 # Disclosure Alpha
 
 <p align="center">
-  <img src="docs/assets/readme-hero-quickstart.png" alt="Disclosure Alpha quickstart: install, set SEC User-Agent, score a 10-K from the CLI" width="720">
+  <img src="docs/assets/readme-hero-cli.png" alt="Disclosure Alpha quickstart: install, set SEC User-Agent, score a 10-K from the CLI" width="720">
 </p>
 
 <p align="center">

@@ -1,6 +1,6 @@
 # Disclosure Alpha
 
-![Disclosure Alpha quickstart](https://raw.githubusercontent.com/alwank/disclosure-alpha/main/docs/assets/readme-hero-quickstart.png)
+![Disclosure Alpha quickstart](https://raw.githubusercontent.com/alwank/disclosure-alpha/main/docs/assets/readme-hero-cli.png)
 
 **Deterministic SEC filing analytics — parse, score, diff. No LLM required.**
 

@@ -10,6 +10,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache--2.0-green.svg" alt="License: Apache-2.0"></a>
   <a href="https://readthedocs.org/projects/disclosure-alpha/badge/?version=latest"><img src="https://readthedocs.org/projects/disclosure-alpha/badge/?version=latest" alt="Documentation"></a>
   <a href="https://github.com/alwank/disclosure-alpha/actions/workflows/ci.yml"><img src="https://github.com/alwank/disclosure-alpha/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://disclosure-alpha.readthedocs.io/en/latest/getting-started/evidence.html"><img src="https://img.shields.io/badge/research-ρ%200.87_vs_NER-teal.svg" alt="Research ρ≈0.87"></a>
   <a href="https://github.com/alwank/disclosure-alpha"><img src="https://img.shields.io/github/stars/alwank/disclosure-alpha?style=social" alt="GitHub"></a>
 </p>
 
@@ -134,8 +135,9 @@ Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/lates
   },
   "versions": {
     "parser_version": "section_extractor_v1",
-    "metrics_engine_version": "text_metrics_v2",
-    "dictionary_version": "built_in_dictionaries_v2"
+    "metrics_engine_version": "text_metrics_v3",
+    "dictionary_version": "built_in_dictionaries_v3",
+    "scoring_model_version": "deterministic_scoring_v2"
   }
 }
 ```
@@ -144,7 +146,16 @@ More examples: [Examples gallery](https://disclosure-alpha.readthedocs.io/en/lat
 
 ## Research-backed
 
-Validated on **428 S&P 500 FY2025 Item 1A 10-Ks** (analysis cohort). Construct validity and partial L3 volatility association — details in **[Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html)** and **[Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html)**.
+S&P 500 FY2025 **Item 1A** · `deterministic_scoring_v2` · [full evidence →](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/evidence.html)
+
+| Check | Result |
+|-------|--------|
+| Analysis cohort | **478** firms (503-name universe) |
+| Specificity vs NER | Spearman **ρ ≈ 0.87** (n=478) |
+| Boilerplate vs LS4-gram proxy | Spearman **ρ ≈ 0.74** (n=478) |
+| Post-filing vol (90d) | Q5/Q1 **≈ 1.15** (n=435) |
+
+Construct checks use independent references. Vol association is descriptive only — **not** investment advice or alpha. Scope: [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html).
 
 ## MCP in Cursor
 
@@ -172,7 +183,7 @@ Full MCP guide: [MCP](https://disclosure-alpha.readthedocs.io/en/latest/guides/m
 | I want to… | Start here |
 |------------|------------|
 | Prove it works in five minutes | [First successful run](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/first-successful-run.html) |
-| Evaluate whether to trust this | [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html) |
+| Evaluate whether to trust this | [Evidence and validation](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/evidence.html) |
 | Understand the numbers | [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html) |
 | Score in terminal | [Quickstart CLI](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-cli.html) |
 | Build a screener | [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html) → [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html) |

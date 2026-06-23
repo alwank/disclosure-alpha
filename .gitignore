@@ -9,7 +9,22 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 data/cache/
+data/validation/cache/
 data/validation/corpus/*.jsonl
 data/validation/outcomes/
 docs/_build/
 .env
+
+# Internal validation (local only; not shipped on public repo)
+scripts/validate_*.py
+scripts/build_validation_corpus*.py
+scripts/build_matrix_validation_corpus*.py
+scripts/fetch_validation_outcomes.py
+scripts/audit_validation_corpus.py
+scripts/precompute_validation_scores.py
+scripts/diagnose_item1a.py
+scripts/mine_dictionary_candidates.py
+docs/validation/
+data/validation/README.md
+data/validation/reports/
+data/validation/baselines/

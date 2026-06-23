@@ -1,6 +1,6 @@
 [
   {"text": "We identified a material weakness in internal control over financial reporting.", "section": "item_9a_controls", "expected_flags": {"material_weakness_flag": true}, "notes": "controls positive"},
-  {"text": "No material weakness was identified during our assessment.", "section": "item_9a_controls", "expected_flags": {"material_weakness_flag": true}, "notes": "weakness phrase present; suppression deferred"},
+  {"text": "No material weakness was identified during our assessment.", "section": "item_9a_controls", "expected_flags": {"material_weakness_flag": false}, "notes": "MW suppression"},
   {"text": "We identified a material weakness in internal control over financial reporting.", "section": "item_7_mdna", "expected_flags": {"material_weakness_flag": false}, "notes": "controls flag out of MD&A scope"},
   {"text": "Management concluded that our internal control over financial reporting was ineffective.", "section": "item_9a_controls", "expected_flags": {"ineffective_controls_flag": true}, "notes": "ineffective controls"},
   {"text": "Disclosure controls and procedures were ineffective as of year end.", "section": "item_4_controls", "expected_flags": {"ineffective_controls_flag": true}, "notes": "10-Q controls"},
@@ -50,5 +50,14 @@
   {"text": "Geopolitical sanctions and tariff changes affect trade.", "section": "item_1a_risk_factors", "expected_topics": ["geopolitical"], "notes": "geopolitical topic"},
   {"text": "Climate-related emissions regulations may increase costs.", "section": "item_1a_risk_factors", "expected_topics": ["climate"], "notes": "climate topic"},
   {"text": "Labor shortage and union negotiations remain risks.", "section": "item_1a_risk_factors", "expected_topics": ["labor"], "notes": "labor topic"},
-  {"text": "Transfer pricing disputes may arise from tax examination.", "section": "item_1a_risk_factors", "expected_topics": ["tax"], "notes": "tax topic phrase"}
+  {"text": "Transfer pricing disputes may arise from tax examination.", "section": "item_1a_risk_factors", "expected_topics": ["tax"], "notes": "tax topic phrase"},
+  {"text": "Substantial doubt has been alleviated as management executed its plan.", "section": "item_7_mdna", "expected_flags": {"going_concern_flag": false}, "notes": "going concern alleviation suppression"},
+  {"text": "The SEC issued a civil investigative demand regarding revenue recognition.", "section": "item_1a_risk_factors", "expected_metrics": {"legal_regulatory_phrase_ratio_gt": 0}, "notes": "legal regulatory phrase"},
+  {"text": "Routine regulatory examinations occur periodically without findings.", "section": "item_1a_risk_factors", "expected_flags": {"investigation_flag": false}, "notes": "routine exam suppression"},
+  {"text": "Net interest margin compression may pressure earnings.", "section": "item_1a_risk_factors", "expected_topics": ["interest rate"], "notes": "bank NIM smoke"},
+  {"text": "SaaS bookings declined amid customer destocking.", "section": "item_7_mdna", "expected_density": {"demand_softness_density_gt": 0}, "notes": "software demand density"},
+  {"text": "Gross margin contracted due to input cost pressures.", "section": "item_7_mdna", "expected_density": {"margin_pressure_density_gt": 0}, "notes": "manufacturing margin density"},
+  {"text": "Clinical trial enrollment delays may affect FDA approval timelines.", "section": "item_1a_risk_factors", "expected_topics": ["healthcare/regulatory"], "notes": "biotech clinical smoke"},
+  {"text": "We maintain a minimum liquidity covenant under our credit facility.", "section": "item_7_mdna", "expected_density": {"liquidity_constraint_density_gt": 0}, "notes": "liquidity covenant density"},
+  {"text": "Forward-looking statements are subject to risks and difficult to forecast.", "section": "item_7_mdna", "expected_density": {"uncertainty_term_density_gt": 0}, "notes": "MD&A uncertainty density v3"}
 ]

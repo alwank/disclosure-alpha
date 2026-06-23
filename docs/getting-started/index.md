@@ -8,6 +8,7 @@ Install Disclosure Alpha, run your first score, and choose the right product sur
 first-successful-run
 installation
 scope-and-claims
+evidence
 quickstart-cli
 quickstart-python
 sec-edgar-setup

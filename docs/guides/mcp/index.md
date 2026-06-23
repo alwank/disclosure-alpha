@@ -27,7 +27,7 @@ disclosure-alpha-mcp-analyst
 | Tool | Description |
 |------|-------------|
 | `list_company_filings_tool` | List 10-K / 10-Q filings for a ticker and fiscal year |
-| `score_company_filing_tool` | Score a filing by ticker, fiscal year, form type, optional quarter; optional `scoring_model_version` (default v1) |
+| `score_company_filing_tool` | Score a filing by ticker, fiscal year, form type, optional quarter; optional `scoring_model_version` (default v2) |
 
 **Resource:** `disclosure://taxonomy/v1` — component weights and version strings.
 
@@ -44,12 +44,12 @@ disclosure-alpha-mcp-builder
 | `extract_sections_tool` | Extract sections from filing HTML |
 | `compute_section_metrics_tool_wrapper` | Metrics + diffs from section JSON |
 | `diff_sections_tool` | Diff two section texts |
-| `score_deterministic_tool_wrapper` | Aggregate scores from metrics JSON; optional `scoring_model_version` (default v1) |
-| `score_filing_html_tool_wrapper` | Full pipeline on HTML (optional prior HTML); optional `scoring_model_version` (default v1) |
+| `score_deterministic_tool_wrapper` | Aggregate scores from metrics JSON; optional `scoring_model_version` (default v2) |
+| `score_filing_html_tool_wrapper` | Full pipeline on HTML (optional prior HTML); optional `scoring_model_version` (default v2) |
 
 Use the builder bundle when your agent already has filing HTML and needs step-by-step pipeline access.
 
-**Scoring model:** all scoring tools default to `deterministic_scoring_v1`. Pass `scoring_model_version=deterministic_scoring_v2` to opt into experimental v2 blends (same semantics as HTTP matrix/panel). See {doc}`../../reference/versioning`.
+**Scoring model:** all scoring tools default to `deterministic_scoring_v2`. Pass `scoring_model_version=deterministic_scoring_v1` for the legacy scale. See {doc}`../../reference/versioning`.
 
 ## Cursor configuration example
 

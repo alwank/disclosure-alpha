@@ -64,7 +64,7 @@ def test_openapi_version_matches_package():
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
-@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.score_for_model")
 def test_disclosure_matrix(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -133,7 +133,7 @@ def test_company_sections_include_text(mock_sections):
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
-@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.score_for_model")
 def test_disclosure_matrix_slim_include(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -148,7 +148,7 @@ def test_disclosure_matrix_slim_include(mock_score, mock_metrics):
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
-@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.score_for_model")
 def test_disclosure_matrix_fields(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -250,7 +250,7 @@ def test_invalid_include_param():
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
-@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.score_for_model")
 def test_disclosure_matrix_sections_filter(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores

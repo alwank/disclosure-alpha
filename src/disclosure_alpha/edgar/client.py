@@ -6,6 +6,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from functools import lru_cache
 from typing import Any
 
 from disclosure_alpha.edgar.types import SecFetchError
@@ -59,6 +60,7 @@ def fetch_text(url: str) -> str:
         raise SecFetchError(f"SEC fetch failed for {url}: {exc.reason}") from exc
 
 
+@lru_cache(maxsize=1)
 def fetch_company_tickers() -> dict[str, tuple[str, str]]:
     """Return ticker -> (cik_padded, company_name)."""
     data = fetch_json(f"{SEC_BASE}/files/company_tickers.json")

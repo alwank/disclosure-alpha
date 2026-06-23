@@ -14,6 +14,7 @@ except ImportError as exc:  # pragma: no cover
     ) from exc
 
 from disclosure_alpha.mcp.tools import list_company_filings, score_company_filing, taxonomy_payload
+from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 mcp = FastMCP("disclosure-alpha-analyst")
 
@@ -34,7 +35,7 @@ def score_company_filing_tool(
     fiscal_year: int,
     form_type: str = "10-K",
     quarter: str | None = None,
-    scoring_model_version: str = "deterministic_scoring_v1",
+    scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> str:
     """Score a company filing by ticker and fiscal year (10-K or 10-Q with quarter)."""
     return score_company_filing(

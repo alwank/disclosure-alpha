@@ -6,14 +6,19 @@ from disclosure_alpha.dictionaries import (
     CONSTRAINING_WORDS,
     FLAG_PATTERNS,
     FLAG_SECTION_SCOPE,
+    FLAG_SUPPRESSIONS,
     GEOGRAPHY_TERMS,
+    LEGAL_REGULATORY_PHRASES,
     LITIGIOUS_WORDS,
     MDNA_DENSITY_TERMS,
     MDNA_SECTIONS,
     MODAL_WORDS,
+    MODERATE_MODAL_WORDS,
     NEGATIVE_WORDS,
     SEGMENT_TERMS,
+    STRONG_MODAL_WORDS,
     UNCERTAINTY_WORDS,
+    WEAK_MODAL_WORDS,
 )
 from disclosure_alpha.text_matching import (
     boilerplate_hits,
@@ -52,6 +57,10 @@ class TextMetricResult:
     litigious_word_ratio: float
     constraining_word_ratio: float
     modal_word_ratio: float
+    weak_modal_word_ratio: float
+    moderate_modal_word_ratio: float
+    strong_modal_word_ratio: float
+    legal_regulatory_phrase_ratio: float
     numeric_specificity_score: float
     company_specificity_score: float
     boilerplate_phrase_ratio: float
@@ -71,6 +80,13 @@ def _word_ratio(words: list[str], vocab: frozenset[str]) -> float:
         return 0.0
     hits = sum(1 for w in words if w in vocab)
     return hits / len(words)
+
+
+def _phrase_ratio(lower: str, phrases: list[str], word_count: int) -> float:
+    if not word_count:
+        return 0.0
+    hits = sum(phrase_count(lower, phrase) for phrase in phrases)
+    return hits / word_count
 
 
 def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
@@ -110,6 +126,12 @@ def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
         litigious_word_ratio=round(_word_ratio(words, LITIGIOUS_WORDS), 6),
         constraining_word_ratio=round(_word_ratio(words, CONSTRAINING_WORDS), 6),
         modal_word_ratio=round(_word_ratio(words, MODAL_WORDS), 6),
+        weak_modal_word_ratio=round(_word_ratio(words, WEAK_MODAL_WORDS), 6),
+        moderate_modal_word_ratio=round(_word_ratio(words, MODERATE_MODAL_WORDS), 6),
+        strong_modal_word_ratio=round(_word_ratio(words, STRONG_MODAL_WORDS), 6),
+        legal_regulatory_phrase_ratio=round(
+            _phrase_ratio(lower, LEGAL_REGULATORY_PHRASES, word_count), 6
+        ),
         numeric_specificity_score=round(numeric_specificity, 4),
         company_specificity_score=round(company_specificity, 4),
         boilerplate_phrase_ratio=round(boilerplate_ratio, 6),
@@ -135,14 +157,24 @@ def compute_metric_families(inp: SectionTextInput) -> list[dict[str, float | str
 
 def detect_section_flags(text: str, section_name: str) -> dict[str, bool]:
     """Return all v1 boolean flags for a section (False when out of scope)."""
-    lower = (text or "").lower()
+    sentences = split_sentences(text or "")
     flags: dict[str, bool] = {}
     for flag_name, phrases in FLAG_PATTERNS.items():
         scope = FLAG_SECTION_SCOPE.get(flag_name, frozenset())
         if section_name not in scope:
             flags[flag_name] = False
             continue
-        flags[flag_name] = any(phrase_matches(lower, phrase) for phrase in phrases)
+        suppressions = FLAG_SUPPRESSIONS.get(flag_name, [])
+        matched = False
+        for sent in sentences:
+            lower = sent.lower()
+            if not any(phrase_matches(lower, phrase) for phrase in phrases):
+                continue
+            if suppressions and any(phrase_matches(lower, sup) for sup in suppressions):
+                continue
+            matched = True
+            break
+        flags[flag_name] = matched
     return flags
 
 

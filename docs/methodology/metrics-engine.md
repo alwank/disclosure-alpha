@@ -6,7 +6,7 @@
 |--|--|
 | **Inputs** | Extracted section `cleaned_text` per section name |
 | **Outputs** | Per-section ratios, flags, MD&A densities (`TextMetricResult`) |
-| **Version** | `text_metrics_v2`, dictionary `built_in_dictionaries_v2` |
+| **Version** | `text_metrics_v3`, dictionary `built_in_dictionaries_v3` |
 
 ## In plain terms
 
@@ -19,7 +19,7 @@ The metrics engine counts tone words, boilerplate phrases, specificity proxies, 
 - **HTTP:** `GET /v1/company/{ticker}/disclosure-metrics`
 - **Components affected:** tone-driven scores (`risk_factor_intensity_score`, `mdna_uncertainty_score`, `boilerplate_risk_score`, …) and flag-boosted scores (`legal_regulatory_risk_score`, `liquidity_stress_score`)
 
-Module: `text_metrics.py` (metrics engine) and the built-in dictionary module (`built_in_dictionaries_v2`).
+Module: `text_metrics.py` (metrics engine) and the built-in dictionary package (`built_in_dictionaries_v3`).
 
 <details>
 <summary>Full specification</summary>

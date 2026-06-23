@@ -46,6 +46,10 @@
         "uncertainty_word_ratio": 0.137931,
         "litigious_word_ratio": 0.103448,
         "modal_word_ratio": 0.103448,
+        "weak_modal_word_ratio": 0.103448,
+        "moderate_modal_word_ratio": 0.0,
+        "strong_modal_word_ratio": 0.0,
+        "legal_regulatory_phrase_ratio": 0.0,
         "constraining_word_ratio": 0.034483,
         "boilerplate_phrase_ratio": 0.0,
         "numeric_specificity_score": 34.4828,
@@ -57,6 +61,10 @@
         "uncertainty_word_ratio": 0.071429,
         "litigious_word_ratio": 0.0,
         "modal_word_ratio": 0.071429,
+        "weak_modal_word_ratio": 0.071429,
+        "moderate_modal_word_ratio": 0.0,
+        "strong_modal_word_ratio": 0.0,
+        "legal_regulatory_phrase_ratio": 0.0,
         "constraining_word_ratio": 0.071429,
         "boilerplate_phrase_ratio": 0.0,
         "numeric_specificity_score": 71.4286,
@@ -126,7 +134,7 @@
     "has_prior": false
   },
   "scores": {
-    "overall_disclosure_risk_score": 17.837056,
+    "overall_disclosure_risk_score": 33.159052,
     "score_coverage_ratio": 0.7778,
     "confidence_score": 0.3426,
     "missing_components": [
@@ -134,11 +142,11 @@
       "event_severity_score"
     ],
     "components": {
-      "risk_factor_intensity_score": 8.6207,
+      "risk_factor_intensity_score": 60.0,
       "disclosure_change_score": null,
       "mdna_uncertainty_score": 26.726221,
-      "legal_regulatory_risk_score": 25.3448,
-      "liquidity_stress_score": 4.201706,
+      "legal_regulatory_risk_score": 37.6724,
+      "liquidity_stress_score": 4.030477,
       "boilerplate_risk_score": 42.528733,
       "internal_controls_risk_score": 3.4483,
       "event_severity_score": null,
@@ -151,19 +159,29 @@
       "disclosure_quality_score": 36.2069,
       "disclosure_deterioration_score": null,
       "static_disclosure_quality_score": 36.2069,
-      "static_disclosure_risk_score": 17.924227,
+      "static_disclosure_risk_score": 19.950289,
       "disclosure_change_risk_score": null
     },
     "provenance": [
       {
         "score_name": "risk_factor_intensity_score",
-        "value": 8.6207,
+        "value": 60.0,
         "inputs": {
-          "negative_word_ratio": 0.034483,
-          "uncertainty_word_ratio": 0.137931,
-          "diff_1a": null
+          "diff_1a": null,
+          "negative_word_ratio": {
+            "raw_value": 0.034483,
+            "calibrated_value": 30.0,
+            "calibration_reference": "builtin_percentiles:10-K:negative_word_ratio",
+            "calibration_status": "calibrated"
+          },
+          "uncertainty_word_ratio": {
+            "raw_value": 0.137931,
+            "calibrated_value": 90.0,
+            "calibration_reference": "builtin_percentiles:10-K:uncertainty_word_ratio",
+            "calibration_status": "calibrated"
+          }
         },
-        "source": "deterministic"
+        "source": "deterministic_v2"
       },
       {
         "score_name": "disclosure_change_score",
@@ -191,27 +209,52 @@
       },
       {
         "score_name": "legal_regulatory_risk_score",
-        "value": 25.3448,
+        "value": 37.6724,
         "inputs": {
-          "litigious_word_ratio": 0.103448,
-          "legal_language_delta": null,
-          "investigation_flag": true,
-          "material_legal_proceeding_flag": false,
-          "flag_boost": 15.0
+          "litigious_word_ratio_item_1a_risk_factors": {
+            "value": 10.3448,
+            "weight": 0.5,
+            "section": "item_1a_risk_factors",
+            "raw_value": 0.103448,
+            "reason": ""
+          },
+          "investigation_flag": {
+            "value": 65.0,
+            "weight": 0.5,
+            "section": "item_1a_risk_factors",
+            "raw_value": true,
+            "reason": "serious_flag"
+          }
         },
-        "source": "deterministic"
+        "source": "deterministic_v2"
       },
       {
         "score_name": "liquidity_stress_score",
-        "value": 4.201706,
+        "value": 4.030477,
         "inputs": {
-          "constraining_word_ratio": 0.071429,
-          "liquidity_constraint_density": 0.0,
-          "going_concern_flag": false,
-          "covenant_breach_flag": false,
-          "flag_boost": 0.0
+          "constraining_word_ratio_mdna": {
+            "value": 7.1429,
+            "weight": 0.5,
+            "section": "item_7_mdna",
+            "raw_value": 0.071429,
+            "reason": ""
+          },
+          "liquidity_constraint_density": {
+            "value": 0.0,
+            "weight": 0.35,
+            "section": "item_7_mdna",
+            "raw_value": 0.0,
+            "reason": ""
+          },
+          "constraining_word_ratio_1a": {
+            "value": 3.4483,
+            "weight": 0.25,
+            "section": "item_1a_risk_factors",
+            "raw_value": 0.034483,
+            "reason": "liquidity_fallback"
+          }
         },
-        "source": "deterministic"
+        "source": "deterministic_v2"
       },
       {
         "score_name": "boilerplate_risk_score",
@@ -227,14 +270,15 @@
         "score_name": "internal_controls_risk_score",
         "value": 3.4483,
         "inputs": {
-          "diff_controls": null,
-          "constraining_word_ratio": 0.034483,
-          "material_weakness_flag": false,
-          "restatement_flag": false,
-          "ineffective_controls_flag": false,
-          "flag_boost": 0.0
+          "constraining_word_ratio": {
+            "value": 3.4483,
+            "weight": 0.4,
+            "section": "item_1a_risk_factors",
+            "raw_value": 0.034483,
+            "reason": ""
+          }
         },
-        "source": "deterministic"
+        "source": "deterministic_v2"
       },
       {
         "score_name": "event_severity_score",
@@ -266,7 +310,7 @@
   },
   "versions": {
     "parser_version": "section_extractor_v1",
-    "metrics_engine_version": "text_metrics_v2",
-    "scoring_model_version": "deterministic_scoring_v1"
+    "metrics_engine_version": "text_metrics_v3",
+    "scoring_model_version": "deterministic_scoring_v2"
   }
 }

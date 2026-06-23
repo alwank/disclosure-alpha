@@ -1,0 +1,23 @@
+{% extends "!base.html" %}
+
+{% block extrahead %}
+{{ super() }}
+{% if site_home_url %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var header = document.querySelector('[data-md-component="header"] .md-header__inner');
+  var source = header && header.querySelector(".md-header__source");
+  if (!header || !source || header.querySelector(".da-header-site-link")) {
+    return;
+  }
+  var link = document.createElement("a");
+  link.href = {{ site_home_url | tojson }};
+  link.className = "da-header-site-link";
+  link.title = "Back to Disclosure Alpha site";
+  link.rel = "noopener";
+  link.textContent = "Back to site";
+  source.insertAdjacentElement("afterend", link);
+});
+</script>
+{% endif %}
+{% endblock %}

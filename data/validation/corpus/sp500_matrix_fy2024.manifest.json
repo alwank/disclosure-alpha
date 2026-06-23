@@ -1,0 +1,28 @@
+{
+  "fiscal_year": 2024,
+  "form": "10-K",
+  "universe": "data/universe/sp500.csv",
+  "corpus": "data/validation/corpus/sp500_matrix_fy2024.jsonl",
+  "compare_prior": true,
+  "n_written": 499,
+  "n_new": 499,
+  "n_skipped_existing": 0,
+  "failures": [
+    {
+      "ticker": "FDXF",
+      "reason": "filing_not_found"
+    },
+    {
+      "ticker": "PSKY",
+      "reason": "filing_not_found"
+    },
+    {
+      "ticker": "Q",
+      "reason": "filing_not_found"
+    },
+    {
+      "ticker": "SNDK",
+      "reason": "filing_not_found"
+    }
+  ]
+}

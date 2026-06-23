@@ -106,6 +106,37 @@ def fetch_realized_vol_90d_openbb(
     return vol, n, None
 
 
+def fetch_realized_vol_90d_yfinance(
+    ticker: str,
+    filing_date: date,
+    *,
+    window_days: int = 90,
+) -> tuple[float | None, int, str | None]:
+    import yfinance as yf
+
+    start = (filing_date + timedelta(days=1)).isoformat()
+    end = (filing_date + timedelta(days=window_days + 5)).isoformat()
+    try:
+        frame = yf.Ticker(ticker).history(start=start, end=end, auto_adjust=False)
+    except Exception as exc:  # ponytail: yfinance errors are heterogeneous
+        return None, 0, str(exc)
+    if frame is None or frame.empty:
+        return None, 0, None
+    bars: list[dict[str, Any]] = []
+    for idx, rec in frame.iterrows():
+        close = rec.get("Close")
+        if close is None:
+            continue
+        bars.append(
+            {
+                "date": idx.isoformat() if hasattr(idx, "isoformat") else str(idx),
+                "close": float(close),
+            }
+        )
+    vol, n = realized_vol_90d_from_bars(bars, filing_date=filing_date, window_days=window_days)
+    return vol, n, None
+
+
 def first_reported_earnings_after(
     earnings_rows: list[dict[str, Any]],
     after: date,
@@ -193,6 +224,7 @@ def fetch_outcomes_for_filing(
     fetch_vol: bool = True,
     fetch_earnings: bool = True,
     resolve_filing_from_edgar: bool = True,
+    vol_provider: Literal["openbb", "yfinance"] = "openbb",
 ) -> OutcomeRow:
     errors: list[str] = []
     row = OutcomeRow(ticker=ticker.upper(), fiscal_year=fiscal_year, filing_date=None, errors=[])
@@ -216,16 +248,25 @@ def fetch_outcomes_for_filing(
         return row
 
     if fetch_vol:
-        if openbb is None:
-            errors.append("vol: OpenBB client not configured")
+        if vol_provider == "openbb":
+            if openbb is None:
+                errors.append("vol: OpenBB client not configured")
+            else:
+                vol, n, err = fetch_realized_vol_90d_openbb(openbb, ticker, fdate)
+                if err:
+                    errors.append(f"vol: {err}")
+                else:
+                    row.realized_vol_90d = vol
+                    row.vol_trading_days = n
+                    row.vol_source = "openbb:yfinance" if vol is not None else "missing"
         else:
-            vol, n, err = fetch_realized_vol_90d_openbb(openbb, ticker, fdate)
+            vol, n, err = fetch_realized_vol_90d_yfinance(ticker, fdate)
             if err:
                 errors.append(f"vol: {err}")
             else:
                 row.realized_vol_90d = vol
                 row.vol_trading_days = n
-                row.vol_source = "openbb:yfinance" if vol is not None else "missing"
+                row.vol_source = "yfinance" if vol is not None else "missing"
 
     if fetch_earnings:
         match, err = fetch_next_earnings_surprise_yfinance(ticker, fdate)

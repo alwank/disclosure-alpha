@@ -93,7 +93,7 @@ def test_panel_passes_compare(mock_score):
 
 
 @patch("disclosure_alpha.api.endpoints.panel.score_panel_tickers")
-def test_panel_default_scoring_version_v1(mock_score):
+def test_panel_default_scoring_version_v2(mock_score):
     mock_score.return_value = PanelBatchResult(
         results=[_ok_panel_result("AAPL")],
         summary={"ok": 1, "failed": 0},

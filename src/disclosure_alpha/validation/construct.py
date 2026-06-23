@@ -44,6 +44,8 @@ class ConstructConfig:
     manifest_path: Path | None = None
     edgar_gates: EdgarGatesConfig | None = None
     scoring_model_version: str = SCORING_MODEL_VERSION
+    use_ner_cache: bool = True
+    refresh_ner_cache: bool = False
 
 
 def spearman_rho(x: list[float], y: list[float]) -> float | None:
@@ -202,7 +204,11 @@ def run_construct_validation(
     diagnostics: dict[str, Any] = {"specificity_compare": "company_specificity_per_word vs ner_entity_density"}
 
     print("Running spaCy NER (slowest step)...", flush=True)
-    ner_by_ticker, ner_msg = compute_ner_densities(rows)
+    ner_by_ticker, ner_msg = compute_ner_densities(
+        rows,
+        use_cache=cfg.use_ner_cache,
+        refresh_cache=cfg.refresh_ner_cache,
+    )
     if ner_msg:
         print(f"  NER skipped: {ner_msg}", flush=True)
 

@@ -8,7 +8,7 @@ from disclosure_alpha.api.endpoints.deps import parse_form_quarter, run_edgar
 from disclosure_alpha.api.helpers import parse_compare_param, parse_sections_param
 from disclosure_alpha.api.schemas import ChangesResponse, ErrorResponse
 from disclosure_alpha.api.shapes import shape_changes_payload
-from disclosure_alpha.pipeline import filter_metrics_result, metrics_filing_ticker, score_deterministic
+from disclosure_alpha.pipeline import filter_metrics_result, metrics_filing_ticker, score_for_model
 
 router = APIRouter(tags=["changes"])
 
@@ -48,7 +48,7 @@ def disclosure_changes(
         metrics = result.metrics
         if section_filter:
             metrics = filter_metrics_result(metrics, section_filter)
-        scores = score_deterministic(metrics) if compare_prior else None
+        scores = score_for_model(metrics) if compare_prior else None
         shaped = shape_changes_payload(metrics, scores)
         return ChangesResponse(
             filing=result.filing,

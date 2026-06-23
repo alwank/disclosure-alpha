@@ -25,8 +25,10 @@ MATRIX_CORPUS = FIXTURES / "matrix_mini_corpus.jsonl"
 
 
 def test_normalize_scoring_version():
-    assert normalize_scoring_version("v1") == SCORING_MODEL_VERSION
-    assert normalize_scoring_version("v2") == SCORING_MODEL_VERSION_V2
+    from disclosure_alpha.version import SCORING_MODEL_VERSION_V1
+
+    assert normalize_scoring_version("v1") == SCORING_MODEL_VERSION_V1
+    assert normalize_scoring_version("v2") == SCORING_MODEL_VERSION
     with pytest.raises(ValueError):
         normalize_scoring_version("v3")
 
@@ -92,6 +94,7 @@ def test_v2_pipeline_entry_point_on_section_metrics():
     assert v2.overall_disclosure_risk_score is not None
 
 
-def test_outcomes_config_defaults_to_v1():
+def test_outcomes_config_defaults_to_v2():
     cfg = OutcomesValidationConfig()
     assert cfg.scoring_model_version == SCORING_MODEL_VERSION
+    assert cfg.scoring_model_version == SCORING_MODEL_VERSION_V2

@@ -1,0 +1,437 @@
+/* Disclosure Alpha docs theme — tokens from DA_Website/docs/design-system.md */
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap");
+
+/* -------------------------------------------------------------------------- */
+/* Design tokens                                                              */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --da-navy-900: #0b1d3a;
+  --da-navy-800: #132b52;
+  --da-navy-700: #1e3a5f;
+  --da-surface: #f4f5f7;
+  --da-elevated: #f9fafb;
+  --da-white: #ffffff;
+  --da-grey-100: #e8eaed;
+  --da-grey-200: #d1d5db;
+  --da-grey-600: #4b5563;
+  --da-grey-900: #111827;
+  --da-link: #2563eb;
+  --da-link-hover: #1d4ed8;
+  --da-code-bg: #0f172a;
+  --da-code-fg: #e2e8f0;
+  --da-focus-ring: var(--da-navy-700);
+
+  /* Dark-syntax palette for code blocks (both modes use navy terminal blocks) */
+  --da-hl-keyword: #6791e0;
+  --da-hl-string: #7dd3a8;
+  --da-hl-number: #f0a870;
+  --da-hl-function: #c9a0e8;
+  --da-hl-constant: #a5b4fc;
+  --da-hl-special: #f0a0b8;
+  --da-hl-comment: #94a3b8;
+  --da-hl-operator: #cbd5e1;
+  --da-hl-punctuation: #cbd5e1;
+  --da-hl-name: var(--da-code-fg);
+  --da-hl-variable: #93c5fd;
+  --da-hl-generic: #94a3b8;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Light mode                                                                 */
+/* -------------------------------------------------------------------------- */
+
+[data-md-color-scheme="default"] {
+  --md-default-fg-color: var(--da-grey-900);
+  --md-default-fg-color--light: var(--da-grey-600);
+  --md-default-fg-color--lighter: #9ca3af;
+  --md-default-fg-color--lightest: rgba(17, 24, 39, 0.07);
+  --md-default-bg-color: var(--da-white);
+  --md-default-bg-color--light: rgba(255, 255, 255, 0.85);
+  --md-default-bg-color--lighter: rgba(255, 255, 255, 0.55);
+  --md-default-bg-color--lightest: rgba(255, 255, 255, 0.25);
+
+  --md-primary-fg-color: var(--da-navy-900);
+  --md-primary-fg-color--light: var(--da-navy-700);
+  --md-primary-fg-color--dark: #081528;
+  --md-primary-bg-color: var(--da-white);
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.85);
+
+  --md-accent-fg-color: var(--da-link);
+  --md-accent-fg-color--transparent: rgba(37, 99, 235, 0.1);
+  --md-accent-bg-color: var(--da-white);
+
+  --md-typeset-a-color: var(--da-link);
+
+  /* Inline code: light chip on white content */
+  --md-code-fg-color: var(--da-navy-800);
+  --md-code-bg-color: #eef1f5;
+}
+
+[data-md-color-scheme="default"][data-md-color-primary="black"] {
+  --md-primary-fg-color: var(--da-navy-900);
+  --md-primary-fg-color--light: var(--da-navy-700);
+  --md-primary-fg-color--dark: #081528;
+  --md-typeset-a-color: var(--da-link);
+}
+
+[data-md-color-scheme="default"][data-md-color-accent="blue"] {
+  --md-accent-fg-color: var(--da-link);
+  --md-accent-fg-color--transparent: rgba(37, 99, 235, 0.1);
+}
+
+[data-md-color-scheme="default"] .md-content,
+[data-md-color-scheme="default"] .md-sidebar__inner {
+  background-color: var(--da-white);
+}
+
+[data-md-color-scheme="default"] .md-header {
+  background-color: var(--da-white);
+  color: var(--da-navy-900);
+  border-bottom: 1px solid var(--da-grey-100);
+  box-shadow: none;
+}
+
+[data-md-color-scheme="default"] .md-header__title,
+[data-md-color-scheme="default"] .md-header__button,
+[data-md-color-scheme="default"] .md-header__topic {
+  color: var(--da-navy-900);
+}
+
+[data-md-color-scheme="default"] .md-search__input {
+  background-color: #eef1f5;
+  color: var(--da-grey-900);
+}
+
+[data-md-color-scheme="default"] .md-search__input::placeholder {
+  color: var(--da-grey-600);
+}
+
+[data-md-color-scheme="default"] .md-search__icon,
+[data-md-color-scheme="default"] .md-search__output {
+  color: var(--da-grey-600);
+}
+
+[data-md-color-scheme="default"] .md-footer {
+  background-color: var(--da-white);
+  color: var(--da-grey-600);
+  border-top: 1px solid var(--da-grey-100);
+}
+
+[data-md-color-scheme="default"] .md-footer-meta {
+  background-color: var(--da-white);
+}
+
+[data-md-color-scheme="default"] .md-typeset h1,
+[data-md-color-scheme="default"] .md-typeset h2 {
+  color: var(--da-navy-900);
+}
+
+[data-md-color-scheme="default"] .md-nav__item .md-nav__link--active,
+[data-md-color-scheme="default"] .md-nav__item .md-nav__link--active code,
+[data-md-color-scheme="default"] .md-nav__link--active,
+[data-md-color-scheme="default"] .md-nav__item--active > .md-nav__link {
+  color: var(--da-navy-900);
+  font-weight: 600;
+}
+
+[data-md-color-scheme="default"] .md-nav__link:hover {
+  color: var(--da-navy-800);
+}
+
+[data-md-color-scheme="default"] .md-typeset a:hover {
+  color: var(--da-link-hover);
+}
+
+[data-md-color-scheme="default"] .md-typeset table:not([class]) th {
+  background: var(--da-elevated);
+  color: var(--da-grey-900);
+}
+
+[data-md-color-scheme="default"] .md-typeset table:not([class]) td {
+  background: var(--da-white);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dark mode                                                                  */
+/* -------------------------------------------------------------------------- */
+
+[data-md-color-scheme="slate"] {
+  --md-default-fg-color: #e8eaed;
+  --md-default-fg-color--light: #b8bcc4;
+  --md-default-fg-color--lighter: #8b919c;
+  --md-default-fg-color--lightest: rgba(232, 234, 237, 0.1);
+  --md-default-bg-color: var(--da-navy-900);
+  --md-default-bg-color--light: rgba(19, 43, 82, 0.72);
+  --md-default-bg-color--lighter: rgba(19, 43, 82, 0.45);
+  --md-default-bg-color--lightest: rgba(19, 43, 82, 0.2);
+
+  --md-primary-fg-color: #e8eaed;
+  --md-primary-fg-color--light: #b8bcc4;
+  --md-primary-fg-color--dark: var(--da-white);
+  --md-primary-bg-color: var(--da-navy-800);
+  --md-primary-bg-color--light: rgba(30, 58, 95, 0.72);
+
+  --md-accent-fg-color: #60a5fa;
+  --md-accent-fg-color--transparent: rgba(96, 165, 250, 0.12);
+  --md-accent-bg-color: var(--da-navy-800);
+
+  --md-typeset-a-color: #60a5fa;
+
+  --md-code-fg-color: var(--da-code-fg);
+  --md-code-bg-color: #1e293b;
+}
+
+[data-md-color-scheme="slate"][data-md-color-primary="black"] {
+  --md-primary-fg-color: #e8eaed;
+  --md-typeset-a-color: #60a5fa;
+}
+
+[data-md-color-scheme="slate"][data-md-color-accent="blue"] {
+  --md-accent-fg-color: #60a5fa;
+  --md-accent-fg-color--transparent: rgba(96, 165, 250, 0.12);
+}
+
+[data-md-color-scheme="slate"] .md-content,
+[data-md-color-scheme="slate"] .md-sidebar__inner {
+  background-color: var(--da-navy-800);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  background-color: var(--da-navy-900);
+  color: #e8eaed;
+  border-bottom: 1px solid rgba(232, 234, 237, 0.12);
+  box-shadow: none;
+}
+
+[data-md-color-scheme="slate"] .md-header__title,
+[data-md-color-scheme="slate"] .md-header__button,
+[data-md-color-scheme="slate"] .md-header__topic {
+  color: #e8eaed;
+}
+
+[data-md-color-scheme="slate"] .md-search__input {
+  background-color: var(--da-navy-800);
+  color: #e8eaed;
+}
+
+[data-md-color-scheme="slate"] .md-search__input::placeholder {
+  color: #8b919c;
+}
+
+[data-md-color-scheme="slate"] .md-footer {
+  background-color: var(--da-navy-800);
+  color: #b8bcc4;
+  border-top: 1px solid rgba(232, 234, 237, 0.12);
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta {
+  background-color: var(--da-navy-900);
+}
+
+[data-md-color-scheme="slate"] .md-typeset h1,
+[data-md-color-scheme="slate"] .md-typeset h2 {
+  color: #f4f5f7;
+}
+
+[data-md-color-scheme="slate"] .md-nav__item .md-nav__link--active,
+[data-md-color-scheme="slate"] .md-nav__item .md-nav__link--active code,
+[data-md-color-scheme="slate"] .md-nav__link--active,
+[data-md-color-scheme="slate"] .md-nav__item--active > .md-nav__link {
+  color: #f4f5f7;
+  font-weight: 600;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  background: rgba(15, 23, 42, 0.65);
+  color: #e8eaed;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) td {
+  border-bottom-color: rgba(232, 234, 237, 0.12);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Code blocks — marketing terminal style (high contrast in both modes)       */
+/* -------------------------------------------------------------------------- */
+
+[data-md-color-scheme="default"] div[class*="highlight-"],
+[data-md-color-scheme="default"] .highlighttable,
+[data-md-color-scheme="slate"] div[class*="highlight-"],
+[data-md-color-scheme="slate"] .highlighttable {
+  --md-code-fg-color: var(--da-code-fg);
+  --md-code-bg-color: var(--da-code-bg);
+  --md-code-hl-keyword-color: var(--da-hl-keyword);
+  --md-code-hl-string-color: var(--da-hl-string);
+  --md-code-hl-number-color: var(--da-hl-number);
+  --md-code-hl-function-color: var(--da-hl-function);
+  --md-code-hl-constant-color: var(--da-hl-constant);
+  --md-code-hl-special-color: var(--da-hl-special);
+  --md-code-hl-comment-color: var(--da-hl-comment);
+  --md-code-hl-operator-color: var(--da-hl-operator);
+  --md-code-hl-punctuation-color: var(--da-hl-punctuation);
+  --md-code-hl-name-color: var(--da-hl-name);
+  --md-code-hl-variable-color: var(--da-hl-variable);
+  --md-code-hl-generic-color: var(--da-hl-generic);
+  --md-code-hl-color: rgba(37, 99, 235, 0.35);
+  --md-code-hl-color--light: rgba(37, 99, 235, 0.12);
+}
+
+div[class*="highlight-"] pre,
+.highlighttable pre,
+.highlighttable .linenos {
+  background-color: var(--da-code-bg);
+  color: var(--da-code-fg);
+}
+
+.highlighttable .linenos {
+  color: #64748b;
+  border-right: 1px solid rgba(226, 232, 240, 0.12);
+}
+
+/* Copy button on dark code blocks */
+div[class*="highlight-"] .md-clipboard,
+.highlighttable .md-clipboard {
+  color: #94a3b8;
+}
+
+div[class*="highlight-"] .md-clipboard:hover,
+.highlighttable .md-clipboard:hover {
+  color: var(--da-code-fg);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Shared components                                                          */
+/* -------------------------------------------------------------------------- */
+
+/* Navbar wordmark logo */
+[data-md-component="header"] .md-header__button.md-logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0.15rem 0.35rem 0.15rem 0;
+}
+
+[data-md-component="header"] .md-header__button.md-logo img {
+  display: block;
+  height: 1.65rem;
+  width: auto;
+  max-width: 9.5rem;
+  object-fit: contain;
+}
+
+/* Wordmark already includes the site name */
+[data-md-component="header"] .md-header__ellipsis > .md-header__topic:first-child {
+  display: none;
+}
+
+.md-typeset h1,
+.md-typeset h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+}
+
+.md-nav__link--active {
+  border-left: 4px solid var(--da-navy-900);
+  padding-left: calc(0.6rem - 4px);
+}
+
+[data-md-color-scheme="slate"] .md-nav__link--active {
+  border-left-color: #60a5fa;
+}
+
+.md-typeset table:not([class]) th {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.md-typeset table:not([class]) td,
+.md-typeset table:not([class]) th {
+  border-bottom: 1px solid var(--da-grey-100);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) td,
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  border-bottom-color: rgba(232, 234, 237, 0.12);
+}
+
+/* Admonitions — brand-aligned borders */
+[data-md-color-scheme="default"] .md-typeset .admonition {
+  border-color: var(--da-grey-200);
+  box-shadow: none;
+}
+
+[data-md-color-scheme="default"] .md-typeset .admonition.note {
+  border-left-color: var(--da-link);
+}
+
+[data-md-color-scheme="default"] .md-typeset .admonition.warning,
+[data-md-color-scheme="default"] .md-typeset .admonition.caution {
+  border-left-color: #d97706;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition {
+  background-color: rgba(15, 23, 42, 0.55);
+  border-color: rgba(232, 234, 237, 0.15);
+  box-shadow: none;
+}
+
+/* Focus rings — accessibility */
+.md-typeset a:focus-visible,
+.md-nav__link:focus-visible,
+.md-header__button:focus-visible,
+.md-search__input:focus-visible {
+  outline: 2px solid var(--da-focus-ring);
+  outline-offset: 2px;
+}
+
+/* GitHub / version metadata in header */
+.md-source__repository,
+.md-source__facts {
+  opacity: 0.85;
+}
+
+[data-md-color-scheme="default"] .md-source__repository,
+[data-md-color-scheme="default"] .md-source__facts {
+  color: var(--da-grey-600);
+}
+
+/* Back to marketing site — right of GitHub badge */
+.da-header-site-link {
+  display: none;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--da-navy-900);
+  border-radius: 4px;
+  color: var(--da-navy-900);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.da-header-site-link:hover {
+  background-color: var(--da-surface);
+  color: var(--da-navy-800);
+}
+
+@media screen and (min-width: 60em) {
+  .da-header-site-link {
+    display: inline-flex;
+  }
+}
+
+[data-md-color-scheme="slate"] .da-header-site-link {
+  border-color: rgba(232, 234, 237, 0.35);
+  color: #e8eaed;
+}
+
+[data-md-color-scheme="slate"] .da-header-site-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}

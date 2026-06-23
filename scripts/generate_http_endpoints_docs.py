@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -131,7 +132,25 @@ def generate() -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def check() -> None:
+    before = OUT.read_text(encoding="utf-8") if OUT.is_file() else ""
+    generated = generate()
+    if before != generated:
+        raise SystemExit("docs/reference/http/endpoints.md drift (run without --check to refresh)")
+    print("docs/reference/http/endpoints.md OK")
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Regenerate in memory and fail if committed file differs",
+    )
+    args = parser.parse_args()
+    if args.check:
+        check()
+        return
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(generate(), encoding="utf-8")
     print(f"Wrote {OUT}")

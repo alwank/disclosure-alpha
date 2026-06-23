@@ -19,7 +19,7 @@ pip install "disclosure-alpha[api,mcp]"
 Pin a release when reproducibility matters — see {doc}`../reference/versioning`:
 
 ```bash
-pip install "disclosure-alpha==1.1.0[api,mcp]"
+pip install "disclosure-alpha==1.3.0[api,mcp]"
 ```
 
 ## Optional extras
@@ -44,7 +44,7 @@ pip install "disclosure-alpha[api,mcp]"
 |-------|---------|
 | `dev` | pytest tooling |
 | `validation` | Construct-validity harness (spaCy) |
-| `outcomes` | L3 outcome fetch (yfinance) |
+| `outcomes` | Post-filing outcome fetch (yfinance; contributor tooling) |
 
 ```bash
 pip install -e ".[api,mcp,dev,validation,outcomes]"

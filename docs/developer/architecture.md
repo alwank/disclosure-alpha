@@ -17,7 +17,7 @@ Detailed architecture documentation is not yet published here. For now:
 - Package layout: `src/disclosure_alpha/`
 - **HTTP app factory:** import `create_app` from `disclosure_alpha.api.app_factory` (canonical). `disclosure_alpha.api.routes:app` is a backward-compat shim for uvicorn/ASGI hosts.
 - Methodology overview: {doc}`../methodology/overview`
-- Validation evidence: {doc}`../validation/evidence-and-limitations`
+- Validation evidence: {doc}`../getting-started/scope-and-claims`
 
 ## Related
 

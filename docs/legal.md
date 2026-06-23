@@ -16,7 +16,7 @@ Production deployment notes: {doc}`guides/production`.
 
 ## Validation scope
 
-Empirical checks on the current release are summarized in {doc}`validation/evidence-and-limitations` and {doc}`getting-started/scope-and-claims`.
+Empirical checks on the current release: {doc}`getting-started/evidence` and {doc}`getting-started/scope-and-claims`.
 
 ## Open-source license
 
@@ -30,7 +30,7 @@ This repository ships CLI, Python SDK, HTTP API, and MCP entry points you run lo
 
 ## Related
 
-- {doc}`validation/evidence-and-limitations`
+- {doc}`getting-started/evidence`
 - {doc}`getting-started/scope-and-claims`
 - {doc}`guides/production`
 - {doc}`getting-started/faq`

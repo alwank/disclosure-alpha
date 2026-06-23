@@ -6,7 +6,7 @@
 |--|--|
 | **Inputs** | Section metrics, diffs, flags, language deltas, MD&A densities |
 | **Outputs** | `components`, `overall_disclosure_risk_score`, coverage, confidence |
-| **Default version** | `deterministic_scoring_v1` (CLI, HTTP, MCP) |
+| **Default version** | `deterministic_scoring_v2` (CLI, HTTP, MCP) |
 | **Opt-in version** | `deterministic_scoring_v2` (`score_deterministic_v2` only) |
 
 ## In plain terms
@@ -219,9 +219,9 @@ Available in CLI/ Python JSON (`scores.provenance`) and HTTP matrix responses wh
 </details>
 
 <details>
-<summary>v2 specification (`deterministic_scoring_v2`, opt-in)</summary>
+<summary>v2 specification (`deterministic_scoring_v2`, default)</summary>
 
-`aggregate_deterministic_matrix_v2()` starts from the v1 result, then replaces four components and recomputes the headline. Entry point: `score_deterministic_v2()` in `pipeline.py`. **Not exposed on HTTP or MCP.**
+`aggregate_deterministic_matrix_v2()` starts from the v1 result, then replaces four components and recomputes the headline. Entry points: `score_deterministic_v2()`, `score_for_model()` (default), HTTP matrix/panel, and MCP scoring tools.
 
 ### Unchanged from v1
 
@@ -293,7 +293,7 @@ Section diffs may include `disclosure_change_score_v2` (sentence-aligned); v1 `d
 
 ### Comparability
 
-Do not compare numeric levels between v1 and v2 without re-scoring. Validation evidence ({doc}`../validation/evidence-and-limitations`) covers v1 only.
+Do not compare numeric levels between v1 and v2 without re-scoring. See {doc}`../getting-started/scope-and-claims` for v2 empirical evidence.
 
 ## Related (v2)
 

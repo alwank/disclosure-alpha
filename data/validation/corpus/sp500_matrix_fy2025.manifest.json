@@ -1,0 +1,16 @@
+{
+  "fiscal_year": 2025,
+  "form": "10-K",
+  "universe": "data/universe/sp500.csv",
+  "corpus": "data/validation/corpus/sp500_matrix_fy2025.jsonl",
+  "compare_prior": true,
+  "n_written": 502,
+  "n_new": 47,
+  "n_skipped_existing": 455,
+  "failures": [
+    {
+      "ticker": "FDXF",
+      "reason": "filing_not_found"
+    }
+  ]
+}

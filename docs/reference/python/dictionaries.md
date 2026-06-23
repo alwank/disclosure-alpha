@@ -1,6 +1,6 @@
 # Dictionaries
 
-Built-in word and phrase lists in `disclosure_alpha.dictionaries`. Version: `built_in_dictionaries_v2`.
+Built-in word and phrase lists in `disclosure_alpha.dictionaries`. Version: `built_in_dictionaries_v3`.
 
 ## Exported constants
 
@@ -15,6 +15,7 @@ Built-in word and phrase lists in `disclosure_alpha.dictionaries`. Version: `bui
 | `MODERATE_MODAL_WORDS` | `frozenset[str]` | Modal tier (moderate) |
 | `STRONG_MODAL_WORDS` | `frozenset[str]` | Modal tier (strong) |
 | `MODAL_WORDS` | `frozenset[str]` | Union of modal tiers → `modal_word_ratio` |
+| `LEGAL_REGULATORY_PHRASES` | `list[str]` | Phrase list → `legal_regulatory_phrase_ratio` |
 | `BOILERPLATE_PHRASES` | `list[str]` | Phrase list → `boilerplate_phrase_ratio` |
 | `GEOGRAPHY_TERMS` | `frozenset[str]` | Specificity proxy |
 | `SEGMENT_TERMS` | `frozenset[str]` | Specificity proxy |
@@ -22,6 +23,7 @@ Built-in word and phrase lists in `disclosure_alpha.dictionaries`. Version: `bui
 | `SEVERITY_WORDS` | `frozenset[str]` | Topic intensity modifier (±10 token window) |
 | `FLAG_PATTERNS` | `dict[str, list[str]]` | Boolean section flags |
 | `FLAG_SECTION_SCOPE` | `dict[str, frozenset[str]]` | Per-flag section allowlist |
+| `FLAG_SUPPRESSIONS` | `dict[str, list[str]]` | Per-flag sentence-level suppression phrases |
 | `MDNA_DENSITY_TERMS` | `dict[str, list[str]]` | MD&A phrase density packs |
 | `SUPPORTED_SECTIONS_*` | `dict[str, str]` | Section regex maps by form type |
 | `REQUIRED_SECTIONS` | `dict[str, list[str]]` | Minimum sections per form |

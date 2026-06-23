@@ -76,7 +76,7 @@ def _metrics_no_prior() -> FilingMetricsResult:
     )
 
 
-@patch("disclosure_alpha.api.endpoints.changes.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.changes.score_for_model")
 @patch("disclosure_alpha.api.endpoints.changes.metrics_filing_ticker")
 def test_disclosure_changes_with_prior(mock_metrics, mock_score):
     result = _metrics_with_prior()
@@ -110,7 +110,7 @@ def test_disclosure_changes_compare_none(mock_metrics):
     assert body["change_score"]["missing_reason"] == "compare=none"
 
 
-@patch("disclosure_alpha.api.endpoints.changes.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.changes.score_for_model")
 @patch("disclosure_alpha.api.endpoints.changes.metrics_filing_ticker")
 def test_disclosure_changes_null_change_score(mock_metrics, mock_score):
     mock_metrics.return_value = _metrics_no_prior()

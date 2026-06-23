@@ -24,7 +24,7 @@ Component names, plain-English meanings, and the 0–100 scale are documented in
 
 ## Evidence & limitations
 
-Scores are validated on a fixed S&P 500 FY2025 corpus — not a trading signal. See {doc}`../validation/evidence-and-limitations` for supported claims and known limits.
+Scores are research tools, not trading signals. See {doc}`evidence` for validation numbers and {doc}`scope-and-claims` for scope limits.
 
 ## Related
 

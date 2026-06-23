@@ -11,7 +11,7 @@
 
 Open-source, deterministic SEC filing analytics for **10-K and 10-Q** HTML. Reproducible JSON scores from text metrics, boolean risk flags, and section diffs. CLI, Python SDK, HTTP API, and MCP. **8-K** supported via local `--html` or MCP Builder only (not `--ticker`, EDGAR, or HTTP ticker routes).
 
-**Not investment advice.** See [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html) and [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html).
+**Not investment advice.** See [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html).
 
 ## Quick start
 
@@ -40,7 +40,7 @@ print(score_filing_ticker("AAPL", 2025, form_type="10-K").scores.overall_disclos
 
 ## Documentation
 
-Full guides, methodology, and validation evidence: **https://disclosure-alpha.readthedocs.io/en/latest/**
+Full guides and methodology: **https://disclosure-alpha.readthedocs.io/en/latest/**
 
 - [Installation](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/installation.html)
 - [Understanding scores](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/understanding-scores.html)

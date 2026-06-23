@@ -10,8 +10,7 @@ from disclosure_alpha.diff_engine import compute_section_diff
 from disclosure_alpha.pipeline import (
     compute_section_metrics,
     extract_sections_from_html,
-    score_deterministic,
-    score_deterministic_v2,
+    score_for_model,
     score_filing_html,
 )
 from disclosure_alpha.scoring_types import COMPONENT_WEIGHTS
@@ -20,7 +19,6 @@ from disclosure_alpha.version import (
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
     SCORING_MODEL_VERSION,
-    SCORING_MODEL_VERSION_V2,
 )
 
 
@@ -84,12 +82,7 @@ def score_deterministic_tool(
 
     version = normalize_scoring_version(scoring_model_version)
     metrics = MetricsResult(**json.loads(metrics_json))
-    score_fn = (
-        score_deterministic_v2
-        if version == SCORING_MODEL_VERSION_V2
-        else score_deterministic
-    )
-    scores = score_fn(metrics)
+    scores = score_for_model(metrics, version)
     return json.dumps(
         {
             "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
@@ -114,10 +107,9 @@ def score_filing_html_tool(
     """Run full pipeline on filing HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
     version = normalize_scoring_version(scoring_model_version)
     result = score_filing_html(html, form_type, prior_html=prior_html)
-    if version == SCORING_MODEL_VERSION_V2:
-        result.scores = score_deterministic_v2(result.metrics)
-        result.versions = dict(result.versions)
-        result.versions["scoring_model_version"] = version
+    result.scores = score_for_model(result.metrics, version)
+    result.versions = dict(result.versions)
+    result.versions["scoring_model_version"] = version
     return json.dumps(result.to_dict(), indent=2, default=str)
 
 
@@ -135,10 +127,9 @@ def score_company_filing(
     result = score_filing_ticker(
         ticker, fiscal_year, form_type=form_type, quarter=quarter
     )
-    if version == SCORING_MODEL_VERSION_V2:
-        result.scores = score_deterministic_v2(result.metrics)
-        result.versions = dict(result.versions)
-        result.versions["scoring_model_version"] = version
+    result.scores = score_for_model(result.metrics, version)
+    result.versions = dict(result.versions)
+    result.versions["scoring_model_version"] = version
     return json.dumps(result.to_dict(), indent=2, default=str)
 
 

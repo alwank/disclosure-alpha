@@ -10,7 +10,7 @@ How to read Disclosure Alpha's 0–100 disclosure risk scores, component fields,
 ```{admonition} Default scoring model
 :class: note
 
-Examples on this page and all committed fixtures use **`deterministic_scoring_v1`**. CLI, HTTP, and MCP default to v1. An opt-in **`deterministic_scoring_v2`** exists for Python (`score_deterministic_v2`); see {doc}`../reference/versioning`. Do not compare v1 and v2 numeric levels without re-scoring.
+Examples on this page and committed fixtures use **`deterministic_scoring_v2`**. CLI, HTTP, and MCP default to v2. Pass **`deterministic_scoring_v1`** to opt into the legacy scale; see {doc}`../reference/versioning`. Do not compare v1 and v2 numeric levels without re-scoring.
 ```
 
 ## Higher / lower means
@@ -23,7 +23,7 @@ Examples on this page and all committed fixtures use **`deterministic_scoring_v1
 | `disclosure_change_score` | Larger year-over-year section change | Smaller change |
 | `score_coverage_ratio` | More headline components computed | More gaps (null components) |
 
-Version and evidence context: {doc}`../reference/versioning`, {doc}`../validation/evidence-and-limitations`.
+Version and evidence context: {doc}`../reference/versioning`, {doc}`evidence`, {doc}`scope-and-claims`.
 
 ## In plain terms
 
@@ -118,5 +118,6 @@ See {doc}`faq` for troubleshooting low coverage and null change scores.
 - {doc}`../reference/versioning` — artifact versions and v1 → v2 migration
 - {doc}`../methodology/overview` — full specification
 - {doc}`../reference/score-catalog` — component catalog and weights
-- {doc}`../validation/evidence-and-limitations` — supported claims
+- {doc}`evidence` — empirical validation
+- {doc}`scope-and-claims` — scope and limits
 - {doc}`../appendix/glossary` — terms and artifact versions

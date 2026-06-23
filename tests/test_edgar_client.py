@@ -86,3 +86,18 @@ def test_throttle_serializes_concurrent_requests(mock_urlopen, monkeypatch):
 
     assert not errors
     assert mock_urlopen.call_count == 2
+
+
+def test_fetch_company_tickers_uses_lru_cache(monkeypatch):
+    monkeypatch.setenv("SEC_USER_AGENT", "TestOrg test@example.com")
+    client.fetch_company_tickers.cache_clear()
+    payload = {
+        "0": {"ticker": "AAPL", "cik_str": 320193, "title": "Apple Inc."},
+        "1": {"ticker": "MSFT", "cik_str": 789019, "title": "Microsoft Corp"},
+    }
+    with patch.object(client, "fetch_json", return_value=payload) as mock_fetch:
+        first = client.fetch_company_tickers()
+        second = client.fetch_company_tickers()
+    assert first == second
+    assert first["AAPL"] == ("0000320193", "Apple Inc.")
+    assert mock_fetch.call_count == 1

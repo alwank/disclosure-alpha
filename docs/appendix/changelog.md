@@ -2,9 +2,59 @@
 
 Version history for parser, metrics engine, dictionary packs, and scoring model.
 
+## 1.3.0 (2026-06-24)
+
+Package release consolidating artifact bumps and default-surface updates.
+
+### What shipped
+
+| Area | Change |
+|------|--------|
+| **Dictionaries / metrics** | `built_in_dictionaries_v3` and `text_metrics_v3` — dictionary package split, flag suppressions, legal phrases, modal tiers, topic tuning |
+| **Scoring default** | **`deterministic_scoring_v2` is now the default** on CLI, HTTP, MCP, and `score_filing_html()` / `score_for_model()`; legacy `deterministic_scoring_v1` remains opt-in |
+| **Validation data** | Reports and baselines removed from the public repo (see `INTERNAL_VALIDATION.md` on the internal branch) |
+| **Docs** | Evidence, scope, HTTP/MCP guides, versioning pins, and glossary aligned to current artifact versions |
+| **Release tooling** | Version sync test, HTTP endpoints doc drift check, hardened PyPI publish workflow |
+
+### Current artifact defaults
+
+| Artifact | Version |
+|----------|---------|
+| Parser | `section_extractor_v1` |
+| Metrics engine | `text_metrics_v3` |
+| Dictionary | `built_in_dictionaries_v3` |
+| Scoring (default) | `deterministic_scoring_v2` |
+| Scoring (legacy) | `deterministic_scoring_v1` |
+
+**Breaking behavior note:** scores may differ from 1.2.0 for callers who did not pin `scoring_model_version=deterministic_scoring_v1`. Pin package and scoring versions for reproducibility — see {doc}`../reference/versioning`.
+
+## built_in_dictionaries_v3 / text_metrics_v3 (2026-06-23)
+
+Shipped v3 dictionary enrichment and package reorganization.
+
+### What shipped
+
+| Area | Change |
+|------|--------|
+| Dictionary package | Split monolith into `src/disclosure_alpha/dictionaries/` modules (`base.py`, `sentiment.py`, `phrases.py`, `topics.py`, `flags.py`) with backward-compatible `disclosure_alpha.dictionaries` exports |
+| Flag precision | Added `FLAG_SUPPRESSIONS` with sentence-scoped suppression logic in `detect_section_flags()` |
+| Legal phrases | Added `LEGAL_REGULATORY_PHRASES` and emitted `legal_regulatory_phrase_ratio` |
+| Modal metrics | Added `weak_modal_word_ratio`, `moderate_modal_word_ratio`, `strong_modal_word_ratio` while preserving `modal_word_ratio` |
+| Topic tuning | Tightened broad topics (`climate`, `labor`) and added high-value phrases like `net interest margin` / `semiconductor inventory` |
+| MD&A density | Added v3 phrase candidates for uncertainty, demand, margin, and liquidity packs |
+| Tooling | Added `scripts/mine_dictionary_candidates.py` for corpus-driven candidate mining |
+
+### Version bumps
+
+| Artifact | v2 | v3 |
+|----------|----|----|
+| `DICTIONARY_VERSION` | `built_in_dictionaries_v2` | `built_in_dictionaries_v3` |
+| `METRICS_ENGINE_VERSION` | `text_metrics_v2` | `text_metrics_v3` |
+| `SCORING_MODEL_VERSION` | `deterministic_scoring_v1` | unchanged at ship time (v2 default in 1.3.0) |
+
 ## deterministic_scoring_v2 (2026-06-22)
 
-Introduced an **opt-in** scoring model (`SCORING_MODEL_VERSION_V2` / `deterministic_scoring_v2`). Default surfaces unchanged — still `deterministic_scoring_v1`.
+Introduced `SCORING_MODEL_VERSION_V2` / `deterministic_scoring_v2`. Shipped as opt-in in 1.2.0; **default on all surfaces in 1.3.0**.
 
 ### What shipped
 
@@ -16,42 +66,35 @@ Introduced an **opt-in** scoring model (`SCORING_MODEL_VERSION_V2` / `determinis
 | `internal_controls_risk_score` | Section-attributed controls diff + evidence-based flags |
 | Confidence (v2 path) | `compute_confidence_detailed()` with explicit penalties |
 
-### Entry points
+### Entry points (as of 1.3.0)
 
-- **v1 (default):** `score_deterministic()`, `score_filing_html()`, HTTP matrix/panel, MCP
-- **v2 (opt-in):** `score_deterministic_v2()`; HTTP matrix/panel via `scoring_model_version`; MCP scoring tools via same parameter
+- **v2 (default):** `score_filing_html()`, `score_for_model()`, HTTP matrix/panel, MCP scoring tools
+- **v1 (legacy):** `score_deterministic()`; HTTP/MCP via `scoring_model_version=deterministic_scoring_v1`
 
-### Artifact versions (unchanged in this release)
+### Artifact versions at v2 ship (2026-06-22)
 
 | Artifact | Version |
 |----------|---------|
 | Parser | `section_extractor_v1` |
 | Metrics engine | `text_metrics_v2` |
 | Dictionary | `built_in_dictionaries_v2` |
-| Scoring (default) | `deterministic_scoring_v1` |
-| Scoring (opt-in) | `deterministic_scoring_v2` |
+| Scoring (default at ship) | `deterministic_scoring_v1` |
+| Scoring (new) | `deterministic_scoring_v2` |
 
-Committed validation reports remain on **v1** for production claims. v2 **smoke** reports on CI fixtures ship in `data/validation/reports/*_v2.json` — see {doc}`../validation/evidence-and-limitations`.
+Public empirical evidence (v2): on **478** S&P 500 FY2025 Item 1A sections, company-specificity correlates **ρ ≈ 0.87** with an independent NER-based specificity measure — see {doc}`../getting-started/scope-and-claims`.
 
-### In v2 (opt-in, smoke-validated only)
+### v2-only components (smoke-validated; not all validated at SP500 scale)
 
-Available via `score_deterministic_v2()` or opt-in `scoring_model_version` on HTTP matrix/panel and MCP scoring tools — not validated at SP500 scale:
+Available via `score_deterministic_v2()` or default `score_for_model()` on HTTP matrix/panel and MCP scoring tools:
 
 - `static_disclosure_quality_score`, `static_disclosure_risk_score`, `disclosure_change_risk_score` (score product split)
 - `cybersecurity_incident_risk_score`, `event_materiality_score` (excluded from v1 headline weights)
 - `disclosure_change_score_v2` on section diffs (v1 `disclosure_change_score` unchanged)
 - Sector/form baselines via `baselines.py` + `calibration.py`
 
-### Still deferred
-
-- v2 headline migration (validation committed; default remains v1)
-
 ## 1.2.0 (2026-06-23)
 
-- **Validation:** FY2025 v2 evidence committed — L2 construct pairs (n=428), matrix gates on partial EDGAR matrix corpus (n=330), L3 volatility association (n=435, corpus mode). v1 FY2025 reports refreshed (PR #19).
-- **Tooling:** EDGAR full-matrix corpus builder (`build_matrix_validation_corpus_from_edgar.py`, PR #18).
-- **Opt-in:** v2 scoring on HTTP matrix/panel and MCP (unchanged from 1.1.x; now backed by SP500 reports).
-- **Docs:** {doc}`../validation/evidence-and-limitations` updated for v2 claims and FY2024 partial robustness notes.
+- **Evidence:** v2 specificity construct validity on 478 S&P 500 FY2025 Item 1A sections (ρ ≈ 0.87 vs NER) — see {doc}`../getting-started/scope-and-claims`.
 
 ## 1.1.0 (2026-06-22)
 
@@ -66,7 +109,6 @@ Public docs and examples aligned with the deterministic scoring surface:
 
 - **Removed dead fields** from documentation and generated fixtures: `business_model_fragility_score`, `cybersecurity_risk_score`, `hidden_risk_score`.
 - **Ten computed components** — nine headline-weighted scores plus supplementary `specificity_quality_score`; canonical list: {doc}`../reference/score-catalog`.
-- **Validation cohorts** — construct validity n=428; L3 volatility n=435 (distinct cohorts). See {doc}`../validation/evidence-and-limitations`.
 - **Doc scope cleanup** — removed composite/OSS product-scope notes from public pages; renamed score catalog page to {doc}`../reference/score-catalog`.
 
 ## built_in_dictionaries_v2 / text_metrics_v2 (2026-06-21)
@@ -106,9 +148,9 @@ v2 flag phrase additions: `material weaknesses in internal control over financia
 | `METRICS_ENGINE_VERSION` | `text_metrics_v1` | `text_metrics_v2` |
 | `SCORING_MODEL_VERSION` | unchanged | `deterministic_scoring_v1` |
 
-### Validation (S&P 500 FY2025 Item 1A)
+### Empirical evidence (S&P 500 FY2025 Item 1A, v2)
 
-See {doc}`../validation/evidence-and-limitations` for canonical cohort counts and gate results (n=428 construct validity; n=435 volatility cohort).
+On **478** sections, company-specificity correlates **ρ ≈ 0.87** with an independent NER-based specificity measure — see {doc}`../getting-started/scope-and-claims`.
 
 ### Out of scope (deferred)
 

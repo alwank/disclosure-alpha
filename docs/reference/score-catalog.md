@@ -5,7 +5,7 @@ Canonical list of deterministic scores returned by CLI, Python, HTTP, and MCP.
 ```{admonition} Scoring version
 :class: note
 
-**This page describes `deterministic_scoring_v1`**, which is the default for all public surfaces (CLI, HTTP, MCP, `score_filing_html`). For v2 component differences and opt-in usage, see {doc}`versioning` and the v2 section in {doc}`../methodology/aggregation`.
+**This page describes `deterministic_scoring_v2`**, the default for CLI, HTTP, MCP, and `score_filing_html`. For legacy v1 differences, see {doc}`versioning` and the v1 section in {doc}`../methodology/aggregation`.
 ```
 
 ## Headline score

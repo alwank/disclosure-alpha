@@ -1,0 +1,47 @@
+{
+  "fiscal_year": 2024,
+  "form": "10-K",
+  "universe": "data/universe/sp500.csv",
+  "corpus": "data/validation/corpus/sp500_item1a_fy2024.jsonl",
+  "n_written": 494,
+  "n_new": 212,
+  "n_skipped_existing": 0,
+  "failures": [
+    {
+      "ticker": "CLX",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "FDXF",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "HAL",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "ICE",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "MCD",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "MS",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "PSKY",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "Q",
+      "reason": "sec_fetch_error"
+    },
+    {
+      "ticker": "SNDK",
+      "reason": "sec_fetch_error"
+    }
+  ]
+}

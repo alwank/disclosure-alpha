@@ -3,24 +3,12 @@
   "form": "10-K",
   "universe": "data/universe/sp500.csv",
   "corpus": "data/validation/corpus/sp500_item1a.jsonl",
-  "n_written": 436,
-  "n_new": 54,
-  "n_skipped_existing": 0,
+  "n_written": 497,
+  "n_new": 61,
+  "n_skipped_existing": 436,
   "failures": [
     {
-      "ticker": "ALB",
-      "reason": "no_item_1a"
-    },
-    {
       "ticker": "CLX",
-      "reason": "no_item_1a"
-    },
-    {
-      "ticker": "DASH",
-      "reason": "no_item_1a"
-    },
-    {
-      "ticker": "DVN",
       "reason": "no_item_1a"
     },
     {
@@ -32,10 +20,6 @@
       "reason": "no_item_1a"
     },
     {
-      "ticker": "IBKR",
-      "reason": "no_item_1a"
-    },
-    {
       "ticker": "ICE",
       "reason": "no_item_1a"
     },
@@ -44,23 +28,7 @@
       "reason": "no_item_1a"
     },
     {
-      "ticker": "MO",
-      "reason": "no_item_1a"
-    },
-    {
       "ticker": "MS",
-      "reason": "no_item_1a"
-    },
-    {
-      "ticker": "SATS",
-      "reason": "no_item_1a"
-    },
-    {
-      "ticker": "SWKS",
-      "reason": "no_item_1a"
-    },
-    {
-      "ticker": "TSLA",
       "reason": "no_item_1a"
     }
   ]

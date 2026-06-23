@@ -13,7 +13,7 @@ Not investment advice. Scores summarize language and change signals in filings. 
 | I want to… | Start here |
 |------------|------------|
 | Prove it works in five minutes | {doc}`getting-started/first-successful-run` |
-| Evaluate whether to trust this | {doc}`getting-started/scope-and-claims` |
+| Evaluate whether to trust this | {doc}`getting-started/evidence` |
 | Understand the numbers | {doc}`getting-started/understanding-scores` |
 | Score in terminal | {doc}`getting-started/quickstart-cli` |
 | Build a screener | {doc}`guides/http/index` → {doc}`guides/workflows/index` |
@@ -86,13 +86,6 @@ reference/index
 :caption: Methodology
 
 methodology/index
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: Evidence and Limitations
-
-validation/index
 ```
 
 ```{toctree}

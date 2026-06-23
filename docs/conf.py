@@ -13,7 +13,18 @@ project = "disclosure-alpha"
 copyright = "Disclosure Alpha contributors"
 author = "Disclosure Alpha"
 release = disclosure_alpha.__version__
-html_title = "disclosure-alpha"
+html_title = "Disclosure Alpha"
+html_logo = "_static/logo.svg"
+html_favicon = "_static/favicon.svg"
+html_css_files = ["disclosure-alpha.css"]
+
+_site_home_url = os.environ.get(
+    "DISCLOSURE_ALPHA_SITE_URL",
+    "https://disclosurealpha.com/",
+)
+html_context = {
+    "site_home_url": _site_home_url,
+}
 
 _repo_url = os.environ.get(
     "READTHEDOCS_GIT_REPOSITORY_URL",
@@ -41,6 +52,7 @@ exclude_patterns = [
     "readthedocs-public-docs-improvement-plan.md",
     "codebase-audit-report.md",  # repo-only audit; not public RTD nav
     "analytics-scoring-layer-improvement-plan.md",  # internal agent brief; repo-only
+    "validation/**",  # internal; gitignored from public repo
     # Contributor / repo-only (not public RTD pages)
     "CONTRIBUTING_DOCS.md",
     "developer/**",
@@ -72,12 +84,16 @@ html_theme_options = {
     "repo_url": _repo_url,
     "repo_name": _repo_name,
     "edit_uri": "edit/main/docs/",
+    "font": {
+        "text": "Inter",
+        "code": "JetBrains Mono",
+    },
     "palette": [
         {
             "media": "(prefers-color-scheme: light)",
             "scheme": "default",
             "primary": "black",
-            "accent": "teal",
+            "accent": "blue",
             "toggle": {
                 "icon": "material/brightness-7",
                 "name": "Switch to dark mode",
@@ -87,7 +103,7 @@ html_theme_options = {
             "media": "(prefers-color-scheme: dark)",
             "scheme": "slate",
             "primary": "black",
-            "accent": "teal",
+            "accent": "blue",
             "toggle": {
                 "icon": "material/brightness-4",
                 "name": "Switch to light mode",
@@ -103,6 +119,23 @@ html_theme_options = {
     "icon": {
         "repo": "fontawesome/brands/github",
     },
+    "social": [
+        {
+            "icon": "material/home",
+            "link": "https://disclosurealpha.com/",
+            "name": "Marketing site",
+        },
+        {
+            "icon": "fontawesome/brands/github",
+            "link": _repo_url,
+            "name": "Source on GitHub",
+        },
+        {
+            "icon": "fontawesome/brands/python",
+            "link": "https://pypi.org/project/disclosure-alpha/",
+            "name": "PyPI package",
+        },
+    ],
 }
 
 myst_heading_anchors = 3
@@ -122,7 +155,7 @@ rediraffe_redirects = {
     "04_diff_spec.md": "methodology/diff-engine.md",
     "05_aggregation_spec.md": "methodology/aggregation.md",
     "06_v2_improvement_plan.md": "methodology/overview.md",
-    "07_validation_protocol.md": "validation/evidence-and-limitations.md",
+    "07_validation_protocol.md": "getting-started/evidence.md",
     "08_dictionary_enrichment_research.md": "methodology/metrics-engine.md",
     "09_product_surfaces.md": "getting-started/choose-your-surface.md",
     "getting-started/hosted-vs-self-hosted.md": "getting-started/choose-your-surface.md",

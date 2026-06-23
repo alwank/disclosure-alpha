@@ -6,30 +6,30 @@ How package, parser, metrics, dictionary, and scoring versions relate — and wh
 
 | Layer | Where it appears | Example |
 |-------|------------------|---------|
-| **Package** | `pip show disclosure-alpha` | `1.2.0` |
+| **Package** | `pip show disclosure-alpha` | `1.3.0` |
 | **Parser** | JSON `versions.parser_version` | `section_extractor_v1` |
-| **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v2` |
-| **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v2` |
-| **Scoring model** | JSON `versions.scoring_model_version` | `deterministic_scoring_v1` (default) or `deterministic_scoring_v2` (opt-in) |
+| **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v3` |
+| **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v3` |
+| **Scoring model** | JSON `versions.scoring_model_version` | `deterministic_scoring_v2` (default) or `deterministic_scoring_v1` (legacy) |
 
 Bump any artifact version can change scores for the same filing. Record all version fields when comparing runs over time.
 
-## Scoring model: v1 (default) vs v2 (opt-in)
+## Scoring model: v2 (default) vs v1 (legacy)
 
-**Default:** CLI, HTTP, MCP, `score_filing_html()`, and `score_deterministic()` all use `deterministic_scoring_v1`. The `versions.scoring_model_version` field in responses is `deterministic_scoring_v1` unless you opt into v2.
+**Default:** CLI, HTTP, MCP, `score_filing_html()`, and `score_for_model()` all use `deterministic_scoring_v2`. The `versions.scoring_model_version` field in responses is `deterministic_scoring_v2` unless you opt into v1.
 
-**Opt-in v2 (HTTP):** `GET /v1/company/{ticker}/disclosure-matrix` and `POST /v1/panel/disclosure-matrix` accept `scoring_model_version=deterministic_scoring_v2` (query param on matrix; JSON body field on panel). Other HTTP routes remain v1-only.
+**Legacy v1 (HTTP):** `GET /v1/company/{ticker}/disclosure-matrix` and `POST /v1/panel/disclosure-matrix` accept `scoring_model_version=deterministic_scoring_v1` (query param on matrix; JSON body field on panel).
 
-**Opt-in v2 (MCP):** scoring tools accept optional `scoring_model_version` (`score_company_filing_tool`, `score_deterministic_tool_wrapper`, `score_filing_html_tool_wrapper`). Default is v1.
+**Legacy v1 (MCP):** scoring tools accept optional `scoring_model_version=deterministic_scoring_v1`.
 
-**Opt-in v2 (Python):** `score_deterministic_v2()` in `disclosure_alpha.pipeline` runs `deterministic_scoring_v2`. To score with v2 in Python:
+**Legacy v1 (Python):** `score_deterministic()` runs the v1 aggregation explicitly. Default pipeline helpers use v2 via `score_for_model()`:
 
 ```python
-from disclosure_alpha.pipeline import compute_section_metrics, score_deterministic_v2
+from disclosure_alpha.pipeline import compute_section_metrics, score_for_model
 
 metrics = compute_section_metrics(sections, prior_sections)
-scores = score_deterministic_v2(metrics)
-# Record SCORING_MODEL_VERSION_V2 when persisting: "deterministic_scoring_v2"
+scores = score_for_model(metrics)  # deterministic_scoring_v2
+legacy = score_for_model(metrics, "deterministic_scoring_v1")
 ```
 
 ### What changed in v2
@@ -49,13 +49,13 @@ Full blend specs: {doc}`../methodology/aggregation` (v1 and v2 sections are labe
 
 **No — treat them as different score scales.** v2 recalibrates Item 1A tone inputs and replaces fixed +15 flag boosts with evidence-weighted blends. Numeric levels, cross-filing ranks, and time-series comparisons must stay within one scoring version. When migrating dashboards or stored scores, re-score historical filings with v2 or keep v1 pinned; do not mix versions in the same panel without relabeling.
 
-Committed validation reports ({doc}`../validation/evidence-and-limitations`) include **v1 (default)** and **v2 (opt-in)** FY2025 cohort evidence; v2 levels are not interchangeable with v1.
+Public empirical evidence for v2: {doc}`../getting-started/evidence`.
 
 ## Pin a release
 
 ```bash
-pip install "disclosure-alpha==1.2.0"
-pip install "disclosure-alpha==1.2.0[api,mcp]"
+pip install "disclosure-alpha==1.3.0"
+pip install "disclosure-alpha==1.3.0[api,mcp]"
 ```
 
 See {doc}`../getting-started/installation`.
@@ -82,21 +82,10 @@ print(result.to_dict()["versions"])
 
 **HTTP:** every matrix/metrics response includes a `versions` object.
 
-## Validation reports
-
-Committed reports under `data/validation/reports/`:
-
-| Report | Purpose |
-|--------|---------|
-| `deterministic_validation_report.json` | L2 construct validity (n=428 cohort) |
-| `l3_outcomes_report.json` | L3 volatility association (corpus mode) |
-| `l3_outcomes_report_edgar.json` | L3 with full EDGAR prior-year diffs |
-
-Reproduction scripts: `data/validation/README.md` in the repository.
-
 ## Related
 
 - {doc}`../appendix/changelog` — release history
 - {doc}`../appendix/glossary` — term definitions
-- {doc}`../validation/evidence-and-limitations` — what validation covers
+- {doc}`../getting-started/evidence` — what's proven
+- {doc}`../getting-started/scope-and-claims` — scope and limits
 - {doc}`../getting-started/understanding-scores`

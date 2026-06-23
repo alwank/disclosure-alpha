@@ -8,20 +8,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from disclosure_alpha.pipeline import compute_section_metrics, score_deterministic, score_deterministic_v2
-from disclosure_alpha.section_extractor import ExtractedSection
+from disclosure_alpha.validation.matrix_corpus import load_matrix_corpus
 from disclosure_alpha.validation.monotonicity import (
     MonotonicityGateResult,
     evaluate_quintile_monotonicity,
     overall_l3_pass,
 )
+from disclosure_alpha.validation.scoring import score_item1a_from_corpus_row
 from disclosure_alpha.validation.scoring_version import normalize_scoring_version
-from disclosure_alpha.version import (
-    METRICS_ENGINE_VERSION,
-    PARSER_VERSION,
-    SCORING_MODEL_VERSION,
-    SCORING_MODEL_VERSION_V2,
-)
+from disclosure_alpha.version import METRICS_ENGINE_VERSION, PARSER_VERSION, SCORING_MODEL_VERSION
 
 
 @dataclass
@@ -81,44 +76,13 @@ def load_corpus_by_ticker(path: Path) -> dict[str, dict[str, Any]]:
     return out
 
 
-def score_item1a_from_corpus_row(
-    row: dict[str, Any],
-    *,
-    scoring_model_version: str = SCORING_MODEL_VERSION,
-) -> dict[str, float | None]:
-    text = str(row.get("cleaned_text") or "")
-    word_count = int(row.get("word_count") or len(text.split()))
-    section = ExtractedSection(
-        "item_1a_risk_factors",
-        text,
-        text,
-        "corpus",
-        word_count,
-        max(1, word_count // 20),
-        float(row.get("extraction_confidence") or 0.5),
-        str(row.get("extraction_method") or "corpus"),
-        PARSER_VERSION,
-        warnings=[],
-    )
-    version = normalize_scoring_version(scoring_model_version)
-    metrics = compute_section_metrics([section], prior_sections=None)
-    score_fn = score_deterministic_v2 if version == SCORING_MODEL_VERSION_V2 else score_deterministic
-    scores = score_fn(metrics)
-    return {
-        "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
-        "disclosure_change_score": scores.components.disclosure_change_score,
-        "risk_factor_intensity_score": scores.components.risk_factor_intensity_score,
-        "score_coverage_ratio": scores.score_coverage_ratio,
-    }
-
-
 def score_from_edgar(
     ticker: str,
     fiscal_year: int,
     *,
     scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> dict[str, float | None]:
-    from disclosure_alpha.pipeline import score_filing_ticker
+    from disclosure_alpha.pipeline import score_filing_ticker, score_for_model
 
     result = score_filing_ticker(
         ticker,
@@ -127,20 +91,12 @@ def score_from_edgar(
         use_cache=True,
         compare_prior=True,
     )
-    if normalize_scoring_version(scoring_model_version) == SCORING_MODEL_VERSION_V2:
-        metrics = result.metrics
-        scores = score_deterministic_v2(metrics)
-        return {
-            "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
-            "disclosure_change_score": scores.components.disclosure_change_score,
-            "risk_factor_intensity_score": scores.components.risk_factor_intensity_score,
-            "score_coverage_ratio": scores.score_coverage_ratio,
-        }
+    scores = score_for_model(result.metrics, scoring_model_version)
     return {
-        "overall_disclosure_risk_score": result.scores.overall_disclosure_risk_score,
-        "disclosure_change_score": result.scores.components.disclosure_change_score,
-        "risk_factor_intensity_score": result.scores.components.risk_factor_intensity_score,
-        "score_coverage_ratio": result.scores.score_coverage_ratio,
+        "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
+        "disclosure_change_score": scores.components.disclosure_change_score,
+        "risk_factor_intensity_score": scores.components.risk_factor_intensity_score,
+        "score_coverage_ratio": scores.score_coverage_ratio,
     }
 
 
@@ -148,6 +104,8 @@ def run_outcomes_validation(
     outcomes_path: Path,
     *,
     corpus_path: Path | None = None,
+    matrix_path: Path | None = None,
+    score_cache_path: Path | None = None,
     score_mode: str = "corpus",
     config: OutcomesValidationConfig | None = None,
     limit: int | None = None,
@@ -158,6 +116,16 @@ def run_outcomes_validation(
     if limit is not None:
         outcomes = outcomes[:limit]
     corpus = load_corpus_by_ticker(corpus_path) if corpus_path else {}
+    matrix_scores: dict[str, dict[str, float | None]] = {}
+    if matrix_path:
+        matrix_rows, _meta = load_matrix_corpus(matrix_path)
+        from disclosure_alpha.validation.scoring import score_matrix_corpus_row
+
+        matrix_scores = {
+            row.ticker: score_matrix_corpus_row(row, scoring_model_version=scoring_model_version)
+            for row in matrix_rows
+        }
+    cache_scores = load_corpus_by_ticker(score_cache_path) if score_cache_path else {}
 
     notes: list[str] = []
     if score_mode == "corpus":
@@ -166,6 +134,10 @@ def run_outcomes_validation(
         )
     elif score_mode == "edgar":
         notes.append("edgar mode: full 10-K + prior via score_filing_ticker (requires SEC cache)")
+    elif score_mode == "matrix":
+        notes.append("matrix mode: score from local matrix corpus (no EDGAR fetch)")
+    elif score_mode == "cache":
+        notes.append("cache mode: score from precomputed sidecar")
 
     joined: list[dict[str, Any]] = []
     total = len(outcomes)
@@ -189,6 +161,15 @@ def run_outcomes_validation(
                 out = {**out, "score_error": str(exc)}
             if score_mode == "edgar" and i % 25 == 0:
                 print(f"  score progress: {i}/{total}", flush=True)
+        elif score_mode == "matrix" and ticker in matrix_scores:
+            score_fields = matrix_scores[ticker]
+        elif score_mode == "cache" and ticker in cache_scores:
+            score_fields = {
+                "overall_disclosure_risk_score": cache_scores[ticker].get("overall_disclosure_risk_score"),
+                "disclosure_change_score": cache_scores[ticker].get("disclosure_change_score"),
+                "risk_factor_intensity_score": cache_scores[ticker].get("risk_factor_intensity_score"),
+                "score_coverage_ratio": cache_scores[ticker].get("score_coverage_ratio"),
+            }
         elif ticker in corpus:
             score_fields = score_item1a_from_corpus_row(
                 corpus[ticker],
@@ -270,6 +251,8 @@ def run_outcomes_validation(
         inputs={
             "outcomes_path": str(outcomes_path),
             "corpus_path": str(corpus_path) if corpus_path else None,
+            "matrix_path": str(matrix_path) if matrix_path else None,
+            "score_cache_path": str(score_cache_path) if score_cache_path else None,
             "score_mode": score_mode,
             "n_outcomes": len(outcomes),
             "n_vol_pairs": len(vol_scores),

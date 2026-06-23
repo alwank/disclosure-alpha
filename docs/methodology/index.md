@@ -6,10 +6,8 @@ This section explains how Disclosure Alpha computes deterministic disclosure ris
 
 1. {doc}`overview`
 2. {doc}`../getting-started/understanding-scores`
-3. {doc}`../validation/evidence-and-limitations`
-4. Detailed specs below (metrics, diff, aggregation)
-
-For supported claims and limitations, see {doc}`../getting-started/scope-and-claims`.
+3. {doc}`../getting-started/evidence`
+4. {doc}`../getting-started/scope-and-claims`
 
 ```{toctree}
 :maxdepth: 2

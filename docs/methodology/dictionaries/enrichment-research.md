@@ -743,6 +743,14 @@ See {doc}`../../appendix/changelog` for the v2 ship record (`built_in_dictionari
 - Bump `SCORING_MODEL_VERSION` only if component formulas or weights change.
 - Record a changelog entry listing added/removed terms by category.
 
+## v3 Candidate Log Template
+
+Use this table for each enrichment batch before adding terms:
+
+| term/phrase | pack | source (lit/corpus) | doc_freq | positive fixture | near-miss fixture | decision |
+|-------------|------|---------------------|----------|------------------|-------------------|----------|
+| example phrase | `LEGAL_REGULATORY_PHRASES` | corpus + SEC 8-K language | 12 | `tests/fixtures/dictionary_near_miss_snippets.json` | `tests/fixtures/dictionary_near_miss_snippets.json` | accepted/rejected |
+
 ## Test Matrix
 
 Minimum tests before shipping dictionary enrichment:

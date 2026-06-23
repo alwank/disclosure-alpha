@@ -28,7 +28,6 @@ from disclosure_alpha.version import (
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
     SCORING_MODEL_VERSION,
-    SCORING_MODEL_VERSION_V2,
 )
 
 _VERSIONS = {
@@ -109,6 +108,12 @@ def _metrics_dict(metrics) -> dict[str, float]:
         "uncertainty_word_ratio": float(metrics.uncertainty_word_ratio or 0),
         "litigious_word_ratio": float(metrics.litigious_word_ratio or 0),
         "modal_word_ratio": float(metrics.modal_word_ratio or 0),
+        "weak_modal_word_ratio": float(getattr(metrics, "weak_modal_word_ratio", 0) or 0),
+        "moderate_modal_word_ratio": float(getattr(metrics, "moderate_modal_word_ratio", 0) or 0),
+        "strong_modal_word_ratio": float(getattr(metrics, "strong_modal_word_ratio", 0) or 0),
+        "legal_regulatory_phrase_ratio": float(
+            getattr(metrics, "legal_regulatory_phrase_ratio", 0) or 0
+        ),
         "constraining_word_ratio": float(metrics.constraining_word_ratio or 0),
         "boilerplate_phrase_ratio": float(metrics.boilerplate_phrase_ratio or 0),
         "numeric_specificity_score": float(metrics.numeric_specificity_score or 0),
@@ -197,6 +202,7 @@ def compute_section_metrics(
 
 
 def score_deterministic(metrics: MetricsResult) -> DeterministicAggregationResult:
+    """Legacy v1 aggregation (`deterministic_scoring_v1`). Prefer score_for_model()."""
     result = aggregate_deterministic_matrix(
         section_metrics=metrics.section_metrics,
         section_diffs=metrics.section_diffs,
@@ -219,7 +225,7 @@ def score_deterministic(metrics: MetricsResult) -> DeterministicAggregationResul
 
 
 def score_deterministic_v2(metrics: MetricsResult) -> DeterministicAggregationResult:
-    """Versioned scoring entry point with evidence model and calibration."""
+    """v2 aggregation (`deterministic_scoring_v2`)."""
     result = aggregate_deterministic_matrix_v2(
         section_metrics=metrics.section_metrics,
         section_diffs=metrics.section_diffs,
@@ -244,6 +250,19 @@ def score_deterministic_v2(metrics: MetricsResult) -> DeterministicAggregationRe
     return result
 
 
+def score_for_model(
+    metrics: MetricsResult,
+    scoring_model_version: str | None = None,
+) -> DeterministicAggregationResult:
+    """Score metrics with the requested model (default: SCORING_MODEL_VERSION / v2)."""
+    from disclosure_alpha.validation.scoring_version import is_v1_scoring, normalize_scoring_version
+
+    version = normalize_scoring_version(scoring_model_version or SCORING_MODEL_VERSION)
+    if is_v1_scoring(version):
+        return score_deterministic(metrics)
+    return score_deterministic_v2(metrics)
+
+
 def score_filing_html(
     html: str,
     form_type: str,
@@ -265,7 +284,7 @@ def score_filing_html(
             accession_number="prior",
         )
     metrics = compute_section_metrics(sections, prior_sections)
-    scores = score_deterministic(metrics)
+    scores = score_for_model(metrics)
     return FilingScoreResult(
         sections=sections,
         metrics=metrics,
@@ -490,9 +509,7 @@ def score_panel_tickers(
                 use_cache=use_cache,
                 compare_prior=compare_prior,
             )
-            scores = scored.scores
-            if scoring_model_version == SCORING_MODEL_VERSION_V2:
-                scores = score_deterministic_v2(scored.metrics)
+            scores = score_for_model(scored.metrics, scoring_model_version)
             results.append(
                 PanelTickerResult(
                     ticker=ticker,
@@ -512,7 +529,9 @@ def score_panel_tickers(
             )
             failed += 1
     versions = dict(_VERSIONS)
-    versions["scoring_model_version"] = scoring_model_version
+    from disclosure_alpha.validation.scoring_version import normalize_scoring_version
+
+    versions["scoring_model_version"] = normalize_scoring_version(scoring_model_version)
     return PanelBatchResult(
         results=results,
         summary={"ok": ok, "failed": failed},

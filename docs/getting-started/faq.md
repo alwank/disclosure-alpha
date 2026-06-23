@@ -86,7 +86,7 @@ See {doc}`../guides/mcp/index` and {doc}`choose-your-surface`.
 
 **Q: Can I use scores as buy/sell signals?**
 
-No. Scores summarize disclosure language and change — they are not investment advice and are not validated to predict returns. See {doc}`scope-and-claims` and {doc}`../legal`.
+No. Scores summarize disclosure language and change — they are not investment advice and are not validated to predict returns. See {doc}`evidence`, {doc}`scope-and-claims`, and {doc}`../legal`.
 
 ## Related
 

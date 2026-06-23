@@ -23,14 +23,21 @@ Disclosure Alpha **does**:
 
 Scores summarize **language and change signals** in filings. They are research and integration tools, not trading signals.
 
+## What's proven
+
+Headline result: on **478** S&P 500 FY2025 Item 1A sections (`deterministic_scoring_v2`), company-specificity correlates **ρ ≈ 0.87** with an independent NER-based measure (Spearman).
+
+Full cohort counts, boilerplate construct validity (ρ ≈ 0.74), post-filing volatility association (Q5/Q1 ≈ 1.15), and limitations: {doc}`evidence`.
+
 ## Unsupported claims
 
 Disclosure Alpha **does not**:
 
 - Provide buy/sell signals or return prediction
 - Replace reading the underlying SEC filing
-- Guarantee full S&P 500 corpus coverage (see validation cohort below)
-- Support earnings-surprise outcome validation in the current release
+- Guarantee full S&P 500 index coverage in any empirical cohort
+- Claim earnings-surprise or other outcome prediction
+- Offer investment signals — scores are not validated as alpha
 
 ## Language signal vs risk score vs investment signal
 
@@ -44,23 +51,11 @@ Disclosure Alpha **does not**:
 
 Given the same filing HTML and the same artifact versions (`parser_version`, `metrics_engine_version`, `scoring_model_version`, dictionary version), output is reproducible. No external model API is called in the scoring pipeline.
 
-## Validation cohort (canonical counts)
-
-Source reports (paths relative to repository root):
-
-| Metric | Value | Report |
-|--------|------:|--------|
-| Analysis cohort (S&P 500 FY2025 Item 1A) | **428** | `data/validation/reports/deterministic_validation_report.json` |
-| Construct validity — boilerplate proxy | Spearman ρ ≈ **0.69** (n=428) | same |
-| Construct validity — specificity proxy | Spearman ρ ≈ **0.84** (n=428) | same |
-| Post-filing volatility association | Q5/Q1 ≈ **1.11** on **435**-firm cohort (90-day window) | `data/validation/reports/l3_outcomes_report.json` |
-
-**Last validated:** 2026-06-21 (L2 construct gates). Corpus fetch does not cover 100% of the S&P 500 index (~84% of universe in manifest audits).
-
-Full methodology and limitations: {doc}`../validation/evidence-and-limitations`. Version pinning: {doc}`../reference/versioning`.
+Version pinning: {doc}`../reference/versioning`.
 
 ## Related
 
+- {doc}`evidence` — empirical validation table and cohort detail
 - {doc}`../legal` — not investment advice, SEC EDGAR terms
 - {doc}`understanding-scores` — how to read score JSON
 - {doc}`../guides/production` — hosting the HTTP API safely

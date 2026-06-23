@@ -51,4 +51,4 @@ __all__ = [
 try:
     __version__ = _pkg_version("disclosure-alpha")
 except PackageNotFoundError:
-    __version__ = "1.2.0"  # editable install fallback
+    __version__ = "1.3.0"  # editable install fallback

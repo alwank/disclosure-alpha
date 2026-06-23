@@ -16,13 +16,12 @@ from disclosure_alpha.deterministic_scoring import (
 from disclosure_alpha.pipeline import compute_section_metrics
 from disclosure_alpha.section_extractor import ExtractedSection
 from disclosure_alpha.validation.matrix_corpus import MatrixCorpusRow, sections_for_form
-from disclosure_alpha.validation.scoring_version import normalize_scoring_version
+from disclosure_alpha.validation.scoring_version import is_v1_scoring, normalize_scoring_version
 from disclosure_alpha.version import (
     DICTIONARY_VERSION,
     METRICS_ENGINE_VERSION,
     PARSER_VERSION,
     SCORING_MODEL_VERSION,
-    SCORING_MODEL_VERSION_V2,
 )
 
 COMPONENT_FIELDS = (
@@ -109,21 +108,22 @@ def _sections_from_row(row: MatrixCorpusRow) -> tuple[list[ExtractedSection], li
 
 
 def _aggregate_scores(metrics, *, scoring_model_version: str):
-    if scoring_model_version == SCORING_MODEL_VERSION_V2:
-        return aggregate_deterministic_matrix_v2(
+    version = normalize_scoring_version(scoring_model_version)
+    if is_v1_scoring(version):
+        return aggregate_deterministic_matrix(
             section_metrics=metrics.section_metrics,
             section_diffs=metrics.section_diffs,
             section_flags=metrics.section_flags,
             language_deltas=metrics.language_deltas,
             section_densities=metrics.section_densities,
-            section_diffs_v2=metrics.section_diffs_v2,
         )
-    return aggregate_deterministic_matrix(
+    return aggregate_deterministic_matrix_v2(
         section_metrics=metrics.section_metrics,
         section_diffs=metrics.section_diffs,
         section_flags=metrics.section_flags,
         language_deltas=metrics.language_deltas,
         section_densities=metrics.section_densities,
+        section_diffs_v2=metrics.section_diffs_v2,
     )
 
 

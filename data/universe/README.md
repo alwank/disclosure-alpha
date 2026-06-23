@@ -1,8 +1,8 @@
-# Universe lists for validation cohorts
+# Universe lists
 
 ## S&P 500 (`sp500.csv`)
 
-Checked-in reference list (**503** constituents). Current validated L2 analysis cohort: **428** FY2025 Item 1A extractions (~85%; 436 fetched before filters). L3 volatility validation uses **435** tickers with outcomes — see [data/validation/README.md](../validation/README.md) for cohort definitions, manifest failures, and [Evidence & limitations](https://disclosure-alpha.readthedocs.io/en/latest/validation/evidence-and-limitations.html) for supported claims.
+Checked-in reference list (**503** constituents).
 
 Refresh from Wikipedia:
 
@@ -14,26 +14,4 @@ Columns: `ticker`, `cik`, `company_name`, `as_of_date`
 
 Tickers use SEC-style hyphenation (e.g. `BRK-B` not `BRK.B`).
 
-## Build L2 corpus from EDGAR
-
-Requires `SEC_USER_AGENT`:
-
-```bash
-export SEC_USER_AGENT="YourName your@email.com"
-
-python scripts/build_validation_corpus_from_edgar.py \
-  --fiscal-year 2025 \
-  --resume
-```
-
-Output: `data/validation/corpus/sp500_item1a.jsonl` (gitignored).
-
-Use `--limit 10` for a smoke test. Full run takes ~1 hour at SEC rate limits.
-
-## Build from local HTML
-
-```bash
-python scripts/build_validation_corpus.py \
-  --html-dir ./my_sp500_html \
-  --universe data/universe/sp500.csv
-```
+Supported empirical evidence uses this universe — see [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html).

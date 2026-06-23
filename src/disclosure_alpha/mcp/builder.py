@@ -16,6 +16,7 @@ from disclosure_alpha.mcp.tools import (
     score_deterministic_tool,
     score_filing_html_tool,
 )
+from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 mcp = FastMCP("disclosure-alpha-builder")
 
@@ -46,7 +47,7 @@ def diff_sections_tool(
 @mcp.tool()
 def score_deterministic_tool_wrapper(
     metrics_json: str,
-    scoring_model_version: str = "deterministic_scoring_v1",
+    scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> str:
     """Aggregate deterministic component scores from a metrics payload."""
     return score_deterministic_tool(metrics_json, scoring_model_version=scoring_model_version)
@@ -57,7 +58,7 @@ def score_filing_html_tool_wrapper(
     html: str,
     form_type: str,
     prior_html: str | None = None,
-    scoring_model_version: str = "deterministic_scoring_v1",
+    scoring_model_version: str = SCORING_MODEL_VERSION,
 ) -> str:
     """Run full pipeline on filing HTML (10-K, 10-Q, or 8-K; 8-K: local HTML only)."""
     return score_filing_html_tool(

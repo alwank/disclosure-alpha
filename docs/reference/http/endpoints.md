@@ -116,6 +116,7 @@ Disclosure Matrix
 | `include` | query | no | object |  |
 | `fields` | query | no | object |  |
 | `tier` | query | no | object | Response tier preset (lite\|standard\|analyst); overrides include/fields when set |
+| `scoring_model_version` | query | no | string | Scoring model: deterministic_scoring_v2 (default) or deterministic_scoring_v1 |
 
 **Response (200):** `MatrixResponse`
 

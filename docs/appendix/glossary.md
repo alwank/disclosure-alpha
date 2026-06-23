@@ -45,13 +45,14 @@ Terms used across CLI, HTTP, Python, and methodology docs.
 | Artifact | Current value |
 |----------|---------------|
 | Parser | `section_extractor_v1` |
-| Metrics engine | `text_metrics_v2` |
-| Scoring model | `deterministic_scoring_v1` |
-| Dictionary | `built_in_dictionaries_v2` |
+| Metrics engine | `text_metrics_v3` |
+| Scoring model | `deterministic_scoring_v2` |
+| Dictionary | `built_in_dictionaries_v3` |
 
 See {doc}`changelog` for history.
 
 ## Related
 
 - {doc}`../methodology/overview`
-- {doc}`../validation/evidence-and-limitations`
+- {doc}`../getting-started/evidence`
+- {doc}`../getting-started/scope-and-claims`

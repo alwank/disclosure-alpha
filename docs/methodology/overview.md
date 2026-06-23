@@ -15,7 +15,7 @@ No LLM. Fully reproducible given the same version strings and input text.
 
 - Not a buy/sell signal or investment advice
 - Not a substitute for reading the filing
-- Not full S&P 500 validation coverage — see {doc}`../validation/evidence-and-limitations`
+- Not full S&P 500 index coverage in empirical cohorts — see {doc}`../getting-started/scope-and-claims`
 
 ## Pipeline
 
@@ -88,4 +88,4 @@ Missing sections → lower `score_coverage_ratio`, component `null`s, reduced co
 - {doc}`diff-engine` — section change scoring
 - {doc}`aggregation` — component blends and provenance
 - {doc}`research-foundation` — literature motivation
-- {doc}`../validation/evidence-and-limitations`
+- {doc}`../getting-started/scope-and-claims`

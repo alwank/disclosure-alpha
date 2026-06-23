@@ -9,7 +9,7 @@
         "form_type": "10-K"
       },
       "scores": {
-        "overall_disclosure_risk_score": 17.837056,
+        "overall_disclosure_risk_score": 33.159052,
         "score_coverage_ratio": 0.7778,
         "confidence_score": 0.3426,
         "missing_components": [
@@ -17,11 +17,11 @@
           "event_severity_score"
         ],
         "components": {
-          "risk_factor_intensity_score": 8.6207,
+          "risk_factor_intensity_score": 60.0,
           "disclosure_change_score": null,
           "mdna_uncertainty_score": 26.726221,
-          "legal_regulatory_risk_score": 25.3448,
-          "liquidity_stress_score": 4.201706,
+          "legal_regulatory_risk_score": 37.6724,
+          "liquidity_stress_score": 4.030477,
           "boilerplate_risk_score": 42.528733,
           "internal_controls_risk_score": 3.4483,
           "event_severity_score": null,
@@ -43,6 +43,6 @@
     "failed": 1
   },
   "versions": {
-    "scoring_model_version": "deterministic_scoring_v1"
+    "scoring_model_version": "deterministic_scoring_v2"
   }
 }

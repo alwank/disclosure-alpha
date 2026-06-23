@@ -2,7 +2,7 @@
 
 Peer-reviewed finance and accounting literature motivates the deterministic metrics in Disclosure Alpha. This page maps papers to what the open-source engine measures today.
 
-Empirical results on the current release: {doc}`../validation/evidence-and-limitations`.
+Empirical results on the current release: {doc}`../getting-started/evidence`.
 
 ## Core references
 
@@ -25,7 +25,7 @@ Empirical results on the current release: {doc}`../validation/evidence-and-limit
 | `modal_word_ratio` | LM Modal | Weak commitment language in MD&A |
 | `constraining_word_ratio` | Custom (LM-adjacent) | Covenant / obligation language → liquidity stress proxy |
 
-**Implementation:** Built-in word lists in `src/disclosure_alpha/dictionaries.py` (`built_in_dictionaries_v2`). These are finance-inspired curated lists shipped with the repo — not a redistribution of the full [Loughran–McDonald master dictionary](https://sraf.nd.edu/loughranmcdonald-master-dictionary/).
+**Implementation:** Built-in word lists in `src/disclosure_alpha/dictionaries/` (`built_in_dictionaries_v3`). These are finance-inspired curated lists shipped with the repo — not a redistribution of the full [Loughran–McDonald master dictionary](https://sraf.nd.edu/loughranmcdonald-master-dictionary/).
 
 ## Specificity
 
@@ -73,4 +73,5 @@ Loughran–McDonald word lists are free for academic use; commercial redistribut
 ## Related
 
 - {doc}`overview`
-- {doc}`../validation/evidence-and-limitations`
+- {doc}`../getting-started/evidence`
+- {doc}`../getting-started/scope-and-claims`

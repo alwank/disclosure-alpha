@@ -19,7 +19,7 @@ class PanelRequest(BaseModel):
     fields: str | None = None
     scoring_model_version: str = Field(
         default=SCORING_MODEL_VERSION,
-        description="Scoring model: deterministic_scoring_v1 (default) or deterministic_scoring_v2",
+        description="Scoring model: deterministic_scoring_v2 (default) or deterministic_scoring_v1",
     )
 
 

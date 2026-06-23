@@ -18,12 +18,11 @@ open docs/_build/html/index.html
 
 | Section | Path | Audience |
 |---------|------|----------|
-| Start Here | [getting-started/](getting-started/index.md) | Install, first run, scope, FAQ |
+| Start Here | [getting-started/](getting-started/index.md) | Install, first run, scope, evidence, FAQ |
 | Guides | [guides/](guides/index.md) | CLI, Python, HTTP, MCP, workflows, production |
 | Examples | [examples/](examples/index.md) | JSON fixtures, Postman collections |
 | Reference | [reference/](reference/index.md) | Env vars, versioning, Python API, HTTP endpoints |
 | Methodology | [methodology/](methodology/index.md) | How scoring works |
-| Evidence | [validation/](validation/index.md) | Evidence & limitations |
 | Release notes | [appendix/changelog.md](appendix/changelog.md), [glossary](appendix/glossary.md) | Versions & terms |
 | Legal | [legal.md](legal.md) | Disclaimer & license |
 

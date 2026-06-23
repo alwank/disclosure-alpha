@@ -94,7 +94,7 @@ def test_matrix_sections_filter_scores_from_filtered_metrics(mock_metrics):
     assert full_components["mdna_uncertainty_score"] is not None
     assert filtered_components["mdna_uncertainty_score"] is None
     assert full_components["liquidity_stress_score"] is not None
-    assert filtered_components["liquidity_stress_score"] is None
+    # v2 default: liquidity_stress can fall back to Item 1A constraining when MD&A is filtered out
     assert (
         filtered_components["risk_factor_intensity_score"]
         == full_components["risk_factor_intensity_score"]
@@ -102,7 +102,7 @@ def test_matrix_sections_filter_scores_from_filtered_metrics(mock_metrics):
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
-@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.score_for_model")
 def test_tier_lite_slims_response(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -120,7 +120,7 @@ def test_tier_lite_slims_response(mock_score, mock_metrics):
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
-@patch("disclosure_alpha.api.endpoints.matrix.score_deterministic")
+@patch("disclosure_alpha.api.endpoints.matrix.score_for_model")
 def test_tier_standard_includes_metrics_and_components(mock_score, mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
@@ -146,7 +146,7 @@ def test_invalid_tier_param():
 
 
 @patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
-def test_matrix_default_scoring_version_v1(mock_metrics):
+def test_matrix_default_scoring_version_v2(mock_metrics):
     mock_metrics.return_value = _minimal_metrics_result()
     resp = client.get(
         "/v1/company/AAPL/disclosure-matrix",

@@ -18,10 +18,9 @@ from disclosure_alpha.api.shapes import apply_tier_preset
 from disclosure_alpha.pipeline import (
     filter_metrics_result,
     metrics_filing_ticker,
-    score_deterministic,
-    score_deterministic_v2,
+    score_for_model,
 )
-from disclosure_alpha.version import SCORING_MODEL_VERSION, SCORING_MODEL_VERSION_V2
+from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 router = APIRouter(tags=["matrix"])
 
@@ -50,7 +49,7 @@ def disclosure_matrix(
     ),
     scoring_model_version: str = Query(
         SCORING_MODEL_VERSION,
-        description="Scoring model: deterministic_scoring_v1 (default) or deterministic_scoring_v2",
+        description="Scoring model: deterministic_scoring_v2 (default) or deterministic_scoring_v1",
     ),
 ) -> MatrixResponse:
     base, q = parse_form_quarter(form_type, quarter)
@@ -76,12 +75,7 @@ def disclosure_matrix(
         metrics_for_scope = result.metrics
         if section_filter:
             metrics_for_scope = filter_metrics_result(metrics_for_scope, section_filter)
-        score_fn = (
-            score_deterministic_v2
-            if scoring_version == SCORING_MODEL_VERSION_V2
-            else score_deterministic
-        )
-        scores = score_fn(metrics_for_scope)
+        scores = score_for_model(metrics_for_scope, scoring_version)
         scores_payload = shape_matrix_scores(
             scores_dict(scores),
             include_provenance="provenance" in include_set,

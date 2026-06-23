@@ -44,7 +44,14 @@ Available via `score_deterministic_v2()` or opt-in `scoring_model_version` on HT
 
 ### Still deferred
 
-- v2 full-corpus validation and headline migration
+- v2 headline migration (validation committed; default remains v1)
+
+## 1.2.0 (2026-06-23)
+
+- **Validation:** FY2025 v2 evidence committed — L2 construct pairs (n=428), matrix gates on partial EDGAR matrix corpus (n=330), L3 volatility association (n=435, corpus mode). v1 FY2025 reports refreshed (PR #19).
+- **Tooling:** EDGAR full-matrix corpus builder (`build_matrix_validation_corpus_from_edgar.py`, PR #18).
+- **Opt-in:** v2 scoring on HTTP matrix/panel and MCP (unchanged from 1.1.x; now backed by SP500 reports).
+- **Docs:** {doc}`../validation/evidence-and-limitations` updated for v2 claims and FY2024 partial robustness notes.
 
 ## 1.1.0 (2026-06-22)
 

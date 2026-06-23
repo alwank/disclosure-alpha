@@ -6,7 +6,7 @@ How package, parser, metrics, dictionary, and scoring versions relate — and wh
 
 | Layer | Where it appears | Example |
 |-------|------------------|---------|
-| **Package** | `pip show disclosure-alpha` | `1.1.0` |
+| **Package** | `pip show disclosure-alpha` | `1.2.0` |
 | **Parser** | JSON `versions.parser_version` | `section_extractor_v1` |
 | **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v2` |
 | **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v2` |
@@ -49,13 +49,13 @@ Full blend specs: {doc}`../methodology/aggregation` (v1 and v2 sections are labe
 
 **No — treat them as different score scales.** v2 recalibrates Item 1A tone inputs and replaces fixed +15 flag boosts with evidence-weighted blends. Numeric levels, cross-filing ranks, and time-series comparisons must stay within one scoring version. When migrating dashboards or stored scores, re-score historical filings with v2 or keep v1 pinned; do not mix versions in the same panel without relabeling.
 
-Committed validation reports ({doc}`../validation/evidence-and-limitations`) were produced with **v1 only**. v2 is experimental until a validation pass is committed.
+Committed validation reports ({doc}`../validation/evidence-and-limitations`) include **v1 (default)** and **v2 (opt-in)** FY2025 cohort evidence; v2 levels are not interchangeable with v1.
 
 ## Pin a release
 
 ```bash
-pip install "disclosure-alpha==1.1.0"
-pip install "disclosure-alpha==1.1.0[api,mcp]"
+pip install "disclosure-alpha==1.2.0"
+pip install "disclosure-alpha==1.2.0[api,mcp]"
 ```
 
 See {doc}`../getting-started/installation`.

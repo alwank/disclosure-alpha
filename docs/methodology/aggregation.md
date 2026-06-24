@@ -25,6 +25,8 @@ Implemented in `deterministic_scoring.py`:
 - **v1:** `aggregate_deterministic_matrix()` — default pipeline path
 - **v2:** `aggregate_deterministic_matrix_v2()` — calls v1, then overrides selected components
 
+**Python SDK tuning:** pass `config=ScoringConfig(...)` to `aggregate_deterministic_matrix()` / `aggregate_deterministic_matrix_v2()`, or `config=PipelineConfig(...)` to `score_filing_html()` and related pipeline helpers. Tunable fields include `component_weights`, `flag_boost_points`, `flag_evidence_score`, and v2 `calibration_context`. Per-component blend weights inside each score remain fixed for this release.
+
 <details>
 <summary>v1 full specification (`deterministic_scoring_v1`)</summary>
 

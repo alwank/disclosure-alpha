@@ -147,3 +147,4 @@ def test_mcp_list_company_filings(mock_list):
 def test_mcp_taxonomy_resource():
     payload = json.loads(taxonomy_payload())
     assert set(payload["component_weights"]) == set(COMPONENT_WEIGHTS)
+    assert payload["analytics_config_id"] == "builtin_default"

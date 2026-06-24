@@ -63,6 +63,8 @@ Not in the v1 headline blend; populated by `score_deterministic_v2()` when evide
 | `cybersecurity_incident_risk_score` | Incident flags (Item 1.05 / cyber sections) |
 | `event_materiality_score` | 8-K event materiality proxies |
 
+`cybersecurity_incident_risk_score` can be non-null on 10-K when incident flags fire in Item 1A (see {doc}`../examples/index`). `event_materiality_score` is typically non-null only when 8-K event sections are extracted — it stays `null` in the committed 10-K examples.
+
 `overall_disclosure_risk_score` weights are unchanged in v1 and v2.
 
 ## Supplementary component

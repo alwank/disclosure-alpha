@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
+from disclosure_alpha.analytics_config import PipelineConfig, build_versions, resolve_pipeline_config
 from disclosure_alpha.confidence import ConfidenceInput, compute_confidence_detailed, compute_overall_confidence
 from disclosure_alpha.deterministic_scoring import (
     DeterministicAggregationResult,
@@ -24,18 +25,7 @@ from disclosure_alpha.text_metrics import (
     detect_section_flags,
 )
 from disclosure_alpha.edgar.types import EdgarError
-from disclosure_alpha.version import (
-    METRICS_ENGINE_VERSION,
-    PARSER_VERSION,
-    SCORING_MODEL_VERSION,
-)
-
-_VERSIONS = {
-    "parser_version": PARSER_VERSION,
-    "metrics_engine_version": METRICS_ENGINE_VERSION,
-    "scoring_model_version": SCORING_MODEL_VERSION,
-}
-
+from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 @dataclass
 class FilingBundle:
@@ -201,14 +191,20 @@ def compute_section_metrics(
     )
 
 
-def score_deterministic(metrics: MetricsResult) -> DeterministicAggregationResult:
+def score_deterministic(
+    metrics: MetricsResult,
+    *,
+    config: PipelineConfig | None = None,
+) -> DeterministicAggregationResult:
     """Legacy v1 aggregation (`deterministic_scoring_v1`). Prefer score_for_model()."""
+    pipeline_config = resolve_pipeline_config(config)
     result = aggregate_deterministic_matrix(
         section_metrics=metrics.section_metrics,
         section_diffs=metrics.section_diffs,
         section_flags=metrics.section_flags,
         language_deltas=metrics.language_deltas,
         section_densities=metrics.section_densities,
+        config=pipeline_config.scoring,
     )
     avg_diff_conf = (
         sum(metrics.diff_confs) / len(metrics.diff_confs) if metrics.diff_confs else None
@@ -224,8 +220,14 @@ def score_deterministic(metrics: MetricsResult) -> DeterministicAggregationResul
     return result
 
 
-def score_deterministic_v2(metrics: MetricsResult) -> DeterministicAggregationResult:
+def score_deterministic_v2(
+    metrics: MetricsResult,
+    *,
+    config: PipelineConfig | None = None,
+    form_type: str | None = None,
+) -> DeterministicAggregationResult:
     """v2 aggregation (`deterministic_scoring_v2`)."""
+    pipeline_config = resolve_pipeline_config(config)
     result = aggregate_deterministic_matrix_v2(
         section_metrics=metrics.section_metrics,
         section_diffs=metrics.section_diffs,
@@ -233,6 +235,8 @@ def score_deterministic_v2(metrics: MetricsResult) -> DeterministicAggregationRe
         language_deltas=metrics.language_deltas,
         section_densities=metrics.section_densities,
         section_diffs_v2=metrics.section_diffs_v2,
+        calibration_context=pipeline_config.resolved_calibration(form_type=form_type),
+        config=pipeline_config.scoring,
     )
     avg_diff_conf = (
         sum(metrics.diff_confs) / len(metrics.diff_confs) if metrics.diff_confs else None
@@ -253,14 +257,17 @@ def score_deterministic_v2(metrics: MetricsResult) -> DeterministicAggregationRe
 def score_for_model(
     metrics: MetricsResult,
     scoring_model_version: str | None = None,
+    *,
+    config: PipelineConfig | None = None,
+    form_type: str | None = None,
 ) -> DeterministicAggregationResult:
     """Score metrics with the requested model (default: SCORING_MODEL_VERSION / v2)."""
-    from disclosure_alpha.validation.scoring_version import is_v1_scoring, normalize_scoring_version
+    from disclosure_alpha.validation.scoring_version import is_v1_scoring
 
-    version = normalize_scoring_version(scoring_model_version or SCORING_MODEL_VERSION)
-    if is_v1_scoring(version):
-        return score_deterministic(metrics)
-    return score_deterministic_v2(metrics)
+    pipeline_config = resolve_pipeline_config(config, scoring_model_version=scoring_model_version)
+    if is_v1_scoring(pipeline_config.scoring_model_version):
+        return score_deterministic(metrics, config=pipeline_config)
+    return score_deterministic_v2(metrics, config=pipeline_config, form_type=form_type)
 
 
 def score_filing_html(
@@ -271,6 +278,7 @@ def score_filing_html(
     prior_form_type: str | None = None,
     cik: str = "",
     accession_number: str = "",
+    config: PipelineConfig | None = None,
 ) -> FilingScoreResult:
     sections = extract_sections_from_html(
         html, form_type, cik=cik, accession_number=accession_number
@@ -284,12 +292,13 @@ def score_filing_html(
             accession_number="prior",
         )
     metrics = compute_section_metrics(sections, prior_sections)
-    scores = score_for_model(metrics)
+    pipeline_config = resolve_pipeline_config(config)
+    scores = score_for_model(metrics, config=pipeline_config, form_type=form_type)
     return FilingScoreResult(
         sections=sections,
         metrics=metrics,
         scores=scores,
-        versions=dict(_VERSIONS),
+        versions=build_versions(pipeline_config),
     )
 
 
@@ -397,7 +406,7 @@ def sections_filing_ticker(
     return FilingSectionsResult(
         sections=sections,
         filing=_filing_meta(bundle.ref, prior_accession=bundle.prior_accession),
-        versions=dict(_VERSIONS),
+        versions=build_versions(),
     )
 
 
@@ -436,7 +445,7 @@ def metrics_filing_ticker(
     return FilingMetricsResult(
         metrics=metrics,
         filing=_filing_meta(bundle.ref, prior_accession=bundle.prior_accession),
-        versions=dict(_VERSIONS),
+        versions=build_versions(),
     )
 
 
@@ -448,6 +457,7 @@ def score_filing_ticker(
     quarter: str | None = None,
     use_cache: bool = True,
     compare_prior: bool = True,
+    config: PipelineConfig | None = None,
 ) -> FilingScoreResult:
     bundle = load_filing_bundle(
         ticker,
@@ -463,6 +473,7 @@ def score_filing_ticker(
         prior_html=bundle.prior_html,
         cik=bundle.ref.cik,
         accession_number=bundle.ref.accession_number,
+        config=config,
     )
     result.filing = _filing_meta(bundle.ref, prior_accession=bundle.prior_accession)
     return result
@@ -493,8 +504,10 @@ def score_panel_tickers(
     use_cache: bool = True,
     compare_prior: bool = True,
     scoring_model_version: str = SCORING_MODEL_VERSION,
+    config: PipelineConfig | None = None,
 ) -> PanelBatchResult:
     """Score many tickers sequentially; per-ticker errors do not fail the batch."""
+    pipeline_config = resolve_pipeline_config(config, scoring_model_version=scoring_model_version)
     results: list[PanelTickerResult] = []
     ok = 0
     failed = 0
@@ -508,8 +521,13 @@ def score_panel_tickers(
                 quarter=quarter,
                 use_cache=use_cache,
                 compare_prior=compare_prior,
+                config=pipeline_config,
             )
-            scores = score_for_model(scored.metrics, scoring_model_version)
+            scores = score_for_model(
+                scored.metrics,
+                config=pipeline_config,
+                form_type=scored.filing.get("form_type") if scored.filing else form_type,
+            )
             results.append(
                 PanelTickerResult(
                     ticker=ticker,
@@ -528,12 +546,8 @@ def score_panel_tickers(
                 )
             )
             failed += 1
-    versions = dict(_VERSIONS)
-    from disclosure_alpha.validation.scoring_version import normalize_scoring_version
-
-    versions["scoring_model_version"] = normalize_scoring_version(scoring_model_version)
     return PanelBatchResult(
         results=results,
         summary={"ok": ok, "failed": failed},
-        versions=versions,
+        versions=build_versions(pipeline_config),
     )

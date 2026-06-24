@@ -167,6 +167,7 @@ def taxonomy_payload() -> str:
             "parser_version": PARSER_VERSION,
             "metrics_engine_version": METRICS_ENGINE_VERSION,
             "scoring_model_version": SCORING_MODEL_VERSION,
+            "analytics_config_id": "builtin_default",
             "component_weights": COMPONENT_WEIGHTS,
         },
         indent=2,

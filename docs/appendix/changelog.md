@@ -2,6 +2,20 @@
 
 Version history for parser, metrics engine, dictionary packs, and scoring model.
 
+## 1.4.0 (2026-06-24)
+
+Python SDK configuration for tunable scoring and reproducibility metadata.
+
+### What shipped
+
+| Area | Change |
+|------|--------|
+| **Python SDK** | `PipelineConfig` and `ScoringConfig` on `score_filing_html()`, `score_filing_ticker()`, `score_for_model()`, and `score_panel_tickers()` — tune `component_weights`, `flag_boost_points`, `flag_evidence_score`, and v2 `calibration_context` without forking the parser |
+| **Versions output** | `versions.analytics_config_id` in pipeline, MCP taxonomy, and panel batch responses (`builtin_default` when unset) |
+| **Docs / examples** | Pipeline and versioning docs updated; full-coverage example uses cyber incident language; score-catalog clarifies v2-only components on 10-K vs 8-K fixtures |
+
+Default scores are unchanged when no custom config is passed. Custom weights are tracked via `analytics_config_id`, not a new `scoring_model_version`.
+
 ## 1.3.0 (2026-06-24)
 
 Package release consolidating artifact bumps and default-surface updates.

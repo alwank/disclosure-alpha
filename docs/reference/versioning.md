@@ -6,13 +6,16 @@ How package, parser, metrics, dictionary, and scoring versions relate — and wh
 
 | Layer | Where it appears | Example |
 |-------|------------------|---------|
-| **Package** | `pip show disclosure-alpha` | `1.3.0` |
+| **Package** | `pip show disclosure-alpha` | `1.4.0` |
 | **Parser** | JSON `versions.parser_version` | `section_extractor_v1` |
 | **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v3` |
 | **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v3` |
 | **Scoring model** | JSON `versions.scoring_model_version` | `deterministic_scoring_v2` (default) or `deterministic_scoring_v1` (legacy) |
+| **Analytics config** | JSON `versions.analytics_config_id` | `builtin_default` or a custom id / `custom_<hash>` from `PipelineConfig` |
 
 Bump any artifact version can change scores for the same filing. Record all version fields when comparing runs over time.
+
+Custom `ScoringConfig` weights or flag constants change scores under the same `scoring_model_version`; use `analytics_config_id` to distinguish those runs from built-in defaults.
 
 ## Scoring model: v2 (default) vs v1 (legacy)
 
@@ -54,8 +57,8 @@ Public empirical evidence for v2: {doc}`../getting-started/evidence`.
 ## Pin a release
 
 ```bash
-pip install "disclosure-alpha==1.3.0"
-pip install "disclosure-alpha==1.3.0[api,mcp]"
+pip install "disclosure-alpha==1.4.0"
+pip install "disclosure-alpha==1.4.0[api,mcp]"
 ```
 
 See {doc}`../getting-started/installation`.

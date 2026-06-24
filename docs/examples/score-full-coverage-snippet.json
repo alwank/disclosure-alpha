@@ -1,27 +1,27 @@
 {
-  "overall_disclosure_risk_score": 33.10187,
+  "overall_disclosure_risk_score": 32.298828,
   "score_coverage_ratio": 1.0,
-  "confidence_score": 0.6729,
+  "confidence_score": 0.6705,
   "missing_components": [],
   "components": {
-    "risk_factor_intensity_score": 56.2975,
-    "disclosure_change_score": 38.6268,
+    "risk_factor_intensity_score": 45.6425,
+    "disclosure_change_score": 37.763145,
     "mdna_uncertainty_score": 26.726221,
-    "legal_regulatory_risk_score": 30.317069,
-    "liquidity_stress_score": 4.030477,
-    "boilerplate_risk_score": 42.528733,
-    "internal_controls_risk_score": 3.4483,
-    "event_severity_score": 45.19,
-    "specificity_quality_score": 36.2069,
-    "tone_negativity_score": 5.2956,
-    "cybersecurity_incident_risk_score": null,
+    "legal_regulatory_risk_score": 31.335654,
+    "liquidity_stress_score": 3.246773,
+    "boilerplate_risk_score": 58.666667,
+    "internal_controls_risk_score": 0.0,
+    "event_severity_score": 47.57,
+    "specificity_quality_score": 12.0,
+    "tone_negativity_score": 3.57145,
+    "cybersecurity_incident_risk_score": 65.0,
     "event_materiality_score": null
   },
   "aggregates": {
-    "disclosure_quality_score": 36.2069,
-    "disclosure_deterioration_score": 38.6268,
-    "static_disclosure_quality_score": 36.2069,
-    "static_disclosure_risk_score": 18.7244,
-    "disclosure_change_risk_score": 41.9084
+    "disclosure_quality_score": 12.0,
+    "disclosure_deterioration_score": 37.763145,
+    "static_disclosure_quality_score": 12.0,
+    "static_disclosure_risk_score": 20.591127,
+    "disclosure_change_risk_score": 42.666573
   }
 }

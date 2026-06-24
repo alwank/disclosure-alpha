@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "disclosure-alpha"
-version = "1.3.0"
+version = "1.4.0"
 description = "Open-source deterministic SEC filing analytics: parse, metrics, diff, score"
 readme = "README-PYPI.md"
 license = { text = "Apache-2.0" }

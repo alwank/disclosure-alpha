@@ -8,6 +8,12 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "tests"))
+
+from disclosure_alpha.pipeline import score_filing_html
+from html_fixtures import full_coverage_10k_html, full_coverage_prior_html, minimal_10k_html
+
 EXAMPLES = ROOT / "docs" / "examples"
 
 DEAD_KEYS = frozenset(
@@ -49,3 +55,19 @@ def test_docs_examples_match_generator():
         text=True,
     )
     assert proc.returncode == 0, proc.stdout + proc.stderr
+
+
+def test_minimal_without_prior_leaves_change_score_null():
+    result = score_filing_html(minimal_10k_html(), "10-K")
+    assert result.scores.components.disclosure_change_score is None
+
+
+def test_full_coverage_10k_populates_cyber_not_event_materiality():
+    result = score_filing_html(
+        full_coverage_10k_html(), "10-K", prior_html=full_coverage_prior_html()
+    )
+    components = result.scores.components
+    assert components.cybersecurity_incident_risk_score is not None
+    assert components.event_materiality_score is None
+    assert result.scores.score_coverage_ratio == 1.0
+    assert not result.scores.missing_components

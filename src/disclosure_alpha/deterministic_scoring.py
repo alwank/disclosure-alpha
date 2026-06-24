@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
+from disclosure_alpha.analytics_config import ScoringConfig
 from disclosure_alpha.scoring_types import (
     COMPONENT_WEIGHTS,
     AggregateScores,
@@ -34,10 +35,15 @@ class DeterministicAggregationResult(MatrixAggregationResult):
     provenance: list[DeterministicComponentProvenance] = field(default_factory=list)
 
 
-def _flag_boost(flags: dict[str, bool] | None, names: list[str]) -> float:
+def _flag_boost(
+    flags: dict[str, bool] | None,
+    names: list[str],
+    *,
+    points: float = 15.0,
+) -> float:
     if not flags:
         return 0.0
-    return 15.0 if any(flags.get(n) for n in names) else 0.0
+    return points if any(flags.get(n) for n in names) else 0.0
 
 
 def _merged_flags(section_flags: dict[str, dict[str, bool]] | None) -> dict[str, bool]:
@@ -127,7 +133,9 @@ def aggregate_deterministic_matrix(
     section_flags: dict[str, dict[str, bool]] | None = None,
     language_deltas: dict[str, dict[str, float]] | None = None,
     section_densities: dict[str, dict[str, float]] | None = None,
+    config: ScoringConfig | None = None,
 ) -> DeterministicAggregationResult:
+    cfg = config or ScoringConfig.default()
     m_1a = _section_metrics(section_metrics, "item_1a_risk_factors")
     m_7, _mdna_section = _mdna_metrics(section_metrics, section_densities)
     flags = _merged_flags(section_flags)
@@ -183,7 +191,9 @@ def aggregate_deterministic_matrix(
         _metric(m_7, "margin_pressure_density"),
         weights=[0.40, 0.35, 0.25, 0.10, 0.05, 0.05],
     )
-    guidance_boost = _flag_boost(flags, ["guidance_withdrawal_flag"])
+    guidance_boost = _flag_boost(
+        flags, ["guidance_withdrawal_flag"], points=cfg.flag_boost_points
+    )
     mdna_inputs: dict[str, Any] = {
         "uncertainty_word_ratio": _metric(m_7, "uncertainty_word_ratio"),
         "modal_word_ratio": _metric(m_7, "modal_word_ratio"),
@@ -220,7 +230,9 @@ def aggregate_deterministic_matrix(
         else None
     )
     legal_flag_boost = _flag_boost(
-        flags, ["investigation_flag", "material_legal_proceeding_flag"]
+        flags,
+        ["investigation_flag", "material_legal_proceeding_flag"],
+        points=cfg.flag_boost_points,
     )
     legal_inputs: dict[str, Any] = {
         "litigious_word_ratio": _metric(m_1a, "litigious_word_ratio"),
@@ -245,7 +257,9 @@ def aggregate_deterministic_matrix(
         _metric(m_7, "liquidity_constraint_density"),
         weights=[0.50, 0.35],
     )
-    liquidity_flag_boost = _flag_boost(flags, ["going_concern_flag", "covenant_breach_flag"])
+    liquidity_flag_boost = _flag_boost(
+        flags, ["going_concern_flag", "covenant_breach_flag"], points=cfg.flag_boost_points
+    )
     liquidity_inputs: dict[str, Any] = {
         "constraining_word_ratio": _metric(m_7, "constraining_word_ratio"),
         "liquidity_constraint_density": _metric(m_7, "liquidity_constraint_density"),
@@ -296,6 +310,7 @@ def aggregate_deterministic_matrix(
     ic_flag_boost = _flag_boost(
         flags,
         ["material_weakness_flag", "restatement_flag", "ineffective_controls_flag"],
+        points=cfg.flag_boost_points,
     )
     ic_inputs: dict[str, Any] = {
         "diff_controls": d_controls,
@@ -369,8 +384,8 @@ def aggregate_deterministic_matrix(
         tone_negativity_score=provenance[9].value,
     )
 
-    comp_map = {k: v for k, v in components.__dict__.items() if k in COMPONENT_WEIGHTS}
-    overall, coverage, missing = overall_from_components(comp_map, COMPONENT_WEIGHTS)
+    comp_map = {k: v for k, v in components.__dict__.items() if k in cfg.component_weights}
+    overall, coverage, missing = overall_from_components(comp_map, cfg.component_weights)
 
     aggregates = aggregate_split_scores(components)
     if aggregates.disclosure_quality_score is None and components.boilerplate_risk_score is not None:
@@ -387,7 +402,6 @@ def aggregate_deterministic_matrix(
     )
 
 
-_FLAG_EVIDENCE_SCORE = 65.0
 _SERIOUS_IC_FLAGS = ["material_weakness_flag", "restatement_flag", "ineffective_controls_flag"]
 _LEGAL_FLAGS = ["investigation_flag", "material_legal_proceeding_flag"]
 _LIQUIDITY_FLAGS = ["going_concern_flag", "covenant_breach_flag"]
@@ -433,6 +447,7 @@ def _internal_controls_risk_score_v2(
     section_diffs: dict[str, float | None],
     section_flags: dict[str, dict[str, bool]] | None,
     flags: dict[str, bool],
+    scoring: ScoringConfig,
 ) -> tuple[float | None, dict[str, Any]]:
     m_1a = _section_metrics(section_metrics, "item_1a_risk_factors")
     evidence: list[ScoreEvidence] = []
@@ -463,7 +478,7 @@ def _internal_controls_risk_score_v2(
             evidence.append(
                 ScoreEvidence(
                     flag,
-                    _FLAG_EVIDENCE_SCORE,
+                    scoring.flag_evidence_score,
                     0.5,
                     section=_flag_section(section_flags, flag),
                     raw_value=True,
@@ -482,6 +497,7 @@ def _legal_regulatory_risk_score_v2(
     language_deltas: dict[str, dict[str, float]] | None,
     section_flags: dict[str, dict[str, bool]] | None,
     flags: dict[str, bool],
+    scoring: ScoringConfig,
 ) -> tuple[float | None, dict[str, Any]]:
     evidence: list[ScoreEvidence] = []
     for section in _LEGAL_SECTIONS:
@@ -513,7 +529,7 @@ def _legal_regulatory_risk_score_v2(
             evidence.append(
                 ScoreEvidence(
                     flag,
-                    _FLAG_EVIDENCE_SCORE,
+                    scoring.flag_evidence_score,
                     0.5,
                     section=_flag_section(section_flags, flag),
                     raw_value=True,
@@ -532,6 +548,7 @@ def _liquidity_stress_score_v2(
     section_densities: dict[str, dict[str, float]] | None,
     section_flags: dict[str, dict[str, bool]] | None,
     flags: dict[str, bool],
+    scoring: ScoringConfig,
 ) -> tuple[float | None, dict[str, Any]]:
     m_7, mdna_section = _mdna_metrics(section_metrics, section_densities)
     m_1a = _section_metrics(section_metrics, "item_1a_risk_factors")
@@ -575,7 +592,7 @@ def _liquidity_stress_score_v2(
             evidence.append(
                 ScoreEvidence(
                     flag,
-                    _FLAG_EVIDENCE_SCORE,
+                    scoring.flag_evidence_score,
                     0.5,
                     section=_flag_section(section_flags, flag),
                     raw_value=True,
@@ -592,6 +609,7 @@ def _cybersecurity_incident_risk_score_v2(
     *,
     section_flags: dict[str, dict[str, bool]] | None,
     flags: dict[str, bool],
+    scoring: ScoringConfig,
 ) -> tuple[float | None, dict[str, Any]]:
     evidence: list[ScoreEvidence] = []
     if flags.get("cybersecurity_incident_flag"):
@@ -600,7 +618,7 @@ def _cybersecurity_incident_risk_score_v2(
             evidence.append(
                 ScoreEvidence(
                     "cybersecurity_incident_flag",
-                    _FLAG_EVIDENCE_SCORE,
+                    scoring.flag_evidence_score,
                     0.7,
                     section=section,
                     raw_value=True,
@@ -619,6 +637,7 @@ def _event_materiality_score_v2(
     section_flags: dict[str, dict[str, bool]] | None,
     section_diffs: dict[str, float | None],
     flags: dict[str, bool],
+    scoring: ScoringConfig,
 ) -> tuple[float | None, dict[str, Any]]:
     evidence: list[ScoreEvidence] = []
     event_flags = [
@@ -635,7 +654,7 @@ def _event_materiality_score_v2(
                 evidence.append(
                     ScoreEvidence(
                         flag,
-                        _FLAG_EVIDENCE_SCORE,
+                        scoring.flag_evidence_score,
                         0.45,
                         section=section,
                         raw_value=True,
@@ -718,10 +737,12 @@ def aggregate_deterministic_matrix_v2(
     section_densities: dict[str, dict[str, float]] | None = None,
     calibration_context: Any | None = None,
     section_diffs_v2: dict[str, float | None] | None = None,
+    config: ScoringConfig | None = None,
 ) -> DeterministicAggregationResult:
     """Scoring v2: section-specific evidence, flag-only paths, calibrated tone ratios."""
     from disclosure_alpha.calibration import CalibrationContext, calibrate_metric, calibration_provenance
 
+    cfg = config or ScoringConfig.default()
     diffs_for_change = section_diffs_v2 if section_diffs_v2 else section_diffs
     ctx = calibration_context or CalibrationContext()
     base = aggregate_deterministic_matrix(
@@ -730,6 +751,7 @@ def aggregate_deterministic_matrix_v2(
         section_flags=section_flags,
         language_deltas=language_deltas,
         section_densities=section_densities,
+        config=cfg,
     )
     flags = _merged_flags(section_flags)
     m_1a = _section_metrics(section_metrics, "item_1a_risk_factors")
@@ -770,6 +792,7 @@ def aggregate_deterministic_matrix_v2(
         language_deltas=language_deltas,
         section_flags=section_flags,
         flags=flags,
+        scoring=cfg,
     )
     _replace_provenance(base.provenance, "legal_regulatory_risk_score", legal_score, legal_inputs)
     base.components.legal_regulatory_risk_score = legal_score
@@ -779,6 +802,7 @@ def aggregate_deterministic_matrix_v2(
         section_densities=section_densities,
         section_flags=section_flags,
         flags=flags,
+        scoring=cfg,
     )
     _replace_provenance(base.provenance, "liquidity_stress_score", liquidity_score, liquidity_inputs)
     base.components.liquidity_stress_score = liquidity_score
@@ -788,6 +812,7 @@ def aggregate_deterministic_matrix_v2(
         section_diffs=section_diffs,
         section_flags=section_flags,
         flags=flags,
+        scoring=cfg,
     )
     _replace_provenance(base.provenance, "internal_controls_risk_score", ic_score, ic_inputs)
     base.components.internal_controls_risk_score = ic_score
@@ -795,6 +820,7 @@ def aggregate_deterministic_matrix_v2(
     cyber_score, cyber_inputs = _cybersecurity_incident_risk_score_v2(
         section_flags=section_flags,
         flags=flags,
+        scoring=cfg,
     )
     base.components.cybersecurity_incident_risk_score = cyber_score
     if cyber_score is not None:
@@ -812,6 +838,7 @@ def aggregate_deterministic_matrix_v2(
         section_flags=section_flags,
         section_diffs=diffs_for_change,
         flags=flags,
+        scoring=cfg,
     )
     base.components.event_materiality_score = event_score
     if event_score is not None:
@@ -824,8 +851,8 @@ def aggregate_deterministic_matrix_v2(
             )
         )
 
-    comp_map = {k: v for k, v in base.components.__dict__.items() if k in COMPONENT_WEIGHTS}
-    overall, coverage, missing = overall_from_components(comp_map, COMPONENT_WEIGHTS)
+    comp_map = {k: v for k, v in base.components.__dict__.items() if k in cfg.component_weights}
+    overall, coverage, missing = overall_from_components(comp_map, cfg.component_weights)
     base.overall_disclosure_risk_score = overall
     base.score_coverage_ratio = round(coverage, 4)
     base.missing_components = missing

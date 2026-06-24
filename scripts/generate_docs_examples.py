@@ -15,7 +15,12 @@ sys.path.insert(0, str(ROOT / "tests"))
 
 from disclosure_alpha.pipeline import score_filing_html
 from disclosure_alpha.version import SCORING_MODEL_VERSION
-from html_fixtures import minimal_10k_html, minimal_prior_html
+from html_fixtures import (
+    full_coverage_10k_html,
+    full_coverage_prior_html,
+    minimal_10k_html,
+    minimal_prior_html,
+)
 
 EXAMPLES = ROOT / "docs" / "examples"
 
@@ -96,7 +101,9 @@ def generate() -> dict[str, str]:
     with_prior = score_filing_html(
         minimal_10k_html(), "10-K", prior_html=minimal_prior_html()
     )
-    full_coverage = with_prior
+    full_coverage = score_filing_html(
+        full_coverage_10k_html(), "10-K", prior_html=full_coverage_prior_html()
+    )
 
     outputs = {
         "score-minimal-10k.json": _dump_json(minimal.to_dict()),

@@ -92,6 +92,8 @@ Full coverage (all nine headline components) with prior + Item 1A + MD&A:
 :language: json
 ```
 
+This fixture uses Item 1A incident language, so `cybersecurity_incident_risk_score` is populated. `event_materiality_score` is **`null`** because the example is 10-K only — that field needs extracted 8-K event sections (see {doc}`../reference/score-catalog`).
+
 ## Component guide
 
 ```{include} ../_includes/component-plain-english.md

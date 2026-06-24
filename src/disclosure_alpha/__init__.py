@@ -2,6 +2,7 @@
 
 from importlib.metadata import PackageNotFoundError, version as _pkg_version
 
+from disclosure_alpha.analytics_config import PipelineConfig, ScoringConfig
 from disclosure_alpha.deterministic_scoring import (
     DeterministicAggregationResult,
     aggregate_deterministic_matrix,
@@ -37,7 +38,9 @@ __all__ = [
     "METRICS_ENGINE_VERSION",
     "MetricsResult",
     "PARSER_VERSION",
+    "PipelineConfig",
     "SCORING_MODEL_VERSION",
+    "ScoringConfig",
     "aggregate_deterministic_matrix",
     "compute_section_metrics",
     "extract_sections",
@@ -51,4 +54,4 @@ __all__ = [
 try:
     __version__ = _pkg_version("disclosure-alpha")
 except PackageNotFoundError:
-    __version__ = "1.3.0"  # editable install fallback
+    __version__ = "1.4.0"  # editable install fallback

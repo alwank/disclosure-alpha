@@ -514,3 +514,46 @@ def test_v2_event_materiality_8k():
         section_flags={"item_8_01": {"investigation_flag": True}},
     )
     assert agg.components.event_materiality_score is not None
+
+
+def test_scoring_config_zero_flag_boost_suppresses_v1_boosts():
+    from disclosure_alpha.analytics_config import ScoringConfig
+
+    kwargs = {
+        "section_metrics": {
+            "item_7_mdna": {
+                "uncertainty_word_ratio": 0.05,
+                "modal_word_ratio": 0.03,
+                "readability_score": 35,
+                "constraining_word_ratio": 0.02,
+            }
+        },
+        "section_diffs": {},
+        "section_flags": {"item_7_mdna": {"guidance_withdrawal_flag": True}},
+    }
+    default = aggregate_deterministic_matrix(**kwargs)
+    no_boost = aggregate_deterministic_matrix(
+        **kwargs,
+        config=ScoringConfig(flag_boost_points=0.0),
+    )
+    assert default.components.mdna_uncertainty_score is not None
+    assert no_boost.components.mdna_uncertainty_score is not None
+    assert no_boost.components.mdna_uncertainty_score < default.components.mdna_uncertainty_score
+
+
+def test_scoring_config_flag_evidence_score_changes_v2_flag_only_path():
+    from disclosure_alpha.analytics_config import ScoringConfig
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    kwargs = {
+        "section_metrics": {},
+        "section_diffs": {},
+        "section_flags": {"item_3_legal_proceedings": {"investigation_flag": True}},
+    }
+    default = aggregate_deterministic_matrix_v2(**kwargs)
+    higher = aggregate_deterministic_matrix_v2(
+        **kwargs,
+        config=ScoringConfig(flag_evidence_score=80.0),
+    )
+    assert default.components.legal_regulatory_risk_score == 65.0
+    assert higher.components.legal_regulatory_risk_score == 80.0

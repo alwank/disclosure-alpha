@@ -13,6 +13,7 @@ from disclosure_alpha.text_metrics import tokenize_words
 MATRIX_SECTIONS_10K = (
     "item_1a_risk_factors",
     "item_7_mdna",
+    "item_7a_market_risk",
     "item_9a_controls",
     "item_3_legal_proceedings",
     "item_1c_cybersecurity",

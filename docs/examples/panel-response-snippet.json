@@ -11,7 +11,7 @@
       "scores": {
         "overall_disclosure_risk_score": 33.159052,
         "score_coverage_ratio": 0.7778,
-        "confidence_score": 0.3426,
+        "confidence_score": 0.0226,
         "missing_components": [
           "disclosure_change_score",
           "event_severity_score"
@@ -43,7 +43,6 @@
     "failed": 1
   },
   "versions": {
-    "dictionary_version": "built_in_dictionaries_v3",
     "scoring_model_version": "deterministic_scoring_v2"
   }
 }

@@ -136,11 +136,11 @@ def _sec_parser_class(form_type: str):
     return sp.Edgar10QParser
 
 
-def _parse_blocks(html: str, *, form_type: str = "10-K") -> list[ParserBlock]:
+def _parse_blocks(html: str, *, form_type: str = "10-K") -> tuple[list[ParserBlock], str | None]:
     try:
         import sec_parser as sp  # noqa: F401 — availability check
     except ImportError:
-        return []
+        return [], "sec_parser_unavailable"
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -148,12 +148,12 @@ def _parse_blocks(html: str, *, form_type: str = "10-K") -> list[ParserBlock]:
             elements = _sec_parser_class(form_type)().parse(html or "")
         except ImportError as exc:
             logger.warning("sec_parser dependency unavailable during parse: %s", exc)
-            return []
+            return [], "sec_parser_unavailable"
         except Exception as exc:
             if not type(exc).__module__.startswith("sec_parser"):
                 raise
             logger.warning("sec_parser parse failed: %s", exc)
-            return []
+            return [], "sec_parser_unavailable"
 
     blocks: list[ParserBlock] = []
     cursor = 0
@@ -182,7 +182,7 @@ def _parse_blocks(html: str, *, form_type: str = "10-K") -> list[ParserBlock]:
             )
         )
         cursor = end
-    return blocks
+    return blocks, None
 
 
 def _section_pattern(section_name: str) -> re.Pattern[str]:
@@ -770,12 +770,21 @@ def _extract_from_sec_parser(
     return results
 
 
+def _stamp_parse_warning(
+    sections: list[ExtractedSection], warning: str
+) -> list[ExtractedSection]:
+    if not sections or warning in sections[0].warnings:
+        return sections
+    first = replace(sections[0], warnings=[*sections[0].warnings, warning])
+    return [first, *sections[1:]]
+
+
 def extract_sections(document: FilingDocument) -> list[ExtractedSection]:
     from disclosure_alpha.version import PARSER_VERSION
 
     parser_version = PARSER_VERSION
     section_map = sections_for_form_type(document.form_type)
-    blocks = _parse_blocks(document.html, form_type=document.form_type)
+    blocks, parse_warning = _parse_blocks(document.html, form_type=document.form_type)
     fallback = _extract_sections_fallback(document, parser_version)
 
     if not blocks:
@@ -786,6 +795,9 @@ def extract_sections(document: FilingDocument) -> list[ExtractedSection]:
             results = fallback
         else:
             results = _merge_with_fallback(primary, fallback, section_map)
+
+    if parse_warning:
+        results = _stamp_parse_warning(results, parse_warning)
 
     results = _ensure_item1a(document, results, parser_version)
     return _tag_extraction_suspect(results)

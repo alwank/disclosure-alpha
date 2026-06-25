@@ -90,6 +90,7 @@ def test_disclosure_changes_with_prior(mock_metrics, mock_score):
     assert resp.status_code == 200
     body = resp.json()
     assert "section_diffs" in body
+    assert "section_diffs_v2" in body
     assert "language_deltas" in body
     change_score = body["change_score"]
     assert change_score["value"] is not None or change_score["missing_reason"] is not None
@@ -142,3 +143,25 @@ def test_disclosure_changes_10q_passes_form_type(mock_metrics, mock_score):
     assert resp.status_code == 200
     mock_score.assert_called_once()
     assert mock_score.call_args.kwargs["form_type"] == "10-Q"
+
+
+@patch("disclosure_alpha.api.endpoints.changes.score_for_model")
+@patch("disclosure_alpha.api.endpoints.changes.metrics_filing_ticker")
+def test_disclosure_changes_scoring_model_version(mock_metrics, mock_score):
+    result = _metrics_with_prior()
+    mock_metrics.return_value = result
+    scored = score_filing_html(minimal_10k_html(), "10-K", prior_html=minimal_prior_html())
+    mock_score.return_value = scored.scores
+    resp = client.get(
+        "/v1/company/AAPL/disclosure-changes",
+        params={
+            "fiscal_year": 2025,
+            "compare": "prior",
+            "scoring_model_version": "deterministic_scoring_v1",
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["versions"]["scoring_model_version"] == "deterministic_scoring_v1"
+    mock_score.assert_called_once()
+    assert mock_score.call_args.args[1] == "deterministic_scoring_v1"

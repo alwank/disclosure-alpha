@@ -364,6 +364,59 @@ def test_compute_section_metrics_aggregates_section_warnings():
     assert warned_score < clean_score
 
 
+def test_sec_parser_unavailable_lowers_confidence():
+    import hashlib
+
+    from disclosure_alpha.pipeline import compute_section_metrics, score_for_model
+    from disclosure_alpha.section_extractor import ExtractedSection
+    from disclosure_alpha.version import PARSER_VERSION
+
+    def _section(name: str, text: str, warnings: list[str] | None = None) -> ExtractedSection:
+        cleaned = text.strip()
+        return ExtractedSection(
+            section_name=name,
+            raw_text=cleaned,
+            cleaned_text=cleaned,
+            text_hash=hashlib.sha256(cleaned.encode()).hexdigest()[:16],
+            word_count=len(cleaned.split()),
+            sentence_count=1,
+            extraction_confidence=0.9,
+            extraction_method="test",
+            parser_version=PARSER_VERSION,
+            warnings=warnings or [],
+        )
+
+    text_1a = "We may face litigation and regulatory investigation. " * 20
+    text_7 = "Revenue may decline amid margin pressure and liquidity constraints. " * 20
+    warned = compute_section_metrics(
+        [
+            _section("item_1a_risk_factors", text_1a, ["sec_parser_unavailable"]),
+            _section("item_7_mdna", text_7),
+        ],
+        form_type="10-K",
+    )
+    assert "sec_parser_unavailable" in warned.extraction_warnings
+    warned_score = score_for_model(warned).confidence_score
+
+    clean = compute_section_metrics(
+        [_section("item_1a_risk_factors", text_1a), _section("item_7_mdna", text_7)],
+        form_type="10-K",
+    )
+    clean_score = score_for_model(clean).confidence_score
+    assert warned_score < clean_score
+
+
+def test_score_filing_html_includes_confidence_details():
+    from html_fixtures import minimal_10k_html
+
+    result = score_filing_html(minimal_10k_html(), "10-K")
+    details = result.scores.confidence_details
+    assert details is not None
+    assert "base" in details
+    assert "penalties" in details
+    assert "confidence_details" in result.to_dict()["scores"]
+
+
 def test_score_panel_tickers_handles_expected_errors(monkeypatch):
     from disclosure_alpha.edgar.types import FilingNotFoundError
     from disclosure_alpha.pipeline import score_panel_tickers

@@ -34,6 +34,18 @@ The analysis cohort is post-filter extractions with sufficient word count and ex
 
 The volatility association uses **435** tickers with valid 90-day realized-vol outcomes — a separate pairing cohort from the 478-firm construct sample.
 
+## Validation scopes
+
+Headline numbers on this page come from **different validation runs** with different cohorts. Do not assume one sample size applies to every row.
+
+| Claim on this page | Cohort | Score source |
+|--------------------|--------|--------------|
+| Specificity / boilerplate (n=478) | Item 1A extract quality filters | Per-section metrics on `item_1a_risk_factors` |
+| Vol Q5/Q1 (n=435) | Outcome pairing subset | `overall_disclosure_risk_score` v2 |
+| L3 outcome gates (n=497) | Full-matrix cache run | Committed L3 report (see below) |
+
+The committed L3 outcomes report (`data/validation/reports/l3_outcomes_report_fy2025_v2.json`) uses **full-matrix cache mode** (`score_mode: cache`) over **497** tickers with valid outcomes. Its volatility quintile ratio (**≈ 1.12**, Q5/Q1) is a different scope from the Item 1A construct table and the n=435 vol row above.
+
 ## Specificity construct validity
 
 | | |

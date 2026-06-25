@@ -91,6 +91,7 @@ def score_deterministic_tool(
             "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
             "score_coverage_ratio": scores.score_coverage_ratio,
             "confidence_score": scores.confidence_score,
+            "confidence_details": scores.confidence_details,
             "missing_components": scores.missing_components,
             "components": asdict(scores.components),
             "aggregates": asdict(scores.aggregates),

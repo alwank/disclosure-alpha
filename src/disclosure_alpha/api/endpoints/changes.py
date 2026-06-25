@@ -5,10 +5,15 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Query
 
 from disclosure_alpha.api.endpoints.deps import parse_form_quarter, run_edgar
-from disclosure_alpha.api.helpers import parse_compare_param, parse_sections_param
+from disclosure_alpha.api.helpers import (
+    parse_compare_param,
+    parse_scoring_model_version,
+    parse_sections_param,
+)
 from disclosure_alpha.api.schemas import ChangesResponse, ErrorResponse
 from disclosure_alpha.api.shapes import shape_changes_payload
 from disclosure_alpha.pipeline import filter_metrics_result, metrics_filing_ticker, score_for_model
+from disclosure_alpha.version import SCORING_MODEL_VERSION
 
 router = APIRouter(tags=["changes"])
 
@@ -29,10 +34,15 @@ def disclosure_changes(
     quarter: str | None = Query(None),
     compare: str = Query("prior"),
     sections: str | None = Query(None),
+    scoring_model_version: str = Query(
+        SCORING_MODEL_VERSION,
+        description="Scoring model: deterministic_scoring_v2 (default) or deterministic_scoring_v1",
+    ),
 ) -> ChangesResponse:
     base, q = parse_form_quarter(form_type, quarter)
     try:
         compare_prior = parse_compare_param(compare)
+        scoring_version = parse_scoring_model_version(scoring_model_version)
         section_filter = parse_sections_param(sections, form_type=base)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -53,14 +63,19 @@ def disclosure_changes(
                 form_type=base,
                 sections=result.sections,
             )
-        scores = score_for_model(metrics, form_type=base) if compare_prior else None
+        scores = (
+            score_for_model(metrics, scoring_version, form_type=base) if compare_prior else None
+        )
         shaped = shape_changes_payload(metrics, scores)
+        versions = dict(result.versions)
+        versions["scoring_model_version"] = scoring_version
         return ChangesResponse(
             filing=result.filing,
             section_diffs=shaped["section_diffs"],
+            section_diffs_v2=shaped["section_diffs_v2"],
             language_deltas=shaped["language_deltas"],
             change_score=shaped["change_score"],
-            versions=result.versions,
+            versions=versions,
         )
 
     return run_edgar(_fetch)

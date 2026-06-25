@@ -121,22 +121,39 @@
     },
     "language_deltas": {},
     "section_diffs_v2": {},
-    "extraction_confs": [
-      0.35,
-      0.35
-    ],
+    "extraction_confs": {
+      "item_1a_risk_factors": 0.35,
+      "item_7_mdna": 0.35
+    },
     "diff_confs": [
       0.2,
       0.2
     ],
-    "extraction_warnings": [],
+    "extraction_warnings": [
+      "short_section",
+      "last_resort_extraction",
+      "open_ended_boundary",
+      "item1a_resliced",
+      "extraction_suspect",
+      "early_candidate"
+    ],
     "required_sections_present": true,
     "has_prior": false
   },
   "scores": {
     "overall_disclosure_risk_score": 33.159052,
     "score_coverage_ratio": 0.7778,
-    "confidence_score": 0.3426,
+    "confidence_score": 0.0226,
+    "confidence_details": {
+      "base": 0.4426,
+      "penalties": {
+        "short_section": 0.08,
+        "last_resort_extraction": 0.12,
+        "extraction_suspect": 0.12,
+        "no_prior_filing": 0.1
+      },
+      "total_penalty": 0.42
+    },
     "missing_components": [
       "disclosure_change_score",
       "event_severity_score"
@@ -283,10 +300,8 @@
       {
         "score_name": "event_severity_score",
         "value": null,
-        "inputs": {
-          "diff_1a": null
-        },
-        "source": "deterministic"
+        "inputs": {},
+        "source": "deterministic_v2"
       },
       {
         "score_name": "specificity_quality_score",

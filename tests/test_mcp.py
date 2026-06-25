@@ -68,6 +68,8 @@ def test_mcp_score_deterministic_tool():
     assert payload["overall_disclosure_risk_score"] is not None
     assert "aggregates" in payload
     assert payload["scoring_model_version"] == SCORING_MODEL_VERSION
+    assert "confidence_details" in payload
+    assert "base" in payload["confidence_details"]
 
 
 def test_mcp_score_deterministic_tool_v2():
@@ -111,6 +113,7 @@ def test_mcp_score_filing_html_tool():
     assert "scores" in payload
     assert "metrics" in payload
     assert "versions" in payload
+    assert "confidence_details" in payload["scores"]
 
 
 @patch("disclosure_alpha.mcp.tools.score_for_model")

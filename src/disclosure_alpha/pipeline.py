@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from disclosure_alpha.analytics_config import PipelineConfig, build_versions, resolve_pipeline_config
-from disclosure_alpha.confidence import ConfidenceInput, compute_confidence_detailed, compute_overall_confidence
+from disclosure_alpha.confidence import ConfidenceInput, compute_confidence_detailed
 from disclosure_alpha.deterministic_scoring import (
     DeterministicAggregationResult,
     aggregate_deterministic_matrix,
@@ -82,6 +82,7 @@ class FilingScoreResult:
                 "overall_disclosure_risk_score": self.scores.overall_disclosure_risk_score,
                 "score_coverage_ratio": self.scores.score_coverage_ratio,
                 "confidence_score": self.scores.confidence_score,
+                "confidence_details": self.scores.confidence_details,
                 "missing_components": self.scores.missing_components,
                 "components": asdict(self.scores.components),
                 "aggregates": asdict(self.scores.aggregates),
@@ -202,6 +203,24 @@ def compute_section_metrics(
     )
 
 
+def _apply_confidence(
+    result: DeterministicAggregationResult, metrics: MetricsResult
+) -> None:
+    avg_diff_conf = (
+        sum(metrics.diff_confs) / len(metrics.diff_confs) if metrics.diff_confs else None
+    )
+    result.confidence_score, result.confidence_details = compute_confidence_detailed(
+        ConfidenceInput(
+            extraction_confidences=list(metrics.extraction_confs.values()),
+            extraction_warnings=metrics.extraction_warnings,
+            coverage_ratio=result.score_coverage_ratio,
+            required_sections_present=metrics.required_sections_present,
+            diff_confidence=avg_diff_conf,
+            has_prior=metrics.has_prior,
+        )
+    )
+
+
 def score_deterministic(
     metrics: MetricsResult,
     *,
@@ -217,17 +236,7 @@ def score_deterministic(
         section_densities=metrics.section_densities,
         config=pipeline_config.scoring,
     )
-    avg_diff_conf = (
-        sum(metrics.diff_confs) / len(metrics.diff_confs) if metrics.diff_confs else None
-    )
-    result.confidence_score = compute_overall_confidence(
-        extraction_confidences=list(metrics.extraction_confs.values()),
-        coverage_ratio=result.score_coverage_ratio,
-        diff_confidence=avg_diff_conf,
-        extraction_warnings=metrics.extraction_warnings,
-        required_sections_present=metrics.required_sections_present,
-        has_prior=metrics.has_prior,
-    )
+    _apply_confidence(result, metrics)
     return result
 
 
@@ -249,19 +258,7 @@ def score_deterministic_v2(
         calibration_context=pipeline_config.resolved_calibration(form_type=form_type),
         config=pipeline_config.scoring,
     )
-    avg_diff_conf = (
-        sum(metrics.diff_confs) / len(metrics.diff_confs) if metrics.diff_confs else None
-    )
-    result.confidence_score, _ = compute_confidence_detailed(
-        ConfidenceInput(
-            extraction_confidences=list(metrics.extraction_confs.values()),
-            extraction_warnings=metrics.extraction_warnings,
-            coverage_ratio=result.score_coverage_ratio,
-            required_sections_present=metrics.required_sections_present,
-            diff_confidence=avg_diff_conf,
-            has_prior=metrics.has_prior,
-        )
-    )
+    _apply_confidence(result, metrics)
     return result
 
 

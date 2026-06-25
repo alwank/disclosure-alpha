@@ -44,6 +44,7 @@ legacy = score_for_model(metrics, "deterministic_scoring_v1")
 | `liquidity_stress_score` | MD&A constraining + liquidity density + +15 flag boost | MD&A-first evidence with Item 1A fallback; flags as weighted evidence |
 | `internal_controls_risk_score` | Controls diff + Item 1A constraining + +15 flag boost | Section-specific controls diff + constraining + serious flags as evidence |
 | Confidence | `compute_overall_confidence()` (also used by v1 after P1-2) | `compute_confidence_detailed()` with explicit penalty breakdown |
+| Confidence details in responses | CLI and MCP score payloads include `confidence_details` | HTTP matrix/changes expose scalar `confidence_score` only (for now) |
 | Unchanged components | — | `disclosure_change_score`, `mdna_uncertainty_score`, `boilerplate_risk_score`, `event_severity_score`, `tone_negativity_score`, `specificity_quality_score`, headline weights |
 
 Full blend specs: {doc}`../methodology/aggregation` (v1 and v2 sections are labeled separately).

@@ -15,6 +15,7 @@ class ChangeScore(BaseModel):
 class ChangesResponse(BaseModel):
     filing: dict[str, Any]
     section_diffs: dict[str, float | None] = Field(default_factory=dict)
+    section_diffs_v2: dict[str, float | None] = Field(default_factory=dict)
     language_deltas: dict[str, dict[str, float]] = Field(default_factory=dict)
     change_score: ChangeScore
     versions: dict[str, str]

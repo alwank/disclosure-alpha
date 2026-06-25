@@ -27,13 +27,13 @@ Use issue numbers from the [Unified Issues Table](#unified-issues-table) below.
 | 8 | P1 | Extraction | done | `_metrics_dict()` preserves `None`; `section_metrics` typed `float \| None` |
 | 9 | P1 | Extraction | done | `missing_required_section` no longer stamped on every extracted section |
 | 10 | P1 | Analytics | done | v2 matrix uses `diffs_for_change` throughout; `event_severity_score` null in v2 path |
-| 11 | P2 | Analytics | open | Reconcile `evidence.md` vs L3 report |
-| 12 | P2 | Analytics | open | Expose `confidence_details` |
-| 13 | P2 | Analytics | open | Changes API v2 diffs + scoring version param |
-| 14 | P2 | Extraction | open | Surface sec_parser failures in warnings |
-| 15 | P2 | Extraction | open | Add `item_7a_market_risk` to matrix corpus |
-| 16 | P2 | Analytics | open | Populate `COMMITTED_REPORTS` or document emptiness |
-| 17 | P2 | Both | open | Integration tests for #1, #3, #5 |
+| 11 | P2 | Analytics | done | Validation scopes table in `evidence.md` links Item 1A vs L3 cohorts |
+| 12 | P2 | Analytics | done | `confidence_details` on CLI `to_dict()` and MCP score payloads; HTTP deferred |
+| 13 | P2 | Analytics | done | Changes API exposes `section_diffs_v2` + `scoring_model_version` query param |
+| 14 | P2 | Extraction | done | `sec_parser_unavailable` warning when `_parse_blocks` fails |
+| 15 | P2 | Extraction | done | `item_7a_market_risk` in `MATRIX_SECTIONS_10K` |
+| 16 | P2 | Analytics | done | L3 report registered in `COMMITTED_REPORTS` |
+| 17 | P2 | Both | done | Integration tests for extraction metadata, form_type, filter scoping, P2 surfaces |
 
 
 ---

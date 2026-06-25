@@ -33,6 +33,7 @@ class DeterministicComponentProvenance:
 @dataclass
 class DeterministicAggregationResult(MatrixAggregationResult):
     provenance: list[DeterministicComponentProvenance] = field(default_factory=list)
+    confidence_details: dict[str, object] | None = None
 
 
 def _flag_boost(

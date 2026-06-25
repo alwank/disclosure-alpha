@@ -58,10 +58,25 @@ def test_parse_blocks_passes_form_type_to_parser():
         "disclosure_alpha.section_extractor._sec_parser_class",
         return_value=parser_cls,
     ):
-        _parse_blocks("<html></html>", form_type="10-K")
+        blocks, warning = _parse_blocks("<html></html>", form_type="10-K")
 
+    assert blocks == []
+    assert warning is None
     parser_cls.assert_called_once()
     parser_instance.parse.assert_called_once_with("<html></html>")
+
+
+def test_extract_sections_stamps_sec_parser_unavailable_warning():
+    html = FIXTURE.read_text(encoding="utf-8")
+    with patch(
+        "disclosure_alpha.section_extractor._parse_blocks",
+        return_value=([], "sec_parser_unavailable"),
+    ):
+        sections = extract_sections(
+            FilingDocument(cik="1", accession_number="x", form_type="10-K", html=html)
+        )
+    assert sections
+    assert "sec_parser_unavailable" in sections[0].warnings
 
 
 def test_extract_sections_passes_form_type_to_parse_blocks():

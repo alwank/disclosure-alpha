@@ -45,7 +45,7 @@ Terms used across CLI, HTTP, Python, and methodology docs.
 | Artifact | Current value |
 |----------|---------------|
 | Parser | `section_extractor_v1` |
-| Metrics engine | `text_metrics_v3` |
+| Metrics engine | `text_metrics_v4` |
 | Scoring model | `deterministic_scoring_v2` |
 | Dictionary | `built_in_dictionaries_v3` |
 

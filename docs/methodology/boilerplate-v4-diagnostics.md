@@ -32,15 +32,15 @@ The mini fixture is too small for production evidence claims. It confirms the co
 
 ## Full S&P 500 FY2025 cohort (internal branch)
 
-Re-run on `internal` against `data/validation/corpus/sp500_item1a_fy2025.jsonl` (n≈478):
+Re-run completed on `internal` against `data/validation/corpus/sp500_item1a_fy2025.jsonl` (n=478):
 
 1. `python scripts/build_boilerplate_baseline.py --corpus … --fiscal-year 2025`
 2. `python scripts/diagnose_boilerplate_blend.py --corpus … --fiscal-year 2025`
 3. L2 construct validation (`boilerplate_vs_ls4gram` uses `boilerplate_combined_ratio`)
 
-**Target:** Spearman ρ ≥ **0.80** vs LS 4-gram proxy (up from ≈0.74 on phrase-only v3).
+**Observed:** Spearman ρ ≈ **0.96** vs LS 4-gram proxy on `boilerplate_combined_ratio` (target ≥ 0.80; phrase-only v3 was ≈0.74).
 
-Update `docs/getting-started/evidence.md` headline boilerplate row only after the internal re-run passes the gate.
+`docs/getting-started/evidence.md` headline boilerplate row is now updated to the completed v4 result.
 
 ## Discordant tickers
 

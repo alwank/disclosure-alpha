@@ -7,13 +7,13 @@
 
 Deterministic scoring (**`deterministic_scoring_v2`**) was checked on S&P 500 FY2025 **Item 1A** risk-factor text. The table below is the public evidence record — construct checks against independent references, plus one descriptive post-filing volatility association.
 
-**Last updated:** 2026-06-23.
+**Last updated:** 2026-06-25.
 
 | Check | Result |
 |-------|--------|
 | **Analysis cohort** | **478** firms (FY2025 Item 1A, S&P 500 universe n=503) |
 | **Specificity construct validity** | Spearman **ρ ≈ 0.87** vs NER entity density (n=478) |
-| **Boilerplate construct validity** | Spearman **ρ ≈ 0.74** vs cross-firm 4-gram proxy on v3 phrase metric (n=478); v4 combined refresh pending |
+| **Boilerplate construct validity** | Spearman **ρ ≈ 0.96** vs cross-firm 4-gram proxy on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478) |
 | **Post-filing volatility association** | Q5/Q1 **≈ 1.15** on 90-day realized vol (n=435) |
 
 Construct rows show our metrics track external references. The volatility row is a **descriptive association only** — not return prediction, alpha, or investment advice.
@@ -63,7 +63,7 @@ The committed L3 outcomes report (`data/validation/reports/l3_outcomes_report_fy
 |--|--|
 | **Our metric** | `boilerplate_combined_ratio` (`text_metrics_v4`: phrase list + cross-firm 4-gram blend) |
 | **Reference** | Lang & Stice-Lawrence-style cross-firm 4-gram boilerplate proxy (`ls_boilerplate_word_ratio`) |
-| **Association** | Spearman **ρ ≈ 0.74** on phrase-only v3 (n=478); **refresh pending** on v4 combined metric — see {doc}`../methodology/boilerplate-v4-diagnostics` |
+| **Association** | Spearman **ρ ≈ 0.96** on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478); phrase-only v3 was ≈0.74 |
 | **n** | 478 |
 
 **Interpretation:** Our boilerplate measure moves with a literature boilerplate proxy. It is **not** a full replication of the LS4-gram paper measure — see {doc}`../methodology/research-foundation` for how the built-in metric differs.

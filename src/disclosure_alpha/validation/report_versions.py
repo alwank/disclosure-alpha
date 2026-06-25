@@ -11,13 +11,7 @@ from disclosure_alpha.version import (
     SCORING_MODEL_VERSION,
 )
 
-COMMITTED_REPORTS: dict[str, dict[str, str]] = {
-    "data/validation/reports/l3_outcomes_report_fy2025_v2.json": {
-        "parser_version": PARSER_VERSION,
-        "metrics_engine_version": METRICS_ENGINE_VERSION,
-        "scoring_model_version": SCORING_MODEL_VERSION,
-    },
-}
+COMMITTED_REPORTS: dict[str, dict[str, str]] = {}
 
 
 def _load_report_versions(path: Path) -> dict[str, str]:

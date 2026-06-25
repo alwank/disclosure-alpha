@@ -78,7 +78,7 @@ For aggregation, ratios are multiplied by 100 before blending into 0–100 compo
 |-------|---------|
 | `boilerplate_phrase_ratio` | `min(1.0, phrase_hits / sentence_count)` |
 | `boilerplate_cross_firm_ratio` | fraction of words in committed cross-firm 4-grams (`data/baselines/item_1a_risk_factors_boilerplate_4grams_fy{year}.json`) |
-| `boilerplate_combined_ratio` | `0.4 × phrase + 0.6 × cross_firm` (default blend; see {doc}`boilerplate-v4-diagnostics`) |
+| `boilerplate_combined_ratio` | `0.4 × phrase + 0.6 × cross_firm` (default blend) |
 
 Phrase hits use `BOILERPLATE_PHRASES` in `dictionaries.py`. Cross-firm grams follow Lang & Stice-Lawrence-style universe frequency (≥25% of docs in baseline build). `boilerplate_risk_score` uses **`boilerplate_combined_ratio`** in aggregation.
 

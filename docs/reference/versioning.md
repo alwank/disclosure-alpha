@@ -6,7 +6,7 @@ How package, parser, metrics, dictionary, and scoring versions relate — and wh
 
 | Layer | Where it appears | Example |
 |-------|------------------|---------|
-| **Package** | `pip show disclosure-alpha` | `1.4.0` |
+| **Package** | `pip show disclosure-alpha` | `1.5.0` |
 | **Parser** | JSON `versions.parser_version` | `section_extractor_v1` |
 | **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v4` |
 | **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v3` |
@@ -68,8 +68,8 @@ Public empirical evidence for v2: {doc}`../getting-started/evidence`.
 ## Pin a release
 
 ```bash
-pip install "disclosure-alpha==1.4.0"
-pip install "disclosure-alpha==1.4.0[api,mcp]"
+pip install "disclosure-alpha==1.5.0"
+pip install "disclosure-alpha==1.5.0[api,mcp]"
 ```
 
 See {doc}`../getting-started/installation`.

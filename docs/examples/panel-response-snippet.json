@@ -9,7 +9,7 @@
         "form_type": "10-K"
       },
       "scores": {
-        "overall_disclosure_risk_score": 33.159052,
+        "overall_disclosure_risk_score": 33.618821,
         "score_coverage_ratio": 0.7778,
         "confidence_score": 0.0226,
         "missing_components": [
@@ -22,7 +22,7 @@
           "mdna_uncertainty_score": 26.726221,
           "legal_regulatory_risk_score": 37.6724,
           "liquidity_stress_score": 4.030477,
-          "boilerplate_risk_score": 42.528733,
+          "boilerplate_risk_score": 45.977,
           "internal_controls_risk_score": 3.4483,
           "event_severity_score": null,
           "specificity_quality_score": 36.2069,

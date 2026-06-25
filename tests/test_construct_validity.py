@@ -133,6 +133,17 @@ def test_boilerplate_reference_monotonic():
     assert ratios["B"] > ratios["C"]
 
 
+def test_construct_report_includes_boilerplate_combined_pair():
+    report = run_construct_validation(
+        MINI_CORPUS,
+        config=ConstructConfig(min_n=3, boilerplate_min_docs=2),
+    )
+    bp = report.pairs["boilerplate_vs_ls4gram"]
+    assert bp.ours_field == "boilerplate_combined_ratio"
+    assert bp.ref_field == "ls_boilerplate_word_ratio"
+    assert "boilerplate_phrase_vs_ls4gram" in report.diagnostics
+
+
 def test_construct_report_shape():
     report = run_construct_validation(
         MINI_CORPUS,

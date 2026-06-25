@@ -135,7 +135,7 @@ Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/lates
   },
   "versions": {
     "parser_version": "section_extractor_v1",
-    "metrics_engine_version": "text_metrics_v3",
+    "metrics_engine_version": "text_metrics_v4",
     "dictionary_version": "built_in_dictionaries_v3",
     "scoring_model_version": "deterministic_scoring_v2",
     "analytics_config_id": "builtin_default"

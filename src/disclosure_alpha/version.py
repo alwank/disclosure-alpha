@@ -1,5 +1,5 @@
 PARSER_VERSION = "section_extractor_v1"
-METRICS_ENGINE_VERSION = "text_metrics_v3"
+METRICS_ENGINE_VERSION = "text_metrics_v4"
 SCORING_MODEL_VERSION_V1 = "deterministic_scoring_v1"
 SCORING_MODEL_VERSION = "deterministic_scoring_v2"
 SCORING_MODEL_VERSION_V2 = SCORING_MODEL_VERSION

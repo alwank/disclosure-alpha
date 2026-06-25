@@ -13,6 +13,7 @@ _DEFAULT_PERCENTILES: dict[str, dict[str, list[float]]] = {
         "negative_word_ratio": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.10, 0.12, 0.15],
         "uncertainty_word_ratio": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.09, 0.11, 0.14],
         "boilerplate_phrase_ratio": [0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 0.22],
+        "boilerplate_combined_ratio": [0.03, 0.06, 0.09, 0.12, 0.15, 0.18, 0.21, 0.24, 0.27, 0.32],
         "readability_score": [20.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 75.0],
     }
 }

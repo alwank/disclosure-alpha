@@ -112,6 +112,8 @@ def _metrics_dict(metrics) -> dict[str, float | None]:
         ),
         "constraining_word_ratio": _f(metrics.constraining_word_ratio),
         "boilerplate_phrase_ratio": _f(metrics.boilerplate_phrase_ratio),
+        "boilerplate_cross_firm_ratio": _f(getattr(metrics, "boilerplate_cross_firm_ratio", None)),
+        "boilerplate_combined_ratio": _f(getattr(metrics, "boilerplate_combined_ratio", None)),
         "numeric_specificity_score": _f(metrics.numeric_specificity_score),
         "company_specificity_score": _f(metrics.company_specificity_score),
         "readability_score": _f(metrics.readability_score),
@@ -151,6 +153,7 @@ def compute_section_metrics(
     prior_sections: list[ExtractedSection] | None = None,
     *,
     form_type: str = "10-K",
+    fiscal_year: int | None = None,
 ) -> MetricsResult:
     section_metrics: dict[str, dict[str, float]] = {}
     section_diffs: dict[str, float | None] = {}
@@ -164,7 +167,9 @@ def compute_section_metrics(
     for section in sections:
         extraction_confs[section.section_name] = float(section.extraction_confidence or 0.5)
         text = section.cleaned_text or ""
-        metrics = compute_text_metrics(SectionTextInput(section.section_name, text))
+        metrics = compute_text_metrics(
+            SectionTextInput(section.section_name, text, fiscal_year=fiscal_year)
+        )
         section_metrics[section.section_name] = _metrics_dict(metrics)
         section_flags[section.section_name] = detect_section_flags(text, section.section_name)
         section_densities[section.section_name] = compute_density_metrics(text, section.section_name)
@@ -287,6 +292,7 @@ def score_filing_html(
     cik: str = "",
     accession_number: str = "",
     config: PipelineConfig | None = None,
+    fiscal_year: int | None = None,
 ) -> FilingScoreResult:
     sections = extract_sections_from_html(
         html, form_type, cik=cik, accession_number=accession_number
@@ -299,7 +305,9 @@ def score_filing_html(
             cik=cik,
             accession_number="prior",
         )
-    metrics = compute_section_metrics(sections, prior_sections, form_type=form_type)
+    metrics = compute_section_metrics(
+        sections, prior_sections, form_type=form_type, fiscal_year=fiscal_year
+    )
     pipeline_config = resolve_pipeline_config(config)
     scores = score_for_model(metrics, config=pipeline_config, form_type=form_type)
     return FilingScoreResult(
@@ -477,7 +485,7 @@ def metrics_filing_ticker(
             accession_number="prior",
         )
     metrics = compute_section_metrics(
-        sections, prior_sections, form_type=bundle.ref.form_type
+        sections, prior_sections, form_type=bundle.ref.form_type, fiscal_year=bundle.ref.fiscal_year
     )
     return FilingMetricsResult(
         metrics=metrics,
@@ -512,6 +520,7 @@ def score_filing_ticker(
         cik=bundle.ref.cik,
         accession_number=bundle.ref.accession_number,
         config=config,
+        fiscal_year=bundle.ref.fiscal_year,
     )
     result.filing = _filing_meta(bundle.ref, prior_accession=bundle.prior_accession)
     return result

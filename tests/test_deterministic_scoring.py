@@ -8,6 +8,7 @@ _BASE_METRICS = {
         "uncertainty_word_ratio": 0.1,
         "litigious_word_ratio": 0.05,
         "boilerplate_phrase_ratio": 0.1,
+        "boilerplate_combined_ratio": 0.1,
         "numeric_specificity_score": 20,
         "company_specificity_score": 30,
         "constraining_word_ratio": 0.02,
@@ -99,6 +100,7 @@ def test_missing_mdna_does_not_synthesize_mdna_scores():
                 "uncertainty_word_ratio": 0.01,
                 "litigious_word_ratio": 0.01,
                 "boilerplate_phrase_ratio": 0.01,
+                "boilerplate_combined_ratio": 0.01,
                 "numeric_specificity_score": 10,
                 "company_specificity_score": 10,
             }
@@ -121,6 +123,7 @@ def test_explicit_zero_metric_values_count_as_present_evidence():
                 "uncertainty_word_ratio": 0.0,
                 "litigious_word_ratio": 0.0,
                 "boilerplate_phrase_ratio": 0.0,
+                "boilerplate_combined_ratio": 0.0,
                 "numeric_specificity_score": 0.0,
                 "company_specificity_score": 0.0,
                 "constraining_word_ratio": 0.0,
@@ -154,6 +157,7 @@ def test_flag_boost_cap_at_100():
                 "uncertainty_word_ratio": 0.5,
                 "litigious_word_ratio": 0.5,
                 "boilerplate_phrase_ratio": 0.1,
+        "boilerplate_combined_ratio": 0.1,
                 "numeric_specificity_score": 5,
                 "company_specificity_score": 5,
                 "constraining_word_ratio": 0.5,
@@ -188,6 +192,7 @@ def test_coverage_math_partial_components():
                 "uncertainty_word_ratio": 0.01,
                 "litigious_word_ratio": 0.01,
                 "boilerplate_phrase_ratio": 0.01,
+                "boilerplate_combined_ratio": 0.01,
                 "numeric_specificity_score": 10,
                 "company_specificity_score": 10,
             }
@@ -207,6 +212,7 @@ def test_deterministic_coverage_partial_without_mdna():
                 "uncertainty_word_ratio": 0.01,
                 "litigious_word_ratio": 0.01,
                 "boilerplate_phrase_ratio": 0.01,
+                "boilerplate_combined_ratio": 0.01,
                 "numeric_specificity_score": 10,
                 "company_specificity_score": 10,
             }
@@ -278,6 +284,7 @@ def test_flag_boost_raises_liquidity_not_wildly():
                 "uncertainty_word_ratio": 0.05,
                 "litigious_word_ratio": 0.02,
                 "boilerplate_phrase_ratio": 0.05,
+                "boilerplate_combined_ratio": 0.05,
                 "numeric_specificity_score": 30,
                 "company_specificity_score": 30,
                 "constraining_word_ratio": 0.02,
@@ -298,6 +305,7 @@ def test_flag_boost_raises_liquidity_not_wildly():
                 "uncertainty_word_ratio": 0.05,
                 "litigious_word_ratio": 0.02,
                 "boilerplate_phrase_ratio": 0.05,
+                "boilerplate_combined_ratio": 0.05,
                 "numeric_specificity_score": 30,
                 "company_specificity_score": 30,
                 "constraining_word_ratio": 0.02,
@@ -351,6 +359,7 @@ def test_disclosure_quality_score_zero_boilerplate():
         section_metrics={
             "item_1a_risk_factors": {
                 "boilerplate_phrase_ratio": 0.0,
+                "boilerplate_combined_ratio": 0.0,
                 "numeric_specificity_score": 100.0,
                 "company_specificity_score": 100.0,
             },

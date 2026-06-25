@@ -6,6 +6,14 @@ Version history for parser, metrics engine, dictionary packs, and scoring model.
 
 Python SDK configuration for tunable scoring and reproducibility metadata.
 
+### text_metrics_v4 (2026-06-25)
+
+| Area | Change |
+|------|--------|
+| **Metrics engine** | `text_metrics_v4` — `boilerplate_cross_firm_ratio`, `boilerplate_combined_ratio`; `boilerplate_risk_score` uses combined ratio |
+| **Baselines** | `data/baselines/item_1a_risk_factors_boilerplate_4grams_fy2025.json` committed 4-gram set |
+| **Validation** | L2 construct primary pair: `boilerplate_combined_ratio` vs LS 4-gram |
+
 ### What shipped
 
 | Area | Change |

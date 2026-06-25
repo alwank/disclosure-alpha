@@ -1,5 +1,5 @@
 {
-  "overall_disclosure_risk_score": 32.309751,
+  "overall_disclosure_risk_score": 32.692892,
   "score_coverage_ratio": 0.8889,
   "confidence_score": 0.3159,
   "missing_components": [
@@ -11,7 +11,7 @@
     "mdna_uncertainty_score": 26.726221,
     "legal_regulatory_risk_score": 30.317069,
     "liquidity_stress_score": 4.030477,
-    "boilerplate_risk_score": 42.528733,
+    "boilerplate_risk_score": 45.977,
     "internal_controls_risk_score": 3.4483,
     "event_severity_score": null,
     "specificity_quality_score": 36.2069,
@@ -23,7 +23,7 @@
     "disclosure_quality_score": 36.2069,
     "disclosure_deterioration_score": 38.6268,
     "static_disclosure_quality_score": 36.2069,
-    "static_disclosure_risk_score": 18.7244,
+    "static_disclosure_risk_score": 19.299111,
     "disclosure_change_risk_score": 38.6268
   }
 }

@@ -52,6 +52,8 @@
         "legal_regulatory_phrase_ratio": 0.0,
         "constraining_word_ratio": 0.034483,
         "boilerplate_phrase_ratio": 0.0,
+        "boilerplate_cross_firm_ratio": 0.172414,
+        "boilerplate_combined_ratio": 0.103448,
         "numeric_specificity_score": 34.4828,
         "company_specificity_score": 37.931,
         "readability_score": 59.8759
@@ -67,6 +69,8 @@
         "legal_regulatory_phrase_ratio": 0.0,
         "constraining_word_ratio": 0.071429,
         "boilerplate_phrase_ratio": 0.0,
+        "boilerplate_cross_firm_ratio": 0.285714,
+        "boilerplate_combined_ratio": 0.171429,
         "numeric_specificity_score": 71.4286,
         "company_specificity_score": 28.5714,
         "readability_score": 64.0
@@ -141,7 +145,7 @@
     "has_prior": false
   },
   "scores": {
-    "overall_disclosure_risk_score": 33.159052,
+    "overall_disclosure_risk_score": 33.618821,
     "score_coverage_ratio": 0.7778,
     "confidence_score": 0.0226,
     "confidence_details": {
@@ -164,7 +168,7 @@
       "mdna_uncertainty_score": 26.726221,
       "legal_regulatory_risk_score": 37.6724,
       "liquidity_stress_score": 4.030477,
-      "boilerplate_risk_score": 42.528733,
+      "boilerplate_risk_score": 45.977,
       "internal_controls_risk_score": 3.4483,
       "event_severity_score": null,
       "specificity_quality_score": 36.2069,
@@ -176,7 +180,7 @@
       "disclosure_quality_score": 36.2069,
       "disclosure_deterioration_score": null,
       "static_disclosure_quality_score": 36.2069,
-      "static_disclosure_risk_score": 19.950289,
+      "static_disclosure_risk_score": 20.525,
       "disclosure_change_risk_score": null
     },
     "provenance": [
@@ -275,9 +279,11 @@
       },
       {
         "score_name": "boilerplate_risk_score",
-        "value": 42.528733,
+        "value": 45.977,
         "inputs": {
+          "boilerplate_combined_ratio": 0.103448,
           "boilerplate_phrase_ratio": 0.0,
+          "boilerplate_cross_firm_ratio": 0.172414,
           "numeric_specificity_score": 34.4828,
           "company_specificity_score": 37.931
         },
@@ -325,7 +331,7 @@
   },
   "versions": {
     "parser_version": "section_extractor_v1",
-    "metrics_engine_version": "text_metrics_v3",
+    "metrics_engine_version": "text_metrics_v4",
     "dictionary_version": "built_in_dictionaries_v3",
     "analytics_config_id": "builtin_default",
     "scoring_model_version": "deterministic_scoring_v2"

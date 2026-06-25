@@ -8,7 +8,7 @@ How package, parser, metrics, dictionary, and scoring versions relate — and wh
 |-------|------------------|---------|
 | **Package** | `pip show disclosure-alpha` | `1.4.0` |
 | **Parser** | JSON `versions.parser_version` | `section_extractor_v1` |
-| **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v3` |
+| **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v4` |
 | **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v3` |
 | **Scoring model** | JSON `versions.scoring_model_version` | `deterministic_scoring_v2` (default) or `deterministic_scoring_v1` (legacy) |
 | **Analytics config** | JSON `versions.analytics_config_id` | `builtin_default` or a custom id / `custom_<hash>` from `PipelineConfig` |
@@ -54,6 +54,16 @@ Full blend specs: {doc}`../methodology/aggregation` (v1 and v2 sections are labe
 **No — treat them as different score scales.** v2 recalibrates Item 1A tone inputs and replaces fixed +15 flag boosts with evidence-weighted blends. Numeric levels, cross-filing ranks, and time-series comparisons must stay within one scoring version. When migrating dashboards or stored scores, re-score historical filings with v2 or keep v1 pinned; do not mix versions in the same panel without relabeling.
 
 Public empirical evidence for v2: {doc}`../getting-started/evidence`.
+
+### text_metrics_v4 (2026-06-25)
+
+| Area | Change |
+|------|--------|
+| Boilerplate | `boilerplate_cross_firm_ratio` + `boilerplate_combined_ratio` (0.4 phrase + 0.6 cross-firm 4-gram); `boilerplate_risk_score` reads combined ratio |
+| Baselines | Committed FY2025 Item 1A 4-gram set under `data/baselines/` |
+| L2 construct | Primary pair: `boilerplate_combined_ratio` vs LS 4-gram reference |
+
+`boilerplate_phrase_ratio` is unchanged for audit. Re-score filings to compare v3 vs v4 levels.
 
 ## Pin a release
 

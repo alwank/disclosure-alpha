@@ -52,6 +52,17 @@ def test_modal_split_preserves_compatibility():
     assert result.modal_word_ratio > 0
 
 
+def test_boilerplate_v4_fields_present():
+    text = "There can be no assurance that results may materially adversely affect our business."
+    result = compute_text_metrics(
+        SectionTextInput("item_1a_risk_factors", text, fiscal_year=2025)
+    )
+    assert result.boilerplate_phrase_ratio > 0
+    assert 0.0 <= result.boilerplate_cross_firm_ratio <= 1.0
+    assert 0.0 <= result.boilerplate_combined_ratio <= 1.0
+    assert result.boilerplate_combined_ratio >= result.boilerplate_phrase_ratio * 0.4
+
+
 def test_boilerplate_ratio():
     text = "There can be no assurance that results may materially adversely affect our business."
     result = compute_text_metrics(SectionTextInput("item_1a_risk_factors", text))

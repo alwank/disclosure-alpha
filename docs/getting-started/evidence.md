@@ -13,7 +13,7 @@ Deterministic scoring (**`deterministic_scoring_v2`**) was checked on S&P 500 FY
 |-------|--------|
 | **Analysis cohort** | **478** firms (FY2025 Item 1A, S&P 500 universe n=503) |
 | **Specificity construct validity** | Spearman **ρ ≈ 0.87** vs NER entity density (n=478) |
-| **Boilerplate construct validity** | Spearman **ρ ≈ 0.74** vs cross-firm 4-gram boilerplate proxy (n=478) |
+| **Boilerplate construct validity** | Spearman **ρ ≈ 0.74** vs cross-firm 4-gram proxy on v3 phrase metric (n=478); v4 combined refresh pending |
 | **Post-filing volatility association** | Q5/Q1 **≈ 1.15** on 90-day realized vol (n=435) |
 
 Construct rows show our metrics track external references. The volatility row is a **descriptive association only** — not return prediction, alpha, or investment advice.
@@ -28,7 +28,7 @@ Construct rows show our metrics track external references. The volatility row is
 | Rows after quality filters | **478** |
 | Rows skipped (short text) | 19 |
 | Scoring model | `deterministic_scoring_v2` |
-| Parser / metrics / dictionary | `section_extractor_v1`, `text_metrics_v3`, `built_in_dictionaries_v3` |
+| Parser / metrics / dictionary | `section_extractor_v1`, `text_metrics_v4`, `built_in_dictionaries_v3` |
 
 The analysis cohort is post-filter extractions with sufficient word count and extraction confidence. It does **not** imply 100% index coverage — some tickers are missing from the corpus or fail extraction.
 
@@ -61,9 +61,9 @@ The committed L3 outcomes report (`data/validation/reports/l3_outcomes_report_fy
 
 | | |
 |--|--|
-| **Our metric** | `boilerplate_phrase_ratio` (section-level phrase hit rate) |
+| **Our metric** | `boilerplate_combined_ratio` (`text_metrics_v4`: phrase list + cross-firm 4-gram blend) |
 | **Reference** | Lang & Stice-Lawrence-style cross-firm 4-gram boilerplate proxy (`ls_boilerplate_word_ratio`) |
-| **Association** | Spearman **ρ ≈ 0.74** |
+| **Association** | Spearman **ρ ≈ 0.74** on phrase-only v3 (n=478); **refresh pending** on v4 combined metric — see {doc}`../methodology/boilerplate-v4-diagnostics` |
 | **n** | 478 |
 
 **Interpretation:** Our boilerplate measure moves with a literature boilerplate proxy. It is **not** a full replication of the LS4-gram paper measure — see {doc}`../methodology/research-foundation` for how the built-in metric differs.

@@ -280,7 +280,7 @@ def aggregate_deterministic_matrix(
 
     boilerplate_risk = (
         blend_scores(
-            _scaled_metric(m_1a, "boilerplate_phrase_ratio"),
+            _scaled_metric(m_1a, "boilerplate_combined_ratio"),
             _inverse_metric(m_1a, "numeric_specificity_score"),
             _inverse_metric(m_1a, "company_specificity_score"),
             weights=[1 / 3, 1 / 3, 1 / 3],
@@ -293,7 +293,9 @@ def aggregate_deterministic_matrix(
             score_name="boilerplate_risk_score",
             value=clamp_score(boilerplate_risk) if boilerplate_risk is not None else None,
             inputs={
+                "boilerplate_combined_ratio": _metric(m_1a, "boilerplate_combined_ratio"),
                 "boilerplate_phrase_ratio": _metric(m_1a, "boilerplate_phrase_ratio"),
+                "boilerplate_cross_firm_ratio": _metric(m_1a, "boilerplate_cross_firm_ratio"),
                 "numeric_specificity_score": _metric(m_1a, "numeric_specificity_score"),
                 "company_specificity_score": _metric(m_1a, "company_specificity_score"),
             },

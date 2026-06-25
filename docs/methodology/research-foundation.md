@@ -38,9 +38,11 @@ Empirical results on the current release: {doc}`../getting-started/evidence`.
 
 | Our metric | Literature basis |
 |------------|------------------|
-| `boilerplate_phrase_ratio` | Lang & Stice-Lawrence — boilerplate risk-factor language; we use a fixed phrase list matched per section |
+| `boilerplate_phrase_ratio` | Lang & Stice-Lawrence — boilerplate risk-factor language; fixed phrase list matched per section |
+| `boilerplate_cross_firm_ratio` | Lang & Stice-Lawrence — cross-firm 4-gram word share (`text_metrics_v4`) |
+| `boilerplate_combined_ratio` | Blended production boilerplate input for `boilerplate_risk_score` (`text_metrics_v4`) |
 
-Our measure is a section-level phrase hit rate, not Lang & Stice-Lawrence's cross-firm 4-gram frequency measure.
+Our phrase measure is a section-level phrase hit rate. The cross-firm measure uses committed universe 4-gram frequency — closer to the LS validation reference than phrase-only v3.
 
 ## Readability
 

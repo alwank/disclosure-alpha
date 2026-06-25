@@ -43,7 +43,7 @@ See `INTERNAL_VALIDATION.md` for the internal branch that hosts the full validat
 
 When writing docs or examples, match [Evidence and validation](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/evidence.html) and [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html):
 
-- **Supported:** on **478** S&P 500 FY2025 Item 1A sections (`deterministic_scoring_v2`), company-specificity correlates **ρ ≈ 0.87** with an independent NER-based specificity measure
+- **Supported:** on **478** S&P 500 FY2025 Item 1A sections (`deterministic_scoring_v2`), company-specificity correlates **ρ ≈ 0.87** with an independent NER-based specificity measure and boilerplate combined ratio correlates **ρ ≈ 0.96** with an LS-style 4-gram proxy
 - **Do not claim:** full-index coverage, earnings-surprise prediction, buy/sell signals, or investment alpha
 
 ## Pull requests

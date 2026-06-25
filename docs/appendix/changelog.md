@@ -2,6 +2,33 @@
 
 Version history for parser, metrics engine, dictionary packs, and scoring model.
 
+## 1.5.0 (2026-06-25)
+
+Metrics-engine v4 release with refreshed boilerplate construct evidence and extraction/scoring pipeline fixes.
+
+### text_metrics_v4
+
+| Area | Change |
+|------|--------|
+| **Metrics engine** | `text_metrics_v4` — `boilerplate_cross_firm_ratio`, `boilerplate_combined_ratio`; `boilerplate_risk_score` uses combined ratio |
+| **Baselines** | `data/baselines/item_1a_risk_factors_boilerplate_4grams_fy2025.json` committed 4-gram set |
+| **Validation** | L2 construct primary pair: `boilerplate_combined_ratio` vs LS 4-gram at **ρ ≈ 0.96** (n=478) |
+
+### Extraction and scoring fixes
+
+| Area | Change |
+|------|--------|
+| **Extraction metadata** | `confidence_details` and extraction metadata surfaced consistently across matrix/changes responses |
+| **Diff payload** | `section_diffs_v2` parity improvements in API/MCP payloads |
+| **Form-aware scoring** | `form_type` wiring tightened on rescoring paths to align calibration behavior |
+
+### Docs and evidence refresh
+
+| Area | Change |
+|------|--------|
+| **Evidence docs** | Public evidence and scope docs updated to boilerplate construct **ρ ≈ 0.96** |
+| **Version pins** | Installation/versioning/glossary docs aligned to `1.5.0` + `text_metrics_v4` |
+
 ## 1.4.0 (2026-06-24)
 
 Python SDK configuration for tunable scoring and reproducibility metadata.

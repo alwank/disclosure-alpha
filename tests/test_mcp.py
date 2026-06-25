@@ -68,6 +68,8 @@ def test_mcp_score_deterministic_tool():
     assert payload["overall_disclosure_risk_score"] is not None
     assert "aggregates" in payload
     assert payload["scoring_model_version"] == SCORING_MODEL_VERSION
+    assert "confidence_details" in payload
+    assert "base" in payload["confidence_details"]
 
 
 def test_mcp_score_deterministic_tool_v2():
@@ -111,6 +113,18 @@ def test_mcp_score_filing_html_tool():
     assert "scores" in payload
     assert "metrics" in payload
     assert "versions" in payload
+    assert "confidence_details" in payload["scores"]
+
+
+@patch("disclosure_alpha.mcp.tools.score_for_model")
+@patch("disclosure_alpha.mcp.tools.score_filing_html")
+def test_mcp_score_filing_html_tool_10q_passes_form_type(mock_score_html, mock_score_model):
+    scored = score_filing_html(minimal_10k_html(), "10-K")
+    mock_score_html.return_value = scored
+    mock_score_model.return_value = scored.scores
+    score_filing_html_tool(minimal_10k_html(), "10-Q")
+    mock_score_model.assert_called_once()
+    assert mock_score_model.call_args.kwargs["form_type"] == "10-Q"
 
 
 @patch("disclosure_alpha.pipeline.score_filing_ticker")

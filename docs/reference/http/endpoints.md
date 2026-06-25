@@ -49,6 +49,7 @@ Disclosure Changes
 | `quarter` | query | no | object |  |
 | `compare` | query | no | string |  |
 | `sections` | query | no | object |  |
+| `scoring_model_version` | query | no | string | Scoring model: deterministic_scoring_v2 (default) or deterministic_scoring_v1 |
 
 **Response (200):** `ChangesResponse`
 

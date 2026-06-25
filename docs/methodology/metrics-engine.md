@@ -6,7 +6,7 @@
 |--|--|
 | **Inputs** | Extracted section `cleaned_text` per section name |
 | **Outputs** | Per-section ratios, flags, MD&A densities (`TextMetricResult`) |
-| **Version** | `text_metrics_v3`, dictionary `built_in_dictionaries_v3` |
+| **Version** | `text_metrics_v4`, dictionary `built_in_dictionaries_v3` |
 
 ## In plain terms
 
@@ -29,7 +29,7 @@ Computes per-section text metrics, boolean risk flags, and MD&A keyword densitie
 ## Input / output
 
 ```python
-SectionTextInput(section_name: str, cleaned_text: str) → TextMetricResult
+SectionTextInput(section_name: str, cleaned_text: str, fiscal_year: int | None = None) → TextMetricResult
 ```
 
 All ratios are **per-word** unless noted. Scores on the 0–100 scale are capped with `min(100, ...)`.
@@ -77,8 +77,10 @@ For aggregation, ratios are multiplied by 100 before blending into 0–100 compo
 | Field | Formula |
 |-------|---------|
 | `boilerplate_phrase_ratio` | `min(1.0, phrase_hits / sentence_count)` |
+| `boilerplate_cross_firm_ratio` | fraction of words in committed cross-firm 4-grams (`data/baselines/item_1a_risk_factors_boilerplate_4grams_fy{year}.json`) |
+| `boilerplate_combined_ratio` | `0.4 × phrase + 0.6 × cross_firm` (default blend) |
 
-Matched against `BOILERPLATE_PHRASES` in `dictionaries.py`.
+Phrase hits use `BOILERPLATE_PHRASES` in `dictionaries.py`. Cross-firm grams follow Lang & Stice-Lawrence-style universe frequency (≥25% of docs in baseline build). `boilerplate_risk_score` uses **`boilerplate_combined_ratio`** in aggregation.
 
 ### Readability
 

@@ -51,6 +51,7 @@ def shape_changes_payload(
             missing_reason = "no prior filing comparison available"
     return {
         "section_diffs": metrics.section_diffs,
+        "section_diffs_v2": metrics.section_diffs_v2,
         "language_deltas": metrics.language_deltas,
         "change_score": {"value": change_value, "missing_reason": missing_reason},
     }

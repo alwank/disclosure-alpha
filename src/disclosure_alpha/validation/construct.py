@@ -10,6 +10,7 @@ from typing import Any
 
 import numpy as np
 
+from disclosure_alpha.boilerplate import DEFAULT_BLEND_WEIGHTS
 from disclosure_alpha.text_metrics import SectionTextInput, compute_text_metrics
 from disclosure_alpha.validation.corpus import (
     CorpusLoadConfig,
@@ -46,6 +47,7 @@ class ConstructConfig:
     scoring_model_version: str = SCORING_MODEL_VERSION
     use_ner_cache: bool = True
     refresh_ner_cache: bool = False
+    boilerplate_blend_weights: tuple[float, float] = DEFAULT_BLEND_WEIGHTS
 
 
 def spearman_rho(x: list[float], y: list[float]) -> float | None:
@@ -75,16 +77,27 @@ def _discordant_tickers(
     return [t for _, t in gaps[:top_k]]
 
 
-def _compute_ours(rows: list[CorpusRow], *, progress_every: int = 25) -> dict[str, dict[str, float]]:
+def _compute_ours(
+    rows: list[CorpusRow],
+    *,
+    progress_every: int = 25,
+    blend_weights: tuple[float, float] = DEFAULT_BLEND_WEIGHTS,
+) -> dict[str, dict[str, float]]:
     out: dict[str, dict[str, float]] = {}
     total = len(rows)
     for i, row in enumerate(rows, start=1):
         m = compute_text_metrics(
-            SectionTextInput(row.section_name, row.cleaned_text)
+            SectionTextInput(
+                row.section_name,
+                row.cleaned_text,
+                fiscal_year=row.fiscal_year,
+            )
         )
         out[row.ticker] = {
             "company_specificity_per_word": m.company_specificity_score / 100.0,
             "boilerplate_phrase_ratio": m.boilerplate_phrase_ratio,
+            "boilerplate_cross_firm_ratio": m.boilerplate_cross_firm_ratio,
+            "boilerplate_combined_ratio": m.boilerplate_combined_ratio,
             "boilerplate_phrase_ratio_per_word": m.boilerplate_phrase_ratio / max(
                 1, m.word_count
             ),
@@ -200,8 +213,14 @@ def run_construct_validation(
         print(f"Universe coverage: {len(present & expected)}/{len(expected)}", flush=True)
 
     print(f"Computing text metrics for {len(rows)} firms...", flush=True)
-    ours = _compute_ours(rows)
-    diagnostics: dict[str, Any] = {"specificity_compare": "company_specificity_per_word vs ner_entity_density"}
+    ours = _compute_ours(rows, blend_weights=cfg.boilerplate_blend_weights)
+    diagnostics: dict[str, Any] = {
+        "specificity_compare": "company_specificity_per_word vs ner_entity_density",
+        "boilerplate_blend_weights": {
+            "phrase": cfg.boilerplate_blend_weights[0],
+            "cross_firm": cfg.boilerplate_blend_weights[1],
+        },
+    }
 
     print("Running spaCy NER (slowest step)...", flush=True)
     ner_by_ticker, ner_msg = compute_ner_densities(
@@ -248,13 +267,29 @@ def run_construct_validation(
         rows,
         ours,
         ls_bp,
-        ours_field="boilerplate_phrase_ratio",
+        ours_field="boilerplate_combined_ratio",
         ref_field="ls_boilerplate_word_ratio",
         threshold=0.50,
         skip_message=bp_skip,
     )
     pairs["boilerplate_vs_ls4gram"] = pr
     discordant["boilerplate_vs_ls4gram"] = disc
+
+    if ls_bp is not None:
+        legacy_pr, _ = _pair_result(
+            "boilerplate_phrase_vs_ls4gram",
+            rows,
+            ours,
+            ls_bp,
+            ours_field="boilerplate_phrase_ratio",
+            ref_field="ls_boilerplate_word_ratio",
+            threshold=0.50,
+        )
+        diagnostics["boilerplate_phrase_vs_ls4gram"] = {
+            "spearman_rho": legacy_pr.spearman_rho,
+            "n": legacy_pr.n,
+            "status": legacy_pr.status,
+        }
 
     if len(rows) < cfg.min_n:
         diagnostics["warning"] = f"n={len(rows)} below recommended min_n={cfg.min_n}"

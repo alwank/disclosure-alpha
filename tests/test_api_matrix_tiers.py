@@ -55,7 +55,7 @@ def _dual_section_metrics_result() -> FilingMetricsResult:
             "item_7_mdna": {"liquidity_constraint_density": 3.0},
         },
         language_deltas={},
-        extraction_confs=[0.9, 0.85],
+        extraction_confs={"item_1a_risk_factors": 0.9, "item_7_mdna": 0.85},
         diff_confs=[0.8, 0.75],
     )
     return FilingMetricsResult(
@@ -184,3 +184,22 @@ def test_matrix_invalid_scoring_model_version(mock_metrics):
         },
     )
     assert resp.status_code == 422
+
+
+@patch("disclosure_alpha.api.endpoints.matrix.metrics_filing_ticker")
+@patch("disclosure_alpha.api.endpoints.matrix.score_for_model")
+def test_matrix_10q_passes_form_type_to_scoring(mock_score, mock_metrics):
+    mock_metrics.return_value = _minimal_metrics_result()
+    mock_score.return_value = score_filing_html(minimal_10k_html(), "10-K").scores
+    resp = client.get(
+        "/v1/company/AAPL/disclosure-matrix",
+        params={
+            "fiscal_year": 2025,
+            "form_type": "10-Q",
+            "quarter": "Q1",
+            "tier": "standard",
+        },
+    )
+    assert resp.status_code == 200
+    mock_score.assert_called_once()
+    assert mock_score.call_args.kwargs["form_type"] == "10-Q"

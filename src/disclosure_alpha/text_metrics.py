@@ -20,6 +20,12 @@ from disclosure_alpha.dictionaries import (
     UNCERTAINTY_WORDS,
     WEAK_MODAL_WORDS,
 )
+from disclosure_alpha.boilerplate import (
+    DEFAULT_BLEND_WEIGHTS,
+    blend_boilerplate_ratios,
+    boilerplate_cross_firm_word_ratio,
+    load_boilerplate_gram_set,
+)
 from disclosure_alpha.text_matching import (
     boilerplate_hits,
     phrase_count,
@@ -44,6 +50,7 @@ __all__ = [
 class SectionTextInput:
     section_name: str
     cleaned_text: str
+    fiscal_year: int | None = None
 
 
 @dataclass
@@ -64,6 +71,8 @@ class TextMetricResult:
     numeric_specificity_score: float
     company_specificity_score: float
     boilerplate_phrase_ratio: float
+    boilerplate_cross_firm_ratio: float
+    boilerplate_combined_ratio: float
 
 
 def _tokenize(text: str) -> list[str]:
@@ -116,6 +125,16 @@ def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
     bp_hits = boilerplate_hits(text, BOILERPLATE_PHRASES)
     boilerplate_ratio = min(1.0, bp_hits / max(1, sentence_count))
 
+    gram_set = load_boilerplate_gram_set(inp.fiscal_year)
+    cross_firm_ratio = (
+        boilerplate_cross_firm_word_ratio(text, gram_set) if gram_set is not None else 0.0
+    )
+    combined_ratio = blend_boilerplate_ratios(
+        boilerplate_ratio,
+        cross_firm_ratio,
+        weights=DEFAULT_BLEND_WEIGHTS,
+    )
+
     return TextMetricResult(
         word_count=word_count,
         sentence_count=sentence_count,
@@ -135,6 +154,8 @@ def compute_text_metrics(inp: SectionTextInput) -> TextMetricResult:
         numeric_specificity_score=round(numeric_specificity, 4),
         company_specificity_score=round(company_specificity, 4),
         boilerplate_phrase_ratio=round(boilerplate_ratio, 6),
+        boilerplate_cross_firm_ratio=round(cross_firm_ratio, 6),
+        boilerplate_combined_ratio=round(combined_ratio, 6),
     )
 
 
@@ -150,6 +171,8 @@ def compute_metric_families(inp: SectionTextInput) -> list[dict[str, float | str
         {"metric_family": "specificity", "metric_name": "numeric_specificity_score", "raw_value": base.numeric_specificity_score, "normalized_value": base.numeric_specificity_score},
         {"metric_family": "specificity", "metric_name": "company_specificity_score", "raw_value": base.company_specificity_score, "normalized_value": base.company_specificity_score},
         {"metric_family": "boilerplate", "metric_name": "boilerplate_phrase_ratio", "raw_value": base.boilerplate_phrase_ratio, "normalized_value": base.boilerplate_phrase_ratio * 100},
+        {"metric_family": "boilerplate", "metric_name": "boilerplate_cross_firm_ratio", "raw_value": base.boilerplate_cross_firm_ratio, "normalized_value": base.boilerplate_cross_firm_ratio * 100},
+        {"metric_family": "boilerplate", "metric_name": "boilerplate_combined_ratio", "raw_value": base.boilerplate_combined_ratio, "normalized_value": base.boilerplate_combined_ratio * 100},
         {"metric_family": "liquidity", "metric_name": "constraining_word_ratio", "raw_value": base.constraining_word_ratio, "normalized_value": base.constraining_word_ratio * 100},
         {"metric_family": "internal_controls", "metric_name": "modal_word_ratio", "raw_value": base.modal_word_ratio, "normalized_value": base.modal_word_ratio * 100},
     ]

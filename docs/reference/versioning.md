@@ -6,9 +6,9 @@ How package, parser, metrics, dictionary, and scoring versions relate — and wh
 
 | Layer | Where it appears | Example |
 |-------|------------------|---------|
-| **Package** | `pip show disclosure-alpha` | `1.4.0` |
+| **Package** | `pip show disclosure-alpha` | `1.5.0` |
 | **Parser** | JSON `versions.parser_version` | `section_extractor_v1` |
-| **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v3` |
+| **Metrics engine** | JSON `versions.metrics_engine_version` | `text_metrics_v4` |
 | **Dictionary** | JSON `versions.dictionary_version` | `built_in_dictionaries_v3` |
 | **Scoring model** | JSON `versions.scoring_model_version` | `deterministic_scoring_v2` (default) or `deterministic_scoring_v1` (legacy) |
 | **Analytics config** | JSON `versions.analytics_config_id` | `builtin_default` or a custom id / `custom_<hash>` from `PipelineConfig` |
@@ -44,6 +44,7 @@ legacy = score_for_model(metrics, "deterministic_scoring_v1")
 | `liquidity_stress_score` | MD&A constraining + liquidity density + +15 flag boost | MD&A-first evidence with Item 1A fallback; flags as weighted evidence |
 | `internal_controls_risk_score` | Controls diff + Item 1A constraining + +15 flag boost | Section-specific controls diff + constraining + serious flags as evidence |
 | Confidence | `compute_overall_confidence()` (also used by v1 after P1-2) | `compute_confidence_detailed()` with explicit penalty breakdown |
+| Confidence details in responses | CLI and MCP score payloads include `confidence_details` | HTTP matrix/changes expose scalar `confidence_score` only (for now) |
 | Unchanged components | — | `disclosure_change_score`, `mdna_uncertainty_score`, `boilerplate_risk_score`, `event_severity_score`, `tone_negativity_score`, `specificity_quality_score`, headline weights |
 
 Full blend specs: {doc}`../methodology/aggregation` (v1 and v2 sections are labeled separately).
@@ -54,11 +55,21 @@ Full blend specs: {doc}`../methodology/aggregation` (v1 and v2 sections are labe
 
 Public empirical evidence for v2: {doc}`../getting-started/evidence`.
 
+### text_metrics_v4 (2026-06-25)
+
+| Area | Change |
+|------|--------|
+| Boilerplate | `boilerplate_cross_firm_ratio` + `boilerplate_combined_ratio` (0.4 phrase + 0.6 cross-firm 4-gram); `boilerplate_risk_score` reads combined ratio |
+| Baselines | Committed FY2025 Item 1A 4-gram set under `data/baselines/` |
+| L2 construct | Primary pair: `boilerplate_combined_ratio` vs LS 4-gram reference |
+
+`boilerplate_phrase_ratio` is unchanged for audit. Re-score filings to compare v3 vs v4 levels.
+
 ## Pin a release
 
 ```bash
-pip install "disclosure-alpha==1.4.0"
-pip install "disclosure-alpha==1.4.0[api,mcp]"
+pip install "disclosure-alpha==1.5.0"
+pip install "disclosure-alpha==1.5.0[api,mcp]"
 ```
 
 See {doc}`../getting-started/installation`.

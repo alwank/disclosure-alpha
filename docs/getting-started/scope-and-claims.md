@@ -27,7 +27,7 @@ Scores summarize **language and change signals** in filings. They are research a
 
 Headline result: on **478** S&P 500 FY2025 Item 1A sections (`deterministic_scoring_v2`), company-specificity correlates **ρ ≈ 0.87** with an independent NER-based measure (Spearman).
 
-Full cohort counts, boilerplate construct validity (ρ ≈ 0.74), post-filing volatility association (Q5/Q1 ≈ 1.15), and limitations: {doc}`evidence`.
+Full cohort counts, boilerplate construct validity (ρ ≈ 0.96), post-filing volatility association (Q5/Q1 ≈ 1.15), and limitations: {doc}`evidence`.
 
 ## Unsupported claims
 

@@ -164,7 +164,7 @@ def evaluate_matrix_gates(
                     confidences.append(q.extraction_confidence)
 
         current, prior = _sections_from_row(row)
-        metrics = compute_section_metrics(current, prior)
+        metrics = compute_section_metrics(current, prior, form_type=row.form_type)
         scores = _aggregate_scores(metrics, scoring_model_version=scoring_model_version)
         for name in COMPONENT_FIELDS:
             if getattr(scores.components, name) is not None:

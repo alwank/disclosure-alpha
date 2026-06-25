@@ -58,6 +58,7 @@ def test_matrix_gates_smoke():
 
 def test_sections_for_form():
     assert "item_7_mdna" in sections_for_form("10-K")
+    assert "item_7a_market_risk" in sections_for_form("10-K")
     assert "item_2_mdna" in sections_for_form("10-Q")
     assert "item_1_05" in sections_for_form("8-K")
 

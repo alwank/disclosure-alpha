@@ -13,6 +13,7 @@ class ConfidenceInput:
 
 _WARNING_PENALTIES: dict[str, float] = {
     "short_section": 0.08,
+    "sec_parser_unavailable": 0.10,
     "extraction_suspect": 0.12,
     "last_resort_extraction": 0.12,
 }

@@ -52,6 +52,7 @@ exclude_patterns = [
     "readthedocs-public-docs-improvement-plan.md",
     "codebase-audit-report.md",  # repo-only audit; not public RTD nav
     "analytics-scoring-layer-improvement-plan.md",  # internal agent brief; repo-only
+    "extraction-analytics-layer-audit.md",  # internal audit tracker; not public RTD
     "validation/**",  # internal; gitignored from public repo
     # Contributor / repo-only (not public RTD pages)
     "CONTRIBUTING_DOCS.md",
@@ -59,6 +60,7 @@ exclude_patterns = [
     # Draft or internal methodology (not public until complete)
     "methodology/roadmap/**",
     "methodology/dictionaries/**",
+    "methodology/boilerplate-v4-diagnostics.md",  # maintainer runbook
     "appendix/index.md",
 ]
 

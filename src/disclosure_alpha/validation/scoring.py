@@ -36,7 +36,12 @@ def score_item1a_from_corpus_row(
         warnings=[],
     )
     version = normalize_scoring_version(scoring_model_version)
-    metrics = compute_section_metrics([section], prior_sections=None)
+    metrics = compute_section_metrics(
+        [section],
+        prior_sections=None,
+        form_type="10-K",
+        fiscal_year=int(row["fiscal_year"]) if row.get("fiscal_year") is not None else None,
+    )
     scores = score_for_model(metrics, version)
     return {
         "overall_disclosure_risk_score": scores.overall_disclosure_risk_score,
@@ -82,7 +87,12 @@ def score_matrix_corpus_row(
             for name, text in row.prior_sections.items()
             if text.strip()
         ]
-    metrics = compute_section_metrics(current, prior)
+    metrics = compute_section_metrics(
+        current,
+        prior,
+        form_type=row.form_type,
+        fiscal_year=row.fiscal_year,
+    )
     version = normalize_scoring_version(scoring_model_version)
     if is_v1_scoring(version):
         scores = aggregate_deterministic_matrix(

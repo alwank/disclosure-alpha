@@ -8,6 +8,7 @@ _BASE_METRICS = {
         "uncertainty_word_ratio": 0.1,
         "litigious_word_ratio": 0.05,
         "boilerplate_phrase_ratio": 0.1,
+        "boilerplate_combined_ratio": 0.1,
         "numeric_specificity_score": 20,
         "company_specificity_score": 30,
         "constraining_word_ratio": 0.02,
@@ -99,6 +100,7 @@ def test_missing_mdna_does_not_synthesize_mdna_scores():
                 "uncertainty_word_ratio": 0.01,
                 "litigious_word_ratio": 0.01,
                 "boilerplate_phrase_ratio": 0.01,
+                "boilerplate_combined_ratio": 0.01,
                 "numeric_specificity_score": 10,
                 "company_specificity_score": 10,
             }
@@ -121,6 +123,7 @@ def test_explicit_zero_metric_values_count_as_present_evidence():
                 "uncertainty_word_ratio": 0.0,
                 "litigious_word_ratio": 0.0,
                 "boilerplate_phrase_ratio": 0.0,
+                "boilerplate_combined_ratio": 0.0,
                 "numeric_specificity_score": 0.0,
                 "company_specificity_score": 0.0,
                 "constraining_word_ratio": 0.0,
@@ -154,6 +157,7 @@ def test_flag_boost_cap_at_100():
                 "uncertainty_word_ratio": 0.5,
                 "litigious_word_ratio": 0.5,
                 "boilerplate_phrase_ratio": 0.1,
+        "boilerplate_combined_ratio": 0.1,
                 "numeric_specificity_score": 5,
                 "company_specificity_score": 5,
                 "constraining_word_ratio": 0.5,
@@ -188,6 +192,7 @@ def test_coverage_math_partial_components():
                 "uncertainty_word_ratio": 0.01,
                 "litigious_word_ratio": 0.01,
                 "boilerplate_phrase_ratio": 0.01,
+                "boilerplate_combined_ratio": 0.01,
                 "numeric_specificity_score": 10,
                 "company_specificity_score": 10,
             }
@@ -207,6 +212,7 @@ def test_deterministic_coverage_partial_without_mdna():
                 "uncertainty_word_ratio": 0.01,
                 "litigious_word_ratio": 0.01,
                 "boilerplate_phrase_ratio": 0.01,
+                "boilerplate_combined_ratio": 0.01,
                 "numeric_specificity_score": 10,
                 "company_specificity_score": 10,
             }
@@ -278,6 +284,7 @@ def test_flag_boost_raises_liquidity_not_wildly():
                 "uncertainty_word_ratio": 0.05,
                 "litigious_word_ratio": 0.02,
                 "boilerplate_phrase_ratio": 0.05,
+                "boilerplate_combined_ratio": 0.05,
                 "numeric_specificity_score": 30,
                 "company_specificity_score": 30,
                 "constraining_word_ratio": 0.02,
@@ -298,6 +305,7 @@ def test_flag_boost_raises_liquidity_not_wildly():
                 "uncertainty_word_ratio": 0.05,
                 "litigious_word_ratio": 0.02,
                 "boilerplate_phrase_ratio": 0.05,
+                "boilerplate_combined_ratio": 0.05,
                 "numeric_specificity_score": 30,
                 "company_specificity_score": 30,
                 "constraining_word_ratio": 0.02,
@@ -351,6 +359,7 @@ def test_disclosure_quality_score_zero_boilerplate():
         section_metrics={
             "item_1a_risk_factors": {
                 "boilerplate_phrase_ratio": 0.0,
+                "boilerplate_combined_ratio": 0.0,
                 "numeric_specificity_score": 100.0,
                 "company_specificity_score": 100.0,
             },
@@ -390,7 +399,7 @@ def test_confidence_bounds():
             section_flags={},
             section_densities={},
             language_deltas={},
-            extraction_confs=[0.85, 0.9],
+        extraction_confs={"item_1a_risk_factors": 0.85, "item_7_mdna": 0.9},
             diff_confs=[0.8, 0.75],
         )
     )
@@ -539,6 +548,49 @@ def test_scoring_config_zero_flag_boost_suppresses_v1_boosts():
     assert default.components.mdna_uncertainty_score is not None
     assert no_boost.components.mdna_uncertainty_score is not None
     assert no_boost.components.mdna_uncertainty_score < default.components.mdna_uncertainty_score
+
+
+def test_v2_unifies_diff_sources_when_section_diffs_v2_disagrees():
+    from disclosure_alpha.deterministic_scoring import aggregate_deterministic_matrix_v2
+
+    metrics = {
+        "item_1a_risk_factors": {
+            "negative_word_ratio": 0.1,
+            "uncertainty_word_ratio": 0.1,
+            "constraining_word_ratio": 0.02,
+        },
+        "item_7_mdna": {
+            "uncertainty_word_ratio": 0.08,
+            "modal_word_ratio": 0.05,
+            "readability_score": 40,
+        },
+    }
+    v1_diffs = {"item_1a_risk_factors": 10.0, "item_7_mdna": 10.0}
+    v2_diffs = {"item_1a_risk_factors": 90.0, "item_7_mdna": 90.0}
+
+    agg = aggregate_deterministic_matrix_v2(
+        section_metrics=metrics,
+        section_diffs=v1_diffs,
+        section_diffs_v2=v2_diffs,
+    )
+    expected = aggregate_deterministic_matrix_v2(
+        section_metrics=metrics,
+        section_diffs=v2_diffs,
+    )
+
+    assert agg.components.disclosure_change_score == expected.components.disclosure_change_score
+    assert agg.components.risk_factor_intensity_score == expected.components.risk_factor_intensity_score
+    assert agg.components.event_severity_score is None
+
+    dc_prov = next(p for p in agg.provenance if p.score_name == "disclosure_change_score")
+    rf_prov = next(p for p in agg.provenance if p.score_name == "risk_factor_intensity_score")
+    es_prov = next(p for p in agg.provenance if p.score_name == "event_severity_score")
+    assert dc_prov.source == "deterministic_v2"
+    assert dc_prov.inputs["diff_1a"] == 90.0
+    assert rf_prov.source == "deterministic_v2"
+    assert rf_prov.inputs["diff_1a"] == 90.0
+    assert es_prov.source == "deterministic_v2"
+    assert es_prov.value is None
 
 
 def test_scoring_config_flag_evidence_score_changes_v2_flag_only_path():

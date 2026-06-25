@@ -135,7 +135,7 @@ Copy-paste recipes: [Workflows](https://disclosure-alpha.readthedocs.io/en/lates
   },
   "versions": {
     "parser_version": "section_extractor_v1",
-    "metrics_engine_version": "text_metrics_v3",
+    "metrics_engine_version": "text_metrics_v4",
     "dictionary_version": "built_in_dictionaries_v3",
     "scoring_model_version": "deterministic_scoring_v2",
     "analytics_config_id": "builtin_default"
@@ -153,7 +153,7 @@ S&P 500 FY2025 **Item 1A** · `deterministic_scoring_v2` · [full evidence →](
 |-------|--------|
 | Analysis cohort | **478** firms (503-name universe) |
 | Specificity vs NER | Spearman **ρ ≈ 0.87** (n=478) |
-| Boilerplate vs LS4-gram proxy | Spearman **ρ ≈ 0.74** (n=478) |
+| Boilerplate vs LS4-gram proxy | Spearman **ρ ≈ 0.96** (n=478) |
 | Post-filing vol (90d) | Q5/Q1 **≈ 1.15** (n=435) |
 
 Construct checks use independent references. Vol association is descriptive only — **not** investment advice or alpha. Scope: [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html).

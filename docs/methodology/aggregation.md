@@ -99,7 +99,7 @@ blend(constraining×100, liquidity_constraint_density; weights 0.50, 0.35)
 ### `boilerplate_risk_score`
 
 ```text
-blend(boilerplate×100, 100−numeric_specificity, 100−company_specificity; equal weights)
+blend(boilerplate_combined×100, 100−numeric_specificity, 100−company_specificity; equal weights)
 ```
 
 ### `internal_controls_risk_score`

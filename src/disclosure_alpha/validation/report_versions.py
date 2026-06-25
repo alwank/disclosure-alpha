@@ -5,7 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-# ponytail: validation reports are local-only; nothing ships in the public repo.
+from disclosure_alpha.version import (
+    METRICS_ENGINE_VERSION,
+    PARSER_VERSION,
+    SCORING_MODEL_VERSION,
+)
+
 COMMITTED_REPORTS: dict[str, dict[str, str]] = {}
 
 

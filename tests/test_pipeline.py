@@ -147,6 +147,7 @@ def test_metrics_filing_ticker_mocked(monkeypatch):
     result = metrics_filing_ticker("AAPL", 2025)
     assert result.filing["ticker"] == "AAPL"
     assert result.metrics.section_metrics
+    assert result.sections
 
 
 def test_sections_filing_ticker_mocked(monkeypatch):
@@ -193,6 +194,7 @@ def test_filter_metrics_result():
         section_flags={"item_1a_risk_factors": {"investigation_flag": True}},
         section_densities={"item_7_mdna": {"uncertainty_term_density": 10.0}},
         language_deltas={"item_1a_risk_factors": {"uncertainty_language_delta": 1.0}},
+        extraction_confs={"item_1a_risk_factors": 0.9, "item_7_mdna": 0.5},
     )
     filtered = filter_metrics_result(metrics, {"item_1a_risk_factors"})
     assert set(filtered.section_metrics) == {"item_1a_risk_factors"}
@@ -200,6 +202,51 @@ def test_filter_metrics_result():
     assert set(filtered.section_flags) == {"item_1a_risk_factors"}
     assert filtered.section_densities == {}
     assert set(filtered.language_deltas) == {"item_1a_risk_factors"}
+    assert filtered.extraction_confs == {"item_1a_risk_factors": 0.9}
+
+
+def test_filter_metrics_result_scopes_extraction_metadata():
+    import hashlib
+
+    from disclosure_alpha.pipeline import compute_section_metrics, filter_metrics_result
+    from disclosure_alpha.section_extractor import ExtractedSection
+    from disclosure_alpha.version import PARSER_VERSION
+
+    def _section(name: str, text: str, warnings: list[str] | None = None) -> ExtractedSection:
+        cleaned = text.strip()
+        return ExtractedSection(
+            section_name=name,
+            raw_text=cleaned,
+            cleaned_text=cleaned,
+            text_hash=hashlib.sha256(cleaned.encode()).hexdigest()[:16],
+            word_count=len(cleaned.split()),
+            sentence_count=1,
+            extraction_confidence=0.9,
+            extraction_method="test",
+            parser_version=PARSER_VERSION,
+            warnings=warnings or [],
+        )
+
+    text_1a = "We may face litigation and regulatory investigation. " * 20
+    text_7 = "Revenue may decline amid margin pressure. " * 20
+    sections = [
+        _section("item_1a_risk_factors", text_1a),
+        _section("item_7_mdna", text_7, ["short_section"]),
+    ]
+    metrics = compute_section_metrics(sections, form_type="10-K")
+    assert metrics.required_sections_present
+    assert "short_section" in metrics.extraction_warnings
+
+    filtered = filter_metrics_result(
+        metrics,
+        {"item_1a_risk_factors"},
+        form_type="10-K",
+        sections=sections,
+    )
+    assert filtered.extraction_confs == {"item_1a_risk_factors": 0.9}
+    assert "short_section" not in filtered.extraction_warnings
+    assert not filtered.required_sections_present
+    assert "missing_required_section" in filtered.extraction_warnings
 
 
 def test_filter_sections():
@@ -212,15 +259,162 @@ def test_filter_sections():
     assert filtered[0].section_name == "item_1a_risk_factors"
 
 
+def test_metrics_dict_preserves_none():
+    from types import SimpleNamespace
+
+    from disclosure_alpha.pipeline import _metrics_dict
+
+    metrics = SimpleNamespace(
+        negative_word_ratio=None,
+        uncertainty_word_ratio=0.05,
+        litigious_word_ratio=None,
+        modal_word_ratio=0.0,
+        constraining_word_ratio=0.02,
+        boilerplate_phrase_ratio=None,
+        numeric_specificity_score=0.4,
+        company_specificity_score=None,
+        readability_score=None,
+    )
+    result = _metrics_dict(metrics)
+    assert result["negative_word_ratio"] is None
+    assert result["uncertainty_word_ratio"] == 0.05
+    assert result["litigious_word_ratio"] is None
+    assert result["modal_word_ratio"] == 0.0
+    assert result["weak_modal_word_ratio"] is None
+    assert result["readability_score"] is None
+    assert result["numeric_specificity_score"] == 0.4
+
+
 def test_compute_section_metrics_item_1a_flags():
     from disclosure_alpha.pipeline import compute_section_metrics, extract_sections_from_html
     from html_fixtures import minimal_10k_html
 
     sections = extract_sections_from_html(minimal_10k_html(), "10-K")
-    metrics = compute_section_metrics(sections)
+    metrics = compute_section_metrics(sections, form_type="10-K")
     assert "item_1a_risk_factors" in metrics.section_metrics
     assert "negative_word_ratio" in metrics.section_metrics["item_1a_risk_factors"]
     assert "investigation_flag" in metrics.section_flags["item_1a_risk_factors"]
+
+
+def test_compute_section_metrics_extraction_metadata():
+    from disclosure_alpha.pipeline import (
+        compute_section_metrics,
+        extract_sections_from_html,
+        score_for_model,
+    )
+    from html_fixtures import minimal_10k_html
+
+    html = (
+        "<html><body><p>Item 7. Management's Discussion</p>"
+        "<p>Only MDNA here without Item 1A.</p></body></html>"
+    )
+    sections = extract_sections_from_html(html, "10-K")
+    metrics = compute_section_metrics(sections, form_type="10-K")
+    assert not metrics.required_sections_present
+    assert "missing_required_section" in metrics.extraction_warnings
+    penalized = score_for_model(metrics).confidence_score
+
+    clean_sections = extract_sections_from_html(minimal_10k_html(), "10-K")
+    clean_metrics = compute_section_metrics(clean_sections, form_type="10-K")
+    assert clean_metrics.required_sections_present
+    clean = score_for_model(clean_metrics).confidence_score
+    assert penalized < clean
+
+
+def test_compute_section_metrics_aggregates_section_warnings():
+    import hashlib
+
+    from disclosure_alpha.pipeline import compute_section_metrics, score_for_model
+    from disclosure_alpha.section_extractor import ExtractedSection
+    from disclosure_alpha.version import PARSER_VERSION
+
+    def _section(name: str, text: str, warnings: list[str] | None = None) -> ExtractedSection:
+        cleaned = text.strip()
+        return ExtractedSection(
+            section_name=name,
+            raw_text=cleaned,
+            cleaned_text=cleaned,
+            text_hash=hashlib.sha256(cleaned.encode()).hexdigest()[:16],
+            word_count=len(cleaned.split()),
+            sentence_count=1,
+            extraction_confidence=0.9,
+            extraction_method="test",
+            parser_version=PARSER_VERSION,
+            warnings=warnings or [],
+        )
+
+    text_1a = "We may face litigation and regulatory investigation. " * 20
+    text_7 = "Revenue may decline amid margin pressure and liquidity constraints. " * 20
+    warned = compute_section_metrics(
+        [
+            _section("item_1a_risk_factors", text_1a, ["short_section"]),
+            _section("item_7_mdna", text_7),
+        ],
+        form_type="10-K",
+    )
+    assert "short_section" in warned.extraction_warnings
+    warned_score = score_for_model(warned).confidence_score
+
+    clean = compute_section_metrics(
+        [_section("item_1a_risk_factors", text_1a), _section("item_7_mdna", text_7)],
+        form_type="10-K",
+    )
+    assert "short_section" not in clean.extraction_warnings
+    clean_score = score_for_model(clean).confidence_score
+    assert warned_score < clean_score
+
+
+def test_sec_parser_unavailable_lowers_confidence():
+    import hashlib
+
+    from disclosure_alpha.pipeline import compute_section_metrics, score_for_model
+    from disclosure_alpha.section_extractor import ExtractedSection
+    from disclosure_alpha.version import PARSER_VERSION
+
+    def _section(name: str, text: str, warnings: list[str] | None = None) -> ExtractedSection:
+        cleaned = text.strip()
+        return ExtractedSection(
+            section_name=name,
+            raw_text=cleaned,
+            cleaned_text=cleaned,
+            text_hash=hashlib.sha256(cleaned.encode()).hexdigest()[:16],
+            word_count=len(cleaned.split()),
+            sentence_count=1,
+            extraction_confidence=0.9,
+            extraction_method="test",
+            parser_version=PARSER_VERSION,
+            warnings=warnings or [],
+        )
+
+    text_1a = "We may face litigation and regulatory investigation. " * 20
+    text_7 = "Revenue may decline amid margin pressure and liquidity constraints. " * 20
+    warned = compute_section_metrics(
+        [
+            _section("item_1a_risk_factors", text_1a, ["sec_parser_unavailable"]),
+            _section("item_7_mdna", text_7),
+        ],
+        form_type="10-K",
+    )
+    assert "sec_parser_unavailable" in warned.extraction_warnings
+    warned_score = score_for_model(warned).confidence_score
+
+    clean = compute_section_metrics(
+        [_section("item_1a_risk_factors", text_1a), _section("item_7_mdna", text_7)],
+        form_type="10-K",
+    )
+    clean_score = score_for_model(clean).confidence_score
+    assert warned_score < clean_score
+
+
+def test_score_filing_html_includes_confidence_details():
+    from html_fixtures import minimal_10k_html
+
+    result = score_filing_html(minimal_10k_html(), "10-K")
+    details = result.scores.confidence_details
+    assert details is not None
+    assert "base" in details
+    assert "penalties" in details
+    assert "confidence_details" in result.to_dict()["scores"]
 
 
 def test_score_panel_tickers_handles_expected_errors(monkeypatch):

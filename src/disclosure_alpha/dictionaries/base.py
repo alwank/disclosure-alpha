@@ -92,6 +92,25 @@ TERM_PACK_METADATA = {
     },
 }
 
+# sec_parser title matching (item number + title fragment); SUPPORTED_SECTIONS_* regexes
+# below are a separate fallback/clean-HTML reslice path — keep both in sync on keys.
+SECTION_HEADING_SPECS: dict[str, tuple[str, str]] = {
+    "item_1a_risk_factors": ("1A", "risk factors"),
+    "item_1c_cybersecurity": ("1C", "cybersecurity"),
+    "item_3_legal_proceedings": ("3", "legal proceedings"),
+    "item_7_mdna": ("7", "management"),
+    "item_7a_market_risk": ("7A", "quantitative"),
+    "item_9a_controls": ("9A", "controls"),
+    "item_1_legal_proceedings": ("1", "legal proceedings"),
+    "item_2_mdna": ("2", "management"),
+    "item_4_controls": ("4", "controls"),
+    "item_1_01": ("1.01", ""),
+    "item_1_05": ("1.05", ""),
+    "item_2_02": ("2.02", ""),
+    "item_5_02": ("5.02", ""),
+    "item_8_01": ("8.01", ""),
+}
+
 SUPPORTED_SECTIONS_10K = {
     # ponytail: [^a-z]{0,40} bridges "Item 1A, \"Risk Factors\"" and "1A.\n\nRisk Factors" TOC styles
     "item_1a_risk_factors": r"(?:item\s*)?1a\.?[^a-z]{0,40}risk\s*factors",

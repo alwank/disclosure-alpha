@@ -5,6 +5,7 @@ import warnings
 from dataclasses import dataclass, field, replace
 
 from disclosure_alpha.dictionaries import REQUIRED_SECTIONS, sections_for_form_type
+from disclosure_alpha.dictionaries.base import SECTION_HEADING_SPECS
 from disclosure_alpha.text_cleaner import clean_html_text, normalize_whitespace
 
 logger = logging.getLogger(__name__)
@@ -66,24 +67,6 @@ class HeadingCandidate:
     warnings: list[str] = field(default_factory=list)
 
 
-SECTION_HEADING_SPECS = {
-    "item_1a_risk_factors": ("1A", "risk factors"),
-    "item_1c_cybersecurity": ("1C", "cybersecurity"),
-    "item_3_legal_proceedings": ("3", "legal proceedings"),
-    "item_7_mdna": ("7", "management"),
-    "item_7a_market_risk": ("7A", "quantitative"),
-    "item_9a_controls": ("9A", "controls"),
-    "item_1_legal_proceedings": ("1", "legal proceedings"),
-    "item_2_mdna": ("2", "management"),
-    "item_4_controls": ("4", "controls"),
-    "item_1_01": ("1.01", ""),
-    "item_1_05": ("1.05", ""),
-    "item_2_02": ("2.02", ""),
-    "item_5_02": ("5.02", ""),
-    "item_8_01": ("8.01", ""),
-}
-
-
 def _count_sentences(text: str) -> int:
     if not text:
         return 0
@@ -134,24 +117,43 @@ def _block_flags(element_type: str, text: str) -> tuple[bool, bool, bool]:
     return is_toc, is_table, is_title
 
 
-def _parse_blocks(html: str) -> list[ParserBlock]:
+def _sec_parser_class(form_type: str):
+    """Return sec_parser parser class for normalized form type."""
+    import sec_parser as sp
+
+    base = form_type.replace("/A", "").replace("-A", "").upper()
+    if base == "10-K":
+        parser_cls = getattr(sp, "Edgar10KParser", None)
+        if parser_cls is None:
+            logger.warning(
+                "Edgar10KParser unavailable; falling back to Edgar10QParser for 10-K"
+            )
+            return sp.Edgar10QParser
+        return parser_cls
+    if base == "10-Q":
+        return sp.Edgar10QParser
+    # ponytail: 8-K has no dedicated sec_parser class yet
+    return sp.Edgar10QParser
+
+
+def _parse_blocks(html: str, *, form_type: str = "10-K") -> tuple[list[ParserBlock], str | None]:
     try:
-        import sec_parser as sp
+        import sec_parser as sp  # noqa: F401 — availability check
     except ImportError:
-        return []
+        return [], "sec_parser_unavailable"
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         try:
-            elements = sp.Edgar10QParser().parse(html or "")
+            elements = _sec_parser_class(form_type)().parse(html or "")
         except ImportError as exc:
             logger.warning("sec_parser dependency unavailable during parse: %s", exc)
-            return []
+            return [], "sec_parser_unavailable"
         except Exception as exc:
             if not type(exc).__module__.startswith("sec_parser"):
                 raise
             logger.warning("sec_parser parse failed: %s", exc)
-            return []
+            return [], "sec_parser_unavailable"
 
     blocks: list[ParserBlock] = []
     cursor = 0
@@ -180,7 +182,7 @@ def _parse_blocks(html: str) -> list[ParserBlock]:
             )
         )
         cursor = end
-    return blocks
+    return blocks, None
 
 
 def _section_pattern(section_name: str) -> re.Pattern[str]:
@@ -701,14 +703,6 @@ def _extract_from_sec_parser(
         return []
 
     cleaned_full = _full_text(blocks)
-    base_form = document.form_type.replace("/A", "").replace("-A", "").upper()
-    missing_required = set(REQUIRED_SECTIONS.get(base_form, [])) - {
-        c.section_name for c in ordered
-    }
-    if missing_required:
-        extra_warnings = ["missing_required_section"]
-    else:
-        extra_warnings = []
 
     end_by_section = {c.section_name: len(cleaned_full) for c in ordered}
     for idx, candidate in enumerate(ordered):
@@ -730,7 +724,6 @@ def _extract_from_sec_parser(
             base_conf=0.75,
             parser_version=parser_version,
             method="sec_parser_sequence_v1",
-            extra_warnings=extra_warnings,
         )
 
         if section.word_count < 50:
@@ -747,7 +740,7 @@ def _extract_from_sec_parser(
                     base_conf=0.75,
                     parser_version=parser_version,
                     method="sec_parser_sequence_v1",
-                    extra_warnings=extra_warnings + ["boundary_extended"],
+                    extra_warnings=["boundary_extended"],
                 )
 
         if section.word_count < ANALYSIS_MIN_WORDS and (
@@ -765,7 +758,7 @@ def _extract_from_sec_parser(
                     base_conf=0.75,
                     parser_version=parser_version,
                     method="sec_parser_sequence_v1",
-                    extra_warnings=extra_warnings + ["alternate_candidate"],
+                    extra_warnings=["alternate_candidate"],
                 )
                 if alt_section.word_count > section.word_count:
                     section = alt_section
@@ -777,12 +770,21 @@ def _extract_from_sec_parser(
     return results
 
 
+def _stamp_parse_warning(
+    sections: list[ExtractedSection], warning: str
+) -> list[ExtractedSection]:
+    if not sections or warning in sections[0].warnings:
+        return sections
+    first = replace(sections[0], warnings=[*sections[0].warnings, warning])
+    return [first, *sections[1:]]
+
+
 def extract_sections(document: FilingDocument) -> list[ExtractedSection]:
     from disclosure_alpha.version import PARSER_VERSION
 
     parser_version = PARSER_VERSION
     section_map = sections_for_form_type(document.form_type)
-    blocks = _parse_blocks(document.html)
+    blocks, parse_warning = _parse_blocks(document.html, form_type=document.form_type)
     fallback = _extract_sections_fallback(document, parser_version)
 
     if not blocks:
@@ -793,6 +795,9 @@ def extract_sections(document: FilingDocument) -> list[ExtractedSection]:
             results = fallback
         else:
             results = _merge_with_fallback(primary, fallback, section_map)
+
+    if parse_warning:
+        results = _stamp_parse_warning(results, parse_warning)
 
     results = _ensure_item1a(document, results, parser_version)
     return _tag_extraction_suspect(results)

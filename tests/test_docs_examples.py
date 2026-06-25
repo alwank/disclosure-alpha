@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tests"))
@@ -69,5 +71,6 @@ def test_full_coverage_10k_populates_cyber_not_event_materiality():
     components = result.scores.components
     assert components.cybersecurity_incident_risk_score is not None
     assert components.event_materiality_score is None
-    assert result.scores.score_coverage_ratio == 1.0
-    assert not result.scores.missing_components
+    assert components.event_severity_score is None
+    assert result.scores.score_coverage_ratio == pytest.approx(8 / 9, rel=1e-3)
+    assert result.scores.missing_components == ["event_severity_score"]

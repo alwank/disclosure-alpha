@@ -7,13 +7,13 @@
 
 Deterministic scoring (**`deterministic_scoring_v2`**) was checked on S&P 500 FY2025 **Item 1A** risk-factor text. The table below is the public evidence record — construct checks against independent references, plus one descriptive post-filing volatility association.
 
-**Last updated:** 2026-06-23.
+**Last updated:** 2026-06-25.
 
 | Check | Result |
 |-------|--------|
 | **Analysis cohort** | **478** firms (FY2025 Item 1A, S&P 500 universe n=503) |
 | **Specificity construct validity** | Spearman **ρ ≈ 0.87** vs NER entity density (n=478) |
-| **Boilerplate construct validity** | Spearman **ρ ≈ 0.74** vs cross-firm 4-gram boilerplate proxy (n=478) |
+| **Boilerplate construct validity** | Spearman **ρ ≈ 0.96** vs cross-firm 4-gram proxy on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478) |
 | **Post-filing volatility association** | Q5/Q1 **≈ 1.15** on 90-day realized vol (n=435) |
 
 Construct rows show our metrics track external references. The volatility row is a **descriptive association only** — not return prediction, alpha, or investment advice.
@@ -28,11 +28,23 @@ Construct rows show our metrics track external references. The volatility row is
 | Rows after quality filters | **478** |
 | Rows skipped (short text) | 19 |
 | Scoring model | `deterministic_scoring_v2` |
-| Parser / metrics / dictionary | `section_extractor_v1`, `text_metrics_v3`, `built_in_dictionaries_v3` |
+| Parser / metrics / dictionary | `section_extractor_v1`, `text_metrics_v4`, `built_in_dictionaries_v3` |
 
 The analysis cohort is post-filter extractions with sufficient word count and extraction confidence. It does **not** imply 100% index coverage — some tickers are missing from the corpus or fail extraction.
 
 The volatility association uses **435** tickers with valid 90-day realized-vol outcomes — a separate pairing cohort from the 478-firm construct sample.
+
+## Validation scopes
+
+Headline numbers on this page come from **different validation runs** with different cohorts. Do not assume one sample size applies to every row.
+
+| Claim on this page | Cohort | Score source |
+|--------------------|--------|--------------|
+| Specificity / boilerplate (n=478) | Item 1A extract quality filters | Per-section metrics on `item_1a_risk_factors` |
+| Vol Q5/Q1 (n=435) | Outcome pairing subset | `overall_disclosure_risk_score` v2 |
+| L3 outcome gates (n=497) | Full-matrix cache run | Committed L3 report (see below) |
+
+The committed L3 outcomes report (`data/validation/reports/l3_outcomes_report_fy2025_v2.json`) uses **full-matrix cache mode** (`score_mode: cache`) over **497** tickers with valid outcomes. Its volatility quintile ratio (**≈ 1.12**, Q5/Q1) is a different scope from the Item 1A construct table and the n=435 vol row above.
 
 ## Specificity construct validity
 
@@ -49,9 +61,9 @@ The volatility association uses **435** tickers with valid 90-day realized-vol o
 
 | | |
 |--|--|
-| **Our metric** | `boilerplate_phrase_ratio` (section-level phrase hit rate) |
+| **Our metric** | `boilerplate_combined_ratio` (`text_metrics_v4`: phrase list + cross-firm 4-gram blend) |
 | **Reference** | Lang & Stice-Lawrence-style cross-firm 4-gram boilerplate proxy (`ls_boilerplate_word_ratio`) |
-| **Association** | Spearman **ρ ≈ 0.74** |
+| **Association** | Spearman **ρ ≈ 0.96** on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478); phrase-only v3 was ≈0.74 |
 | **n** | 478 |
 
 **Interpretation:** Our boilerplate measure moves with a literature boilerplate proxy. It is **not** a full replication of the LS4-gram paper measure — see {doc}`../methodology/research-foundation` for how the built-in metric differs.

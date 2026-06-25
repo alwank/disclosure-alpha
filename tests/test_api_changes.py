@@ -122,3 +122,23 @@ def test_disclosure_changes_null_change_score(mock_metrics, mock_score):
     )
     assert resp.status_code == 200
     assert resp.json()["change_score"]["missing_reason"] == "no prior filing comparison available"
+
+
+@patch("disclosure_alpha.api.endpoints.changes.score_for_model")
+@patch("disclosure_alpha.api.endpoints.changes.metrics_filing_ticker")
+def test_disclosure_changes_10q_passes_form_type(mock_metrics, mock_score):
+    mock_metrics.return_value = _metrics_with_prior()
+    scored = score_filing_html(minimal_10k_html(), "10-K", prior_html=minimal_prior_html())
+    mock_score.return_value = scored.scores
+    resp = client.get(
+        "/v1/company/AAPL/disclosure-changes",
+        params={
+            "fiscal_year": 2025,
+            "form_type": "10-Q",
+            "quarter": "Q1",
+            "compare": "prior",
+        },
+    )
+    assert resp.status_code == 200
+    mock_score.assert_called_once()
+    assert mock_score.call_args.kwargs["form_type"] == "10-Q"

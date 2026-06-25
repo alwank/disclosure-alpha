@@ -43,6 +43,7 @@
     "failed": 1
   },
   "versions": {
+    "dictionary_version": "built_in_dictionaries_v3",
     "scoring_model_version": "deterministic_scoring_v2"
   }
 }

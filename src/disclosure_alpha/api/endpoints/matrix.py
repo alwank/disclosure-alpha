@@ -74,8 +74,13 @@ def disclosure_matrix(
         )
         metrics_for_scope = result.metrics
         if section_filter:
-            metrics_for_scope = filter_metrics_result(metrics_for_scope, section_filter)
-        scores = score_for_model(metrics_for_scope, scoring_version)
+            metrics_for_scope = filter_metrics_result(
+                metrics_for_scope,
+                section_filter,
+                form_type=base,
+                sections=result.sections,
+            )
+        scores = score_for_model(metrics_for_scope, scoring_version, form_type=base)
         scores_payload = shape_matrix_scores(
             scores_dict(scores),
             include_provenance="provenance" in include_set,

@@ -75,7 +75,7 @@ def main() -> None:
         if args.prior_html:
             prior_html = _load_html(args.prior_html)
             prior_sections = extract_sections_from_html(prior_html, args.form)
-        metrics = compute_section_metrics(sections, prior_sections)
+        metrics = compute_section_metrics(sections, prior_sections, form_type=args.form)
         print(json.dumps(metrics.__dict__, indent=2, default=str))
         return
 

@@ -47,8 +47,13 @@ def disclosure_changes(
         )
         metrics = result.metrics
         if section_filter:
-            metrics = filter_metrics_result(metrics, section_filter)
-        scores = score_for_model(metrics) if compare_prior else None
+            metrics = filter_metrics_result(
+                metrics,
+                section_filter,
+                form_type=base,
+                sections=result.sections,
+            )
+        scores = score_for_model(metrics, form_type=base) if compare_prior else None
         shaped = shape_changes_payload(metrics, scores)
         return ChangesResponse(
             filing=result.filing,

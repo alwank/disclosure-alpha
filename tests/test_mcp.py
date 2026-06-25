@@ -113,6 +113,17 @@ def test_mcp_score_filing_html_tool():
     assert "versions" in payload
 
 
+@patch("disclosure_alpha.mcp.tools.score_for_model")
+@patch("disclosure_alpha.mcp.tools.score_filing_html")
+def test_mcp_score_filing_html_tool_10q_passes_form_type(mock_score_html, mock_score_model):
+    scored = score_filing_html(minimal_10k_html(), "10-K")
+    mock_score_html.return_value = scored
+    mock_score_model.return_value = scored.scores
+    score_filing_html_tool(minimal_10k_html(), "10-Q")
+    mock_score_model.assert_called_once()
+    assert mock_score_model.call_args.kwargs["form_type"] == "10-Q"
+
+
 @patch("disclosure_alpha.pipeline.score_filing_ticker")
 def test_mcp_score_company_filing(mock_score):
     scored = score_filing_html(minimal_10k_html(), "10-K")

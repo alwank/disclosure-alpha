@@ -9,7 +9,12 @@ from typing import Mapping
 
 from disclosure_alpha.baselines import CalibrationContext
 from disclosure_alpha.scoring_types import COMPONENT_WEIGHTS
-from disclosure_alpha.version import METRICS_ENGINE_VERSION, PARSER_VERSION, SCORING_MODEL_VERSION
+from disclosure_alpha.version import (
+    DICTIONARY_VERSION,
+    METRICS_ENGINE_VERSION,
+    PARSER_VERSION,
+    SCORING_MODEL_VERSION,
+)
 
 _BUILTIN_DEFAULT_ID = "builtin_default"
 
@@ -121,5 +126,6 @@ def build_versions(config: PipelineConfig | None = None) -> dict[str, str]:
     return {
         "parser_version": PARSER_VERSION,
         "metrics_engine_version": METRICS_ENGINE_VERSION,
+        "dictionary_version": DICTIONARY_VERSION,
         **cfg.version_fields(),
     }

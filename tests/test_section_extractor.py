@@ -1,7 +1,11 @@
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
+from disclosure_alpha.dictionaries.base import SECTION_HEADING_SPECS
 from disclosure_alpha.section_extractor import (
     FilingDocument,
+    _parse_blocks,
+    _sec_parser_class,
     extract_sections,
     required_sections_present,
 )
@@ -10,6 +14,67 @@ from disclosure_alpha.version import PARSER_VERSION
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_10k.html"
 FILING_FIXTURES = Path(__file__).parent / "fixtures" / "filings"
+
+
+def test_section_heading_specs_single_source():
+    from disclosure_alpha.dictionaries.base import SUPPORTED_SECTIONS_10K
+
+    assert set(SECTION_HEADING_SPECS) >= set(SUPPORTED_SECTIONS_10K)
+    item, title = SECTION_HEADING_SPECS["item_1a_risk_factors"]
+    assert item == "1A"
+    assert title == "risk factors"
+
+
+def test_sec_parser_class_selects_by_form_type():
+    import sec_parser as sp
+
+    assert _sec_parser_class("10-Q") is sp.Edgar10QParser
+    assert _sec_parser_class("10-Q/A") is sp.Edgar10QParser
+    assert _sec_parser_class("8-K") is sp.Edgar10QParser
+
+    ten_k_cls = _sec_parser_class("10-K")
+    if hasattr(sp, "Edgar10KParser"):
+        assert ten_k_cls is sp.Edgar10KParser
+    else:
+        assert ten_k_cls is sp.Edgar10QParser
+
+
+def test_sec_parser_class_10k_when_available():
+    fake_10k = MagicMock(name="Edgar10KParser")
+    fake_10q = MagicMock(name="Edgar10QParser")
+    fake_sp = MagicMock(Edgar10KParser=fake_10k, Edgar10QParser=fake_10q)
+
+    with patch.dict("sys.modules", {"sec_parser": fake_sp}):
+        assert _sec_parser_class("10-K") is fake_10k
+        assert _sec_parser_class("10-Q") is fake_10q
+
+
+def test_parse_blocks_passes_form_type_to_parser():
+    parser_instance = MagicMock()
+    parser_instance.parse.return_value = []
+    parser_cls = MagicMock(return_value=parser_instance)
+
+    with patch(
+        "disclosure_alpha.section_extractor._sec_parser_class",
+        return_value=parser_cls,
+    ):
+        _parse_blocks("<html></html>", form_type="10-K")
+
+    parser_cls.assert_called_once()
+    parser_instance.parse.assert_called_once_with("<html></html>")
+
+
+def test_extract_sections_passes_form_type_to_parse_blocks():
+    html = FIXTURE.read_text(encoding="utf-8")
+    with patch(
+        "disclosure_alpha.section_extractor._parse_blocks",
+        wraps=_parse_blocks,
+    ) as mock_parse:
+        extract_sections(
+            FilingDocument(cik="1", accession_number="x", form_type="10-Q", html=html)
+        )
+        mock_parse.assert_called_once()
+        assert mock_parse.call_args.kwargs["form_type"] == "10-Q"
 
 
 def test_extract_item_1a_and_item_7():
@@ -35,6 +100,23 @@ def test_missing_section_not_fabricated():
     )
     names = {s.section_name for s in sections}
     assert "item_1a_risk_factors" not in names
+
+
+def test_present_sections_lack_missing_required_warning():
+    body = "Competition and regulatory risk may adversely affect operations. " * 80
+    html = f"""
+    <html><body>
+    <h1>Item 1A. Risk Factors</h1>
+    <p>{body}</p>
+    </body></html>
+    """
+    sections = extract_sections(
+        FilingDocument(cik="1", accession_number="x", form_type="10-K", html=html)
+    )
+    assert "item_7_mdna" not in {s.section_name for s in sections}
+    assert not required_sections_present("10-K", sections)
+    for section in sections:
+        assert "missing_required_section" not in section.warnings
 
 
 def test_malformed_html_does_not_crash():

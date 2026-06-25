@@ -756,6 +756,10 @@ def aggregate_deterministic_matrix_v2(
     flags = _merged_flags(section_flags)
     m_1a = _section_metrics(section_metrics, "item_1a_risk_factors")
 
+    # ponytail: v2 headline uses event_materiality_score, not legacy event_severity_score
+    _replace_provenance(base.provenance, "event_severity_score", None, {})
+    base.components.event_severity_score = None
+
     if diffs_for_change is not section_diffs:
         dc_value, dc_inputs = _disclosure_change_from_diffs(diffs_for_change, language_deltas)
         _replace_provenance(base.provenance, "disclosure_change_score", dc_value, dc_inputs)
@@ -770,7 +774,7 @@ def aggregate_deterministic_matrix_v2(
     if m_1a is not None:
         neg_raw = _metric(m_1a, "negative_word_ratio")
         unc_raw = _metric(m_1a, "uncertainty_word_ratio")
-        d_1a = section_diffs.get("item_1a_risk_factors")
+        d_1a = diffs_for_change.get("item_1a_risk_factors")
         neg_cal = calibrate_metric("negative_word_ratio", neg_raw, ctx) if neg_raw is not None else None
         unc_cal = (
             calibrate_metric("uncertainty_word_ratio", unc_raw, ctx) if unc_raw is not None else None
@@ -809,7 +813,7 @@ def aggregate_deterministic_matrix_v2(
 
     ic_score, ic_inputs = _internal_controls_risk_score_v2(
         section_metrics=section_metrics,
-        section_diffs=section_diffs,
+        section_diffs=diffs_for_change,
         section_flags=section_flags,
         flags=flags,
         scoring=cfg,

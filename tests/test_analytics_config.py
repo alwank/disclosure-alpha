@@ -8,7 +8,7 @@ from disclosure_alpha.analytics_config import (
 )
 from disclosure_alpha.baselines import CalibrationContext
 from disclosure_alpha.scoring_types import COMPONENT_WEIGHTS
-from disclosure_alpha.version import SCORING_MODEL_VERSION
+from disclosure_alpha.version import DICTIONARY_VERSION, SCORING_MODEL_VERSION
 
 
 def test_scoring_config_default_matches_builtin():
@@ -69,3 +69,8 @@ def test_build_versions_includes_analytics_config_id():
     assert versions["scoring_model_version"] == SCORING_MODEL_VERSION
     assert "parser_version" in versions
     assert "metrics_engine_version" in versions
+
+
+def test_build_versions_includes_dictionary_version():
+    versions = build_versions(PipelineConfig.default())
+    assert versions["dictionary_version"] == DICTIONARY_VERSION

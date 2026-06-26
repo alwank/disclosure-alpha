@@ -6,6 +6,7 @@ from disclosure_alpha.api.endpoints.matrix import router as matrix_router
 from disclosure_alpha.api.endpoints.metrics import router as metrics_router
 from disclosure_alpha.api.endpoints.panel import router as panel_router
 from disclosure_alpha.api.endpoints.sections import router as sections_router
+from disclosure_alpha.openbb.router import router as openbb_router
 
 ROUTERS = [
     health_router,
@@ -16,4 +17,5 @@ ROUTERS = [
     flags_router,
     changes_router,
     panel_router,
+    openbb_router,
 ]

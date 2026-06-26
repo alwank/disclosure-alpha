@@ -19,6 +19,7 @@ flowchart TD
 
   ticker --> cli_t["CLI or Python SDK"]
   ticker --> http_t["HTTP matrix GET"]
+  ticker --> openbb_d["OpenBB Workspace"]
   ticker --> mcp_a["MCP Analyst"]
 
   html --> cli_h["CLI --html"]
@@ -29,6 +30,7 @@ flowchart TD
 
   cli_t --> read["Read scores: understanding-scores"]
   http_t --> read
+  openbb_d --> read
   panel --> read
 ```
 
@@ -42,6 +44,7 @@ Need help reading the JSON? Start with {doc}`understanding-scores`.
 | Quant / researcher | Raw metrics, flags, diffs | Disclosure Analytics, Flags, Changes (HTTP) |
 | Risk analyst | Filing-level scores | Disclosure Risk Score / matrix (HTTP) |
 | Screener / index builder | Batch tickers | Panel POST (HTTP) |
+| OpenBB Workspace dashboard | Interactive disclosure app | OpenBB backend + {doc}`../guides/openbb/index` |
 | Agent builder | Low-level pipeline in MCP | Builder MCP bundle |
 | Agent user | Ticker score + filings | Analyst MCP bundle |
 | Script / notebook | One-off scoring | CLI or Python SDK |
@@ -53,7 +56,8 @@ Need help reading the JSON? Start with {doc}`understanding-scores`.
 | CLI | Terminal workflows, local HTML | `disclosure-alpha` |
 | Python SDK | Custom pipelines, notebooks | `import disclosure_alpha` |
 | HTTP API | Services, dashboards, screeners | `disclosure-alpha-api` |
-| MCP Analyst | Cursor / Claude ticker tools | `disclosure-alpha-mcp-analyst` |
+| OpenBB Workspace | Analyst dashboards in OpenBB | `disclosure-alpha-api` + {doc}`../guides/openbb/index` |
+| MCP Analyst | AI agent ticker tools | `disclosure-alpha-mcp-analyst` |
 | MCP Builder | Raw HTML agent workflows | `disclosure-alpha-mcp-builder` |
 
 ## MCP bundles
@@ -69,6 +73,7 @@ Legacy `disclosure-alpha-mcp` aliases to the analyst bundle.
 
 - {doc}`understanding-scores` — interpret score JSON
 - {doc}`../guides/http/index` — endpoint map, tiers, Postman collections
+- {doc}`../guides/openbb/index` — OpenBB Workspace backend
 - {doc}`../guides/mcp/index`
 - {doc}`../guides/cli/index`
 - {doc}`../guides/python/index`

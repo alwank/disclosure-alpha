@@ -2,6 +2,29 @@
 
 Version history for parser, metrics engine, dictionary packs, and scoring model.
 
+## 1.5.1 (2026-06-26)
+
+OpenBB Workspace addon modernization plus API pipeline performance and EDGAR improvements.
+
+### OpenBB Workspace
+
+| Area | Change |
+|------|--------|
+| **OpenBB `apps.json`** | Curated Copilot prompts; `mcp_servers` for Disclosure Alpha Analyst at `/mcp` |
+| **OpenBB `widgets.json`** | `imgUrl`, `subCategory`, `mcp_tool` linking widget to `score_company_filing_tool` |
+| **HTTP MCP** | Analyst MCP mounted at `/mcp` on `disclosure-alpha-api` when `[mcp]` installed (Streamable HTTP) |
+| **CORS** | `Mcp-Session-Id` exposed for browser MCP clients |
+| **Docs** | OpenBB guide and quickstart: `[api,mcp]` install, Copilot/MCP connect, port 8000 consistency |
+
+### API and pipeline
+
+| Area | Change |
+|------|--------|
+| **Metrics cache** | In-process TTL cache on `metrics_filing_ticker` (`METRICS_CACHE_TTL_SECONDS`, `METRICS_CACHE_MAX_SIZE`) |
+| **Pipeline timing** | Optional per-stage timing logs on `metrics_filing_ticker` (`PIPELINE_TIMING`) |
+| **Panel screener** | Concurrent ticker scoring via `PANEL_MAX_WORKERS` |
+| **EDGAR** | Metadata-first filing resolution (`resolve_filing_with_prior`) |
+
 ## 1.5.0 (2026-06-25)
 
 Metrics-engine v4 release with refreshed boilerplate construct evidence and extraction/scoring pipeline fixes.

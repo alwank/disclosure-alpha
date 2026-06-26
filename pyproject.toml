@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "disclosure-alpha"
-version = "1.5.0"
+version = "1.5.1"
 description = "Open-source deterministic SEC filing analytics: parse, metrics, diff, score"
 readme = "README-PYPI.md"
 license = { text = "Apache-2.0" }
@@ -50,6 +50,11 @@ disclosure-alpha-mcp-builder = "disclosure_alpha.mcp.builder:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/disclosure_alpha"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/disclosure_alpha/openbb/widgets.json" = "disclosure_alpha/openbb/widgets.json"
+"src/disclosure_alpha/openbb/apps.json" = "disclosure_alpha/openbb/apps.json"
+"src/disclosure_alpha/openbb/data/sp500_overall_fy2025.json" = "disclosure_alpha/openbb/data/sp500_overall_fy2025.json"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

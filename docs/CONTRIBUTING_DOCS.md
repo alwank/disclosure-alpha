@@ -10,7 +10,7 @@ Each section folder is owned by one workstream. Edit files **inside your section
 |------------|--------|-------------|
 | Getting Started | `getting-started/` | Install, quickstarts, concepts |
 | Methodology | `methodology/` | Scoring specs, research, roadmap |
-| Guides | `guides/` | CLI, HTTP, MCP, workflows |
+| Guides | `guides/` | CLI, HTTP, OpenBB, MCP, workflows |
 | Reference | `reference/` | Env vars, taxonomy, autodoc, schemas |
 | Developer | `developer/`, `appendix/` | Architecture, testing, glossary |
 

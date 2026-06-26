@@ -4,6 +4,8 @@
 
 ## Start here
 
+- **`resolve_filing_with_prior()`** — resolve current + prior filing in one submissions fetch (used by the pipeline)
+- **`resolve_filing_targets()`** — batch-resolve multiple fiscal-year targets in one scan
 - **`resolve_filing()`** — resolve ticker + fiscal year + form to a `FilingRef`
 - **`resolve_prior_filing()`** — find the prior comparable filing for diffs
 - **`load_filing_html()`** — download (or read from cache) filing HTML
@@ -18,17 +20,17 @@ Requires `SEC_USER_AGENT` in the environment. See {doc}`../../getting-started/se
 import os
 os.environ["SEC_USER_AGENT"] = "YourName your@email.com"
 
-from disclosure_alpha.edgar.resolver import resolve_filing, load_filing_html
+from disclosure_alpha.edgar.resolver import resolve_filing_with_prior, load_filing_html
 
-ref = resolve_filing("AAPL", fiscal_year=2025, form_type="10-K")
-html = load_filing_html(ref)
+current, prior = resolve_filing_with_prior("AAPL", fiscal_year=2025, form_type="10-K")
+html = load_filing_html(current)
 ```
 
 ## Full API
 
 ```{eval-rst}
 .. automodule:: disclosure_alpha.edgar.resolver
-   :members: resolve_filing, resolve_prior_filing, load_filing_html, resolve_cik, list_filings
+   :members: resolve_filing, resolve_filing_with_prior, resolve_filing_targets, resolve_prior_filing, load_filing_html, resolve_cik, list_filings
 .. automodule:: disclosure_alpha.edgar.client
-   :members: fetch_json, fetch_text, fetch_company_tickers
+   :members: fetch_json, fetch_text, fetch_text_prefix, fetch_company_tickers
 ```

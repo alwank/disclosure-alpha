@@ -7,6 +7,7 @@ Architecture, testing, and contribution notes. Contributor-only — excluded fro
 
 architecture
 testing
+openbb-performance-roadmap
 ../appendix/index
 ```
 

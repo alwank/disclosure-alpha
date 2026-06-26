@@ -22,10 +22,10 @@
 - [Quick start](#quick-start)
 - [What it is](#what-it-is)
 - [Integration surfaces](#integration-surfaces)
+- [OpenBB Workspace](#openbb-workspace)
 - [Capabilities](#capabilities)
 - [Example output](#example-output)
 - [Research-backed](#research-backed)
-- [MCP in Cursor](#mcp-in-cursor)
 - [Documentation](#documentation)
 
 ## Quick start
@@ -63,7 +63,7 @@ print(result.scores.overall_disclosure_risk_score)
 
 ## What it is
 
-Open-source, deterministic SEC filing analytics for **10-K and 10-Q** HTML. Reproducible JSON scores from text metrics, boolean risk flags, and section diffs — one pipeline across CLI, Python SDK, HTTP API, and MCP. **8-K** is supported via local `--html` or the MCP Builder bundle only (not `--ticker`, EDGAR, or HTTP ticker routes).
+Open-source, deterministic SEC filing analytics for **10-K and 10-Q** HTML. Reproducible JSON scores from text metrics, boolean risk flags, and section diffs — one pipeline across CLI, Python SDK, HTTP API, OpenBB Workspace, and MCP. **8-K** is supported via local `--html` or the MCP Builder bundle only (not `--ticker`, EDGAR, or HTTP ticker routes).
 
 **What it is not:**
 
@@ -74,24 +74,45 @@ Full scope and limits: [Scope and claims](https://disclosure-alpha.readthedocs.i
 
 ## Integration surfaces
 
-Five entry points, one deterministic pipeline. Not sure which to pick? See [Choose your surface](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/choose-your-surface.html).
+Six entry points, one deterministic pipeline. Not sure which to pick? See [Choose your surface](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/choose-your-surface.html).
 
 | You are… | Entry | Install extra |
 |----------|-------|---------------|
 | Terminal / scripts | `disclosure-alpha` | *(base)* |
 | Notebooks / apps | `import disclosure_alpha` | *(base)* |
 | REST screener or dashboard | `disclosure-alpha-api` | `[api]` |
-| Cursor / Claude (ticker scoring) | `disclosure-alpha-mcp-analyst` | `[mcp]` |
+| OpenBB Workspace analyst | `disclosure-alpha-api` + [OpenBB guide](https://disclosure-alpha.readthedocs.io/en/latest/guides/openbb/index.html) | `[api,mcp]` |
+| AI agent (ticker scoring) | `disclosure-alpha-mcp-analyst` | `[mcp]` |
 | Agent with raw HTML | `disclosure-alpha-mcp-builder` | `[mcp]` |
 
 HTTP matrix tiers apply to **single-ticker GET** `GET /v1/company/{ticker}/disclosure-matrix` only: `tier=lite` (headline score), `tier=standard` (components + metrics), `tier=analyst` (provenance for audit). Panel `POST /v1/panel/disclosure-matrix` has no `tier` param — use `include` / `fields`. See [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html).
 
 ```bash
-disclosure-alpha-api              # HTTP on :8000
-disclosure-alpha-mcp-analyst      # MCP for Cursor / Claude Desktop
+disclosure-alpha-api              # HTTP + OpenBB Workspace backend on :8000
+disclosure-alpha-mcp-analyst      # MCP analyst bundle
 ```
 
 Guides, [Postman collections](https://github.com/alwank/disclosure-alpha/tree/main/docs/postman), and MCP reference: **[Guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/index.html)**.
+
+## OpenBB Workspace
+
+Score filings in [OpenBB Workspace](https://pro.openbb.co) with a self-hosted backend — overall score, components, active flags, and section changes in one widget.
+
+```bash
+pip install "disclosure-alpha[api,mcp]"
+export SEC_USER_AGENT="YourName your@email.com"
+disclosure-alpha-api
+```
+
+In Workspace: **Apps → Connect backend** → `http://127.0.0.1:8000` → **My Apps → Disclosure Alpha → Company** → **Run**. Connect **Disclosure Alpha Analyst** MCP from the app page for Copilot scoring tools.
+
+<p align="center">
+  <img src="docs/assets/openbb-workspace-company-widget.png" alt="Disclosure Alpha Company widget in OpenBB Workspace showing AJG FY2025 10-K scores, flags, and section changes" width="720">
+</p>
+
+OpenBB Copilot can summarize the widget; that is an OpenBB feature, not part of Disclosure Alpha.
+
+Quickstart: [OpenBB Workspace](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-openbb.html) · Full guide: [OpenBB guide](https://disclosure-alpha.readthedocs.io/en/latest/guides/openbb/index.html)
 
 ## Capabilities
 
@@ -100,6 +121,7 @@ Deterministic scores — ten computed components (nine headline-weighted, 0–10
 | Task | How |
 |------|-----|
 | Score one company | `disclosure-alpha score --ticker AAPL --fiscal-year 2025 --form 10-K` |
+| Score in OpenBB Workspace | `disclosure-alpha-api` + Workspace connect → [OpenBB quickstart](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-openbb.html) |
 | Screen up to 25 tickers | HTTP `POST /v1/panel/disclosure-matrix` (no `tier`; use `include` / `fields`) |
 | Compare year-over-year | `--prior-html prior.html` or HTTP `compare=prior` |
 | Work offline (no EDGAR) | `disclosure-alpha score --html filing.html --form 10-K` |
@@ -158,27 +180,6 @@ S&P 500 FY2025 **Item 1A** · `deterministic_scoring_v2` · [full evidence →](
 
 Construct checks use independent references. Vol association is descriptive only — **not** investment advice or alpha. Scope: [Scope and claims](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/scope-and-claims.html).
 
-## MCP in Cursor
-
-Requires `pip install "disclosure-alpha[mcp]"`. Add to your MCP settings (Analyst bundle):
-
-```json
-{
-  "mcpServers": {
-    "disclosure-alpha": {
-      "command": "disclosure-alpha-mcp-analyst",
-      "env": {
-        "SEC_USER_AGENT": "YourName your@email.com"
-      }
-    }
-  }
-}
-```
-
-If Cursor cannot find the command, use the full venv path: `"command": "/path/to/.venv/bin/disclosure-alpha-mcp-analyst"`.
-
-Full MCP guide: [MCP](https://disclosure-alpha.readthedocs.io/en/latest/guides/mcp/index.html) (Builder bundle for raw HTML pipelines).
-
 ## Documentation
 
 | I want to… | Start here |
@@ -189,7 +190,7 @@ Full MCP guide: [MCP](https://disclosure-alpha.readthedocs.io/en/latest/guides/m
 | Score in terminal | [Quickstart CLI](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-cli.html) |
 | Build a screener | [HTTP guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/http/index.html) → [Workflows](https://disclosure-alpha.readthedocs.io/en/latest/guides/workflows/index.html) |
 | Use in Python | [Quickstart Python](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-python.html) |
-| Wire an agent | [MCP guide](https://disclosure-alpha.readthedocs.io/en/latest/guides/mcp/index.html) |
+| Score in OpenBB Workspace | [Quickstart OpenBB](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/quickstart-openbb.html) |
 | Copy-paste examples | [Examples gallery](https://disclosure-alpha.readthedocs.io/en/latest/examples/index.html) |
 
 ## License

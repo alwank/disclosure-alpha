@@ -17,6 +17,42 @@ Conceptual guide: {doc}`../../guides/http/index`. Interactive docs: {doc}`openap
 | **422** | Invalid query or body (e.g. panel with >25 tickers) |
 | **502** | Upstream EDGAR fetch failure |
 
+## `GET /`
+
+Openbb Root
+
+**Response (200):** `object`
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
+
+## `GET /agents.json`
+
+Get Agents Json
+
+**Response (200):** `object`
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
+
+## `GET /apps.json`
+
+Get Apps Json
+
+**Response (200):** `object`
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
+
 ## `GET /health`
 
 Health
@@ -34,6 +70,66 @@ Health
 ```bash
 curl "http://localhost:8000/health"
 ```
+
+## `GET /openbb/company`
+
+Openbb Company
+
+### Parameters
+
+| Name | In | Required | Type | Description |
+|------|-----|----------|------|-------------|
+| `ticker` | query | no | string |  |
+| `fiscal_year` | query | no | integer |  |
+| `form_type` | query | no | string |  |
+| `quarter` | query | no | object |  |
+| `demo` | query | no | object |  |
+| `scoring_model_version` | query | no | string |  |
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
+| **422** | Validation Error |
+
+### Example
+
+```bash
+curl -s "http://localhost:8000/openbb/company?demo=1" | head
+```
+
+## `GET /prompts.json`
+
+Get Prompts Json
+
+**Response (200):** `object`
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
+
+## `GET /mcp`
+
+Analyst MCP (Streamable HTTP)
+
+Mounted when `disclosure-alpha[mcp]` is installed alongside `[api]`. Serves the **Disclosure Alpha Analyst** MCP server on the same process as `disclosure-alpha-api`. OpenBB Workspace connects from the app page via `mcp_servers` in `/apps.json`.
+
+Not listed in the OpenAPI schema (ASGI sub-mount). Requires `pip install "disclosure-alpha[api,mcp]"`.
+
+## `GET /templates.json`
+
+Get Templates Json
+
+**Response (200):** `object`
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
 
 ## `GET /v1/company/{ticker}/disclosure-changes`
 
@@ -252,4 +348,22 @@ Panel Disclosure Matrix
 curl -s -X POST "http://localhost:8000/v1/panel/disclosure-matrix" \
   -H "Content-Type: application/json" \
   -d '{"tickers": ["AAPL", "MSFT"], "fiscal_year": 2025, "form_type": "10-K"}'
+```
+
+## `GET /widgets.json`
+
+Get Widgets Json
+
+**Response (200):** `object`
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
+
+### Example
+
+```bash
+curl -s "http://localhost:8000/widgets.json" | jq 'keys'
 ```

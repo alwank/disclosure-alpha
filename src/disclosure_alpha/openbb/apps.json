@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Disclosure Alpha",
+    "description": "Deterministic SEC filing disclosure risk scores — parse, diff, score. Language signals only; not investment advice.",
+    "img": "https://raw.githubusercontent.com/alwank/disclosure-alpha/main/docs/assets/openbb-workspace-company-widget.png",
+    "img_dark": "https://raw.githubusercontent.com/alwank/disclosure-alpha/main/docs/assets/openbb-workspace-company-widget.png",
+    "img_light": "https://raw.githubusercontent.com/alwank/disclosure-alpha/main/docs/assets/openbb-workspace-company-widget.png",
+    "allowCustomization": true,
+    "tabs": {
+      "company": {
+        "id": "company",
+        "name": "Company",
+        "layout": [
+          {
+            "i": "disclosure_company",
+            "x": 0,
+            "y": 0,
+            "w": 40,
+            "h": 50
+          }
+        ]
+      }
+    },
+    "groups": [
+      {
+        "name": "ticker",
+        "type": "param",
+        "paramName": "ticker",
+        "widgetIds": ["disclosure_company"]
+      }
+    ],
+    "prompts": [
+      "Summarize the overall disclosure risk score and top component drivers for $SYMBOL using @[id:disclosure_company].",
+      "Which active risk flags fired in the latest filing shown in @[id:disclosure_company]?",
+      "What section changes vs the prior filing stand out in @[id:disclosure_company]?",
+      "Compare boilerplate risk vs risk-factor intensity for this company in @[id:disclosure_company]."
+    ],
+    "mcp_servers": [
+      {
+        "name": "Disclosure Alpha Analyst",
+        "description": "Deterministic 10-K/10-Q scoring and filing discovery — same pipeline as the Company widget.",
+        "url": "/mcp"
+      }
+    ]
+  }
+]

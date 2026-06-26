@@ -19,6 +19,7 @@ Not investment advice. Scores summarize language and change signals in filings. 
 | Build a screener | {doc}`guides/http/index` → {doc}`guides/workflows/index` |
 | Use in Python | {doc}`getting-started/quickstart-python` |
 | Wire an agent | {doc}`guides/mcp/index` |
+| Score in OpenBB Workspace | {doc}`getting-started/quickstart-openbb` |
 | Copy-paste examples | {doc}`examples/index` |
 
 ## Get started in three steps
@@ -49,7 +50,7 @@ Full install options: {doc}`getting-started/installation`.
 - **Deterministic scores** — ten computed components (nine headline-weighted, 0–100) plus an overall disclosure risk score; see {doc}`reference/score-catalog`
 - **Section extraction** — Item 1A, MD&A, controls, and more from 10-K / 10-Q HTML (8-K via local `--html` or MCP Builder only; not EDGAR or HTTP ticker routes)
 - **Change detection** — lexical and semantic diffs vs the prior comparable filing
-- **Multiple surfaces** — terminal CLI, Python imports, REST API, and MCP tools for agents
+- **Multiple surfaces** — terminal CLI, Python imports, REST API, OpenBB Workspace, and MCP tools for agents
 
 ## Documentation
 

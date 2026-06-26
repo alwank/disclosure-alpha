@@ -72,7 +72,7 @@ def test_score_filing_ticker_mocked(monkeypatch):
 
 def test_load_filing_bundle_compare_prior(monkeypatch):
     from disclosure_alpha.edgar.types import FilingRef
-    from disclosure_alpha.pipeline import FilingBundle, load_filing_bundle
+    from disclosure_alpha.pipeline import load_filing_bundle
 
     ref = FilingRef(
         cik="0000320193",
@@ -85,34 +85,42 @@ def test_load_filing_bundle_compare_prior(monkeypatch):
         report_date="2025-09-27",
         primary_document="aapl.htm",
     )
-    prior_calls: list[str] = []
+    prior_ref = FilingRef(
+        cik="0000320193",
+        ticker="AAPL",
+        accession_number="0000320193-24-000001",
+        form_type="10-K",
+        fiscal_year=2024,
+        quarter=None,
+        filing_date="2024-10-31",
+        report_date="2024-09-27",
+        primary_document="aapl-prior.htm",
+    )
+    pair_calls: list[bool] = []
+
+    def _resolve_with_prior(*_a, compare_prior=True, **_k):
+        pair_calls.append(compare_prior)
+        if compare_prior:
+            return ref, prior_ref
+        return ref, None
 
     monkeypatch.setattr(
-        "disclosure_alpha.edgar.resolver.resolve_filing",
-        lambda *a, **k: ref,
+        "disclosure_alpha.edgar.resolver.resolve_filing_with_prior",
+        _resolve_with_prior,
     )
     monkeypatch.setattr(
         "disclosure_alpha.edgar.resolver.load_filing_html",
-        lambda r, **k: "<html></html>",
-    )
-
-    def _prior(*a, **k):
-        prior_calls.append("called")
-        return ref
-
-    monkeypatch.setattr(
-        "disclosure_alpha.edgar.resolver.resolve_prior_filing",
-        _prior,
+        lambda r, **k: f"<html>{r.accession_number}</html>",
     )
 
     bundle = load_filing_bundle("AAPL", 2025, compare_prior=True)
     assert bundle.prior_html is not None
-    assert prior_calls
+    assert pair_calls == [True]
 
-    prior_calls.clear()
+    pair_calls.clear()
     bundle = load_filing_bundle("AAPL", 2025, compare_prior=False)
     assert bundle.prior_html is None
-    assert not prior_calls
+    assert pair_calls == [False]
 
 
 def test_metrics_filing_ticker_mocked(monkeypatch):
@@ -419,7 +427,7 @@ def test_score_filing_html_includes_confidence_details():
 
 def test_score_panel_tickers_handles_expected_errors(monkeypatch):
     from disclosure_alpha.edgar.types import FilingNotFoundError
-    from disclosure_alpha.pipeline import score_panel_tickers
+    from disclosure_alpha.pipeline import FilingMetricsResult, score_panel_tickers
 
     ok_html = (
         "<html><body><p>Item 1A. Risk Factors</p>"
@@ -427,14 +435,15 @@ def test_score_panel_tickers_handles_expected_errors(monkeypatch):
     )
     good = score_filing_html(ok_html, "10-K")
 
-    def fake_score(ticker, fiscal_year, **kwargs):
+    def fake_metrics(ticker, fiscal_year, **kwargs):
         if ticker == "BAD":
             raise FilingNotFoundError("No 10-K for BAD FY2025")
-        result = good
-        result.filing = {"ticker": ticker, "fiscal_year": fiscal_year}
-        return result
+        return FilingMetricsResult(
+            metrics=good.metrics,
+            filing={"ticker": ticker, "fiscal_year": fiscal_year, "form_type": "10-K"},
+        )
 
-    monkeypatch.setattr("disclosure_alpha.pipeline.score_filing_ticker", fake_score)
+    monkeypatch.setattr("disclosure_alpha.pipeline.metrics_filing_ticker", fake_metrics)
     batch = score_panel_tickers(["GOOD", "BAD", "GOOD2"], 2025)
     assert batch.summary == {"ok": 2, "failed": 1}
     by_ticker = {r.ticker: r for r in batch.results}
@@ -447,9 +456,9 @@ def test_score_panel_tickers_handles_expected_errors(monkeypatch):
 def test_score_panel_tickers_propagates_unexpected_errors(monkeypatch):
     from disclosure_alpha.pipeline import score_panel_tickers
 
-    def fake_score(ticker, fiscal_year, **kwargs):
+    def fake_metrics(ticker, fiscal_year, **kwargs):
         raise RuntimeError("unexpected bug")
 
-    monkeypatch.setattr("disclosure_alpha.pipeline.score_filing_ticker", fake_score)
+    monkeypatch.setattr("disclosure_alpha.pipeline.metrics_filing_ticker", fake_metrics)
     with pytest.raises(RuntimeError, match="unexpected bug"):
         score_panel_tickers(["AAPL"], 2025)

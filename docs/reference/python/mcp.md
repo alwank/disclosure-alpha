@@ -1,6 +1,6 @@
 # mcp
 
-**Use when:** You want Cursor, Claude, or another MCP client to call Disclosure Alpha tools — either by ticker (analyst) or from raw HTML (builder).
+**Use when:** You want an MCP client to call Disclosure Alpha tools — either by ticker (analyst) or from raw HTML (builder).
 
 ## Start here
 

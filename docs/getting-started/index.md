@@ -11,6 +11,7 @@ scope-and-claims
 evidence
 quickstart-cli
 quickstart-python
+quickstart-openbb
 sec-edgar-setup
 understanding-scores
 concepts

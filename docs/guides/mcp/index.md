@@ -1,6 +1,6 @@
 # MCP Guide
 
-Disclosure Alpha ships two [Model Context Protocol](https://modelcontextprotocol.io/) servers for AI agents in Cursor, Claude Desktop, and other MCP hosts.
+Disclosure Alpha ships two [Model Context Protocol](https://modelcontextprotocol.io/) servers for AI agents and other MCP hosts.
 
 **Prerequisites:** `pip install "disclosure-alpha[mcp]"` (see {doc}`../../getting-started/installation`) and `SEC_USER_AGENT` for ticker-based tools.
 
@@ -51,7 +51,7 @@ Use the builder bundle when your agent already has filing HTML and needs step-by
 
 **Scoring model:** all scoring tools default to `deterministic_scoring_v2`. Pass `scoring_model_version=deterministic_scoring_v1` for the legacy scale. See {doc}`../../reference/versioning`.
 
-## Cursor configuration example
+## MCP host configuration
 
 Add to your MCP settings (paths may vary):
 

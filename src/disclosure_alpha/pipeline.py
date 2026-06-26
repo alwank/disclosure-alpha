@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import nullcontext
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
@@ -154,6 +157,7 @@ def compute_section_metrics(
     *,
     form_type: str = "10-K",
     fiscal_year: int | None = None,
+    timer: Any | None = None,
 ) -> MetricsResult:
     section_metrics: dict[str, dict[str, float]] = {}
     section_diffs: dict[str, float | None] = {}
@@ -167,20 +171,24 @@ def compute_section_metrics(
     for section in sections:
         extraction_confs[section.section_name] = float(section.extraction_confidence or 0.5)
         text = section.cleaned_text or ""
-        metrics = compute_text_metrics(
-            SectionTextInput(section.section_name, text, fiscal_year=fiscal_year)
-        )
-        section_metrics[section.section_name] = _metrics_dict(metrics)
-        section_flags[section.section_name] = detect_section_flags(text, section.section_name)
-        section_densities[section.section_name] = compute_density_metrics(text, section.section_name)
+        with timer.stage("metrics") if timer is not None else nullcontext():
+            metrics = compute_text_metrics(
+                SectionTextInput(section.section_name, text, fiscal_year=fiscal_year)
+            )
+            section_metrics[section.section_name] = _metrics_dict(metrics)
+            section_flags[section.section_name] = detect_section_flags(text, section.section_name)
+            section_densities[section.section_name] = compute_density_metrics(
+                text, section.section_name
+            )
 
         prior = _prior_by_name(prior_sections, section.section_name)
-        diff = compute_section_diff(
-            current_text=text,
-            prior_text=prior.cleaned_text if prior else None,
-            current_section_id=section.section_name,
-            prior_section_id=prior.section_name if prior else None,
-        )
+        with timer.stage("diff") if timer is not None else nullcontext():
+            diff = compute_section_diff(
+                current_text=text,
+                prior_text=prior.cleaned_text if prior else None,
+                current_section_id=section.section_name,
+                prior_section_id=prior.section_name if prior else None,
+            )
         if diff.disclosure_change_score is not None:
             section_diffs[section.section_name] = float(diff.disclosure_change_score)
         change_v2 = getattr(diff, "disclosure_change_score_v2", None)
@@ -396,22 +404,26 @@ def load_filing_bundle(
 ) -> FilingBundle:
     from disclosure_alpha.edgar.resolver import (
         load_filing_html,
-        resolve_filing,
-        resolve_prior_filing,
+        resolve_filing_with_prior,
     )
     from disclosure_alpha.edgar.types import FilingNotFoundError
 
-    ref = resolve_filing(ticker, fiscal_year, form_type, quarter, use_cache=use_cache)
+    ref, prior_ref = resolve_filing_with_prior(
+        ticker,
+        fiscal_year,
+        form_type=form_type,
+        quarter=quarter,
+        use_cache=use_cache,
+        compare_prior=compare_prior,
+    )
     html = load_filing_html(ref, use_cache=use_cache)
 
     prior_html = None
     prior_accession = None
-    if compare_prior:
+    if prior_ref is not None:
         try:
-            prior_ref = resolve_prior_filing(ref, use_cache=use_cache)
-            if prior_ref:
-                prior_html = load_filing_html(prior_ref, use_cache=use_cache)
-                prior_accession = prior_ref.accession_number
+            prior_html = load_filing_html(prior_ref, use_cache=use_cache)
+            prior_accession = prior_ref.accession_number
         except FilingNotFoundError:
             pass
 
@@ -453,6 +465,72 @@ def sections_filing_ticker(
     )
 
 
+def _metrics_timing_label(
+    ticker: str,
+    fiscal_year: int,
+    form_type: str,
+    quarter: str | None,
+    compare_prior: bool,
+) -> str:
+    q = f" {quarter}" if quarter else ""
+    return f"{ticker.upper()} FY{fiscal_year} {form_type}{q} compare_prior={compare_prior}"
+
+
+def _metrics_filing_ticker_uncached(
+    ticker: str,
+    fiscal_year: int,
+    *,
+    form_type: str = "10-K",
+    quarter: str | None = None,
+    use_cache: bool = True,
+    compare_prior: bool = True,
+) -> FilingMetricsResult:
+    from disclosure_alpha.pipeline_timing import PipelineTimer
+
+    timer = PipelineTimer(
+        _metrics_timing_label(ticker, fiscal_year, form_type, quarter, compare_prior)
+    )
+    with timer.stage("edgar"):
+        bundle = load_filing_bundle(
+            ticker,
+            fiscal_year,
+            form_type=form_type,
+            quarter=quarter,
+            use_cache=use_cache,
+            compare_prior=compare_prior,
+        )
+    with timer.stage("parse"):
+        sections = extract_sections_from_html(
+            bundle.html,
+            bundle.ref.form_type,
+            cik=bundle.ref.cik,
+            accession_number=bundle.ref.accession_number,
+        )
+    prior_sections = None
+    if bundle.prior_html:
+        with timer.stage("parse_prior"):
+            prior_sections = extract_sections_from_html(
+                bundle.prior_html,
+                bundle.ref.form_type,
+                cik=bundle.ref.cik,
+                accession_number="prior",
+            )
+    metrics = compute_section_metrics(
+        sections,
+        prior_sections,
+        form_type=bundle.ref.form_type,
+        fiscal_year=bundle.ref.fiscal_year,
+        timer=timer,
+    )
+    timer.log(sections=len(sections), has_prior=bool(prior_sections))
+    return FilingMetricsResult(
+        metrics=metrics,
+        sections=sections,
+        filing=_filing_meta(bundle.ref, prior_accession=bundle.prior_accession),
+        versions=build_versions(),
+    )
+
+
 def metrics_filing_ticker(
     ticker: str,
     fiscal_year: int,
@@ -462,7 +540,26 @@ def metrics_filing_ticker(
     use_cache: bool = True,
     compare_prior: bool = True,
 ) -> FilingMetricsResult:
-    bundle = load_filing_bundle(
+    from disclosure_alpha.cache import metrics_cache, metrics_cache_key
+
+    if not use_cache:
+        return _metrics_filing_ticker_uncached(
+            ticker,
+            fiscal_year,
+            form_type=form_type,
+            quarter=quarter,
+            use_cache=use_cache,
+            compare_prior=compare_prior,
+        )
+    from disclosure_alpha.pipeline_timing import log_cache_hit
+
+    cache = metrics_cache()
+    key = metrics_cache_key(ticker, fiscal_year, form_type, quarter, compare_prior)
+    hit = cache.get(key)
+    if hit is not None:
+        log_cache_hit(_metrics_timing_label(ticker, fiscal_year, form_type, quarter, compare_prior))
+        return hit
+    result = _metrics_filing_ticker_uncached(
         ticker,
         fiscal_year,
         form_type=form_type,
@@ -470,29 +567,8 @@ def metrics_filing_ticker(
         use_cache=use_cache,
         compare_prior=compare_prior,
     )
-    sections = extract_sections_from_html(
-        bundle.html,
-        bundle.ref.form_type,
-        cik=bundle.ref.cik,
-        accession_number=bundle.ref.accession_number,
-    )
-    prior_sections = None
-    if bundle.prior_html:
-        prior_sections = extract_sections_from_html(
-            bundle.prior_html,
-            bundle.ref.form_type,
-            cik=bundle.ref.cik,
-            accession_number="prior",
-        )
-    metrics = compute_section_metrics(
-        sections, prior_sections, form_type=bundle.ref.form_type, fiscal_year=bundle.ref.fiscal_year
-    )
-    return FilingMetricsResult(
-        metrics=metrics,
-        sections=sections,
-        filing=_filing_meta(bundle.ref, prior_accession=bundle.prior_accession),
-        versions=build_versions(),
-    )
+    cache.set(key, result)
+    return result
 
 
 def score_filing_ticker(
@@ -542,6 +618,38 @@ class PanelBatchResult:
     versions: dict[str, str]
 
 
+def _score_panel_ticker(
+    raw: str,
+    fiscal_year: int,
+    *,
+    form_type: str,
+    quarter: str | None,
+    use_cache: bool,
+    compare_prior: bool,
+    pipeline_config: PipelineConfig,
+) -> PanelTickerResult:
+    ticker = raw.strip().upper()
+    try:
+        metrics_result = metrics_filing_ticker(
+            ticker,
+            fiscal_year,
+            form_type=form_type,
+            quarter=quarter,
+            use_cache=use_cache,
+            compare_prior=compare_prior,
+        )
+        ft = metrics_result.filing.get("form_type") if metrics_result.filing else form_type
+        scores = score_for_model(metrics_result.metrics, config=pipeline_config, form_type=ft)
+        return PanelTickerResult(
+            ticker=ticker,
+            status="ok",
+            filing=metrics_result.filing,
+            scores=scores,
+        )
+    except (EdgarError, ValueError, FileNotFoundError) as exc:
+        return PanelTickerResult(ticker=ticker, status="error", error=str(exc))
+
+
 def score_panel_tickers(
     tickers: list[str],
     fiscal_year: int,
@@ -552,47 +660,51 @@ def score_panel_tickers(
     compare_prior: bool = True,
     scoring_model_version: str = SCORING_MODEL_VERSION,
     config: PipelineConfig | None = None,
+    max_workers: int | None = None,
 ) -> PanelBatchResult:
-    """Score many tickers sequentially; per-ticker errors do not fail the batch."""
+    """Score many tickers; per-ticker errors do not fail the batch."""
     pipeline_config = resolve_pipeline_config(config, scoring_model_version=scoring_model_version)
-    results: list[PanelTickerResult] = []
-    ok = 0
-    failed = 0
-    for raw in tickers:
-        ticker = raw.strip().upper()
-        try:
-            scored = score_filing_ticker(
-                ticker,
+    if max_workers is None:
+        max_workers = int(os.environ.get("PANEL_MAX_WORKERS", "4"))
+    workers = max(1, max_workers)
+
+    if workers <= 1 or len(tickers) <= 1:
+        results = [
+            _score_panel_ticker(
+                raw,
                 fiscal_year,
                 form_type=form_type,
                 quarter=quarter,
                 use_cache=use_cache,
                 compare_prior=compare_prior,
-                config=pipeline_config,
+                pipeline_config=pipeline_config,
             )
-            scores = score_for_model(
-                scored.metrics,
-                config=pipeline_config,
-                form_type=scored.filing.get("form_type") if scored.filing else form_type,
-            )
-            results.append(
-                PanelTickerResult(
-                    ticker=ticker,
-                    status="ok",
-                    filing=scored.filing,
-                    scores=scores,
-                )
-            )
-            ok += 1
-        except (EdgarError, ValueError, FileNotFoundError) as exc:
-            results.append(
-                PanelTickerResult(
-                    ticker=ticker,
-                    status="error",
-                    error=str(exc),
-                )
-            )
-            failed += 1
+            for raw in tickers
+        ]
+    else:
+        # ponytail: preserve ticker order via index map
+        indexed = list(enumerate(tickers))
+        out: list[PanelTickerResult | None] = [None] * len(tickers)
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {
+                pool.submit(
+                    _score_panel_ticker,
+                    raw,
+                    fiscal_year,
+                    form_type=form_type,
+                    quarter=quarter,
+                    use_cache=use_cache,
+                    compare_prior=compare_prior,
+                    pipeline_config=pipeline_config,
+                ): idx
+                for idx, raw in indexed
+            }
+            for future in as_completed(futures):
+                out[futures[future]] = future.result()
+        results = [r for r in out if r is not None]
+
+    ok = sum(1 for r in results if r.status == "ok")
+    failed = len(results) - ok
     return PanelBatchResult(
         results=results,
         summary={"ok": ok, "failed": failed},

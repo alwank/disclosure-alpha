@@ -60,6 +60,29 @@ def fetch_text(url: str) -> str:
         raise SecFetchError(f"SEC fetch failed for {url}: {exc.reason}") from exc
 
 
+def fetch_text_prefix(url: str, max_bytes: int = 131_072) -> str:
+    """Fetch first max_bytes of HTML (DEI tags); fallback to full fetch if Range unsupported."""
+    _throttle()
+    end = max(0, max_bytes - 1)
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": _user_agent(),
+            "Accept": "text/html,*/*",
+            "Range": f"bytes=0-{end}",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            return resp.read().decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as exc:
+        if exc.code in (416, 501):
+            return fetch_text(url)
+        raise SecFetchError(f"SEC HTTP {exc.code} for {url}") from exc
+    except urllib.error.URLError as exc:
+        raise SecFetchError(f"SEC fetch failed for {url}: {exc.reason}") from exc
+
+
 @lru_cache(maxsize=1)
 def fetch_company_tickers() -> dict[str, tuple[str, str]]:
     """Return ticker -> (cik_padded, company_name)."""

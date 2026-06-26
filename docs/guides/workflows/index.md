@@ -146,6 +146,24 @@ With prior HTML, `disclosure_change_score` populates when matching sections exis
 
 No network or `SEC_USER_AGENT` required when both files are local.
 
+## Score in OpenBB Workspace (demo then live)
+
+**Goal:** Run the Disclosure Company widget in OpenBB Workspace — sample data first, then live EDGAR.
+
+See {doc}`../../getting-started/quickstart-openbb` for install, demo, and connect steps. Summary:
+
+1. Start `disclosure-alpha-api` with `SEC_USER_AGENT` set for live scoring.
+2. Connect Workspace (**Chrome**, URL `http://127.0.0.1:8000`).
+3. **My Apps → Disclosure Alpha → Company** — Run with **`demo=1`**, then clear **`demo`** and Run again for live EDGAR.
+
+### How to read it
+
+Same score card as the HTTP matrix headline view: overall score, components, active flags, and section changes. See {doc}`../../getting-started/understanding-scores`.
+
+### If something looks wrong
+
+Chrome Local Network Access, Test 500, and Safari blocks: {doc}`../openbb/index` and {doc}`../../getting-started/quickstart-openbb`.
+
 ## Related
 
 - {doc}`../../examples/index`
@@ -153,3 +171,4 @@ No network or `SEC_USER_AGENT` required when both files are local.
 - {doc}`../../getting-started/understanding-scores`
 - {doc}`../python/index`
 - {doc}`../http/index`
+- {doc}`../openbb/index`

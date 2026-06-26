@@ -1,0 +1,68 @@
+{
+  "disclosure_company": {
+    "name": "Disclosure Company",
+    "description": "Score card, active flags, and section changes in one view.",
+    "category": "Filings and Research",
+    "subCategory": "SEC Filings",
+    "type": "html",
+    "endpoint": "openbb/company",
+    "runButton": true,
+    "exportable": false,
+    "gridData": { "w": 40, "h": 50 },
+    "imgUrl": "https://raw.githubusercontent.com/alwank/disclosure-alpha/main/docs/assets/openbb-workspace-company-widget.png",
+    "params": [
+      {
+        "type": "ticker",
+        "paramName": "ticker",
+        "value": "AAPL",
+        "label": "Ticker",
+        "show": true
+      },
+      {
+        "type": "number",
+        "paramName": "fiscal_year",
+        "value": 2025,
+        "label": "Fiscal year",
+        "show": true
+      },
+      {
+        "type": "text",
+        "paramName": "form_type",
+        "value": "10-K",
+        "label": "Form type",
+        "show": true,
+        "options": [
+          { "label": "10-K", "value": "10-K" },
+          { "label": "10-Q", "value": "10-Q" }
+        ]
+      },
+      {
+        "type": "text",
+        "paramName": "quarter",
+        "value": "",
+        "label": "Quarter (10-Q only)",
+        "show": true,
+        "description": "Required for 10-Q: Q1, Q2, or Q3. Leave blank for 10-K.",
+        "options": [
+          { "label": "(none)", "value": "" },
+          { "label": "Q1", "value": "Q1" },
+          { "label": "Q2", "value": "Q2" },
+          { "label": "Q3", "value": "Q3" }
+        ]
+      },
+      {
+        "type": "text",
+        "paramName": "demo",
+        "value": "",
+        "label": "Demo mode",
+        "show": false,
+        "description": "Set to 1 for fixture data without EDGAR (layout testing only)."
+      }
+    ],
+    "source": ["Disclosure Alpha"],
+    "mcp_tool": {
+      "mcp_server": "Disclosure Alpha Analyst",
+      "tool_id": "score_company_filing_tool"
+    }
+  }
+}

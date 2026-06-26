@@ -27,8 +27,8 @@ pip install "disclosure-alpha==1.5.0[api,mcp]"
 | Extra | Purpose |
 |-------|---------|
 | *(base)* | CLI + Python SDK |
-| `api` | HTTP API (`disclosure-alpha-api`) |
-| `mcp` | MCP servers for Cursor / Claude Desktop |
+| `api` | HTTP API (`disclosure-alpha-api`) and OpenBB Workspace backend |
+| `mcp` | MCP servers for AI agents |
 | `semantic` | MiniLM embeddings (default pipeline uses TF-IDF) |
 
 ```bash

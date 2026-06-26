@@ -38,7 +38,21 @@ _CURL_EXAMPLES: dict[tuple[str, str], str] = {
         '  -H "Content-Type: application/json" \\\n'
         '  -d \'{"tickers": ["AAPL", "MSFT"], "fiscal_year": 2025, "form_type": "10-K"}\''
     ),
+    ("get", "/openbb/company"): 'curl -s "http://localhost:8000/openbb/company?demo=1" | head',
+    ("get", "/widgets.json"): 'curl -s "http://localhost:8000/widgets.json" | jq \'keys\'',
 }
+
+# ponytail: ASGI-mounted routes not in OpenAPI — keep in sync with docs/guides/openbb
+_MANUAL_BEFORE_TEMPLATES = """\
+## `GET /mcp`
+
+Analyst MCP (Streamable HTTP)
+
+Mounted when `disclosure-alpha[mcp]` is installed alongside `[api]`. Serves the **Disclosure Alpha Analyst** MCP server on the same process as `disclosure-alpha-api`. OpenBB Workspace connects from the app page via `mcp_servers` in `/apps.json`.
+
+Not listed in the OpenAPI schema (ASGI sub-mount). Requires `pip install "disclosure-alpha[api,mcp]"`.
+
+"""
 
 
 def _ref_name(schema: dict) -> str:
@@ -129,7 +143,11 @@ def generate() -> str:
             if curl:
                 lines.extend(["### Example", "", "```bash", curl, "```", ""])
 
-    return "\n".join(lines).rstrip() + "\n"
+    body = "\n".join(lines).rstrip() + "\n"
+    marker = "## `GET /templates.json`"
+    if marker in body:
+        body = body.replace(marker, _MANUAL_BEFORE_TEMPLATES + marker, 1)
+    return body
 
 
 def check() -> None:

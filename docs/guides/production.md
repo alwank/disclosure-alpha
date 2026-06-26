@@ -59,11 +59,27 @@ Panel POST and batch ticker jobs should serialize fetches within each worker. Sc
 ## Security
 
 - **No auth** in the API server — add API keys, mTLS, or VPN at your edge
+- **`/mcp`** (OpenBB Copilot MCP) is unauthenticated when `[mcp]` is installed — keep the API on localhost or a private network
+- CORS exposes **`Mcp-Session-Id`** for browser-based MCP clients (OpenBB Workspace)
 - Do not expose unauthenticated instances to the public internet
 - Scope claims: {doc}`../getting-started/scope-and-claims`
+
+## OpenBB Workspace browser access
+
+When analysts connect [OpenBB Workspace](https://pro.openbb.co) to your API, the browser at `https://pro.openbb.co` fetches your local or private backend. Disclosure Alpha adds CORS headers and Private Network Access (`Access-Control-Allow-Private-Network: true`) automatically.
+
+| Concern | Guidance |
+|---------|----------|
+| CORS origins | Override **`OPENBB_CORS_ORIGINS`** if Workspace runs on a non-default host |
+| Chrome Local Network Access | Analysts must allow `pro.openbb.co` to reach `127.0.0.1` — a browser permission, not an API config bug |
+| Multi-worker deploy | **`METRICS_CACHE_*`** is per-process; `gunicorn -w N` means N separate caches; MCP HTTP defaults to stateless mode (single-worker localhost recommended) |
+| Safari / Brave | May block HTTP localhost from HTTPS pages — use a TLS tunnel |
+
+Full connect and troubleshooting flow: {doc}`openbb/index`.
 
 ## Related
 
 - {doc}`http/index` — HTTP API guide
+- {doc}`openbb/index` — OpenBB Workspace backend
 - {doc}`../reference/http/endpoints` — endpoint reference
 - {doc}`../getting-started/sec-edgar-setup`

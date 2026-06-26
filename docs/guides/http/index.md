@@ -57,6 +57,12 @@ disclosure-alpha-api
 # listens on 0.0.0.0:8000 (override with HOST / PORT env)
 ```
 
+```{admonition} OpenBB Workspace
+:class: tip
+
+The same `disclosure-alpha-api` process also serves OpenBB discovery (`/widgets.json`, `/apps.json`) and the bundled Company widget at `GET /openbb/company`. See {doc}`../openbb/index`.
+```
+
 ## Response tiers (matrix only)
 
 Optional `tier` query param overrides `include` and `fields`:
@@ -132,4 +138,5 @@ See {doc}`../../getting-started/faq`.
 - {doc}`../../examples/index`
 - {doc}`../../reference/section-taxonomy`
 - {doc}`../../reference/environment-variables`
+- {doc}`../openbb/index` — OpenBB Workspace backend (same API process)
 - {doc}`../../methodology/overview`

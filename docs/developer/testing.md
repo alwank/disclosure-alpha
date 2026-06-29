@@ -8,7 +8,7 @@ How to run unit, integration, and validation checks locally and what CI enforces
 
 ## In plain terms
 
-Fast tests run without network access. Integration and EDGAR-backed tests are opt-in. Full validation harness (scripts, reports) lives on the internal branch — see `INTERNAL_VALIDATION.md`.
+Fast tests run without network access. Integration and EDGAR-backed tests are opt-in. Full validation harness is not shipped in this repository.
 
 ## Main content
 

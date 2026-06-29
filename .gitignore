@@ -16,6 +16,7 @@ docs/_build/
 .env
 
 # Internal validation (local only; not shipped on public repo)
+INTERNAL_VALIDATION.md
 scripts/validate_*.py
 scripts/build_validation_corpus*.py
 scripts/build_matrix_validation_corpus*.py
@@ -28,3 +29,14 @@ docs/validation/
 data/validation/README.md
 data/validation/reports/
 data/validation/baselines/
+
+# Medium article draft (local only; not shipped on public repo)
+medium/
+
+# Repo-only planning and audit docs (local only; not shipped on public repo)
+docs/codebase-audit-report.md
+docs/extraction-analytics-layer-audit.md
+docs/analytics-scoring-layer-improvement-plan.md
+docs/readthedocs-public-docs-improvement-plan.md
+docs/methodology/boilerplate-v4-diagnostics.md
+docs/methodology/roadmap/

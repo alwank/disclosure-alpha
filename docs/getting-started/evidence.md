@@ -7,13 +7,13 @@
 
 Deterministic scoring (**`deterministic_scoring_v2`**) was checked on S&P 500 FY2025 **Item 1A** risk-factor text. The table below is the public evidence record — construct checks against independent references, plus one descriptive post-filing volatility association.
 
-**Last updated:** 2026-06-25.
+**Last updated:** 2026-06-29.
 
 | Check | Result |
 |-------|--------|
 | **Analysis cohort** | **478** firms (FY2025 Item 1A, S&P 500 universe n=503) |
 | **Specificity construct validity** | Spearman **ρ ≈ 0.87** vs NER entity density (n=478) |
-| **Boilerplate construct validity** | Spearman **ρ ≈ 0.96** vs cross-firm 4-gram proxy on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478) |
+| **Boilerplate construct validity** | Spearman **ρ ≈ 0.92** vs cross-firm 4-gram proxy on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478) |
 | **Post-filing volatility association** | Q5/Q1 **≈ 1.15** on 90-day realized vol (n=435) |
 
 Construct rows show our metrics track external references. The volatility row is a **descriptive association only** — not return prediction, alpha, or investment advice.
@@ -63,7 +63,7 @@ The committed L3 outcomes report (`data/validation/reports/l3_outcomes_report_fy
 |--|--|
 | **Our metric** | `boilerplate_combined_ratio` (`text_metrics_v4`: phrase list + cross-firm 4-gram blend) |
 | **Reference** | Lang & Stice-Lawrence-style cross-firm 4-gram boilerplate proxy (`ls_boilerplate_word_ratio`) |
-| **Association** | Spearman **ρ ≈ 0.96** on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478); phrase-only v3 was ≈0.74 |
+| **Association** | Spearman **ρ ≈ 0.92** on `boilerplate_combined_ratio` (`text_metrics_v4`, n=478); phrase-only v3 was ≈0.74 |
 | **n** | 478 |
 
 **Interpretation:** Our boilerplate measure moves with a literature boilerplate proxy. It is **not** a full replication of the LS4-gram paper measure — see {doc}`../methodology/research-foundation` for how the built-in metric differs.
@@ -93,9 +93,15 @@ We do **not** claim earnings-surprise prediction (change-score vs surprise did n
 - That headline risk scores are "correct" in an absolute sense — only that components relate to chosen external references and one vol outcome in-sample
 - Comparable numeric levels between `deterministic_scoring_v1` and v2 (different scales — see {doc}`../reference/versioning`)
 
-## Reproducing checks (contributors)
+## Reproducing checks
 
-The public `main` branch does not ship validation scripts or report JSON. Maintainers refresh evidence on the git branch **`internal`** — see `INTERNAL_VALIDATION.md` in the repository. After a re-run, update the table on this page if headline numbers change.
+Headline numbers on this page come from FY2025 L2/L3 runs on EDGAR-built corpora (`n=478` construct cohort; `n=435` vol pairing with matrix score cache). Contributors with local validation artifacts can refresh reports:
+
+```bash
+python scripts/run_fy2025_validation.py
+```
+
+Outputs (gitignored): `data/validation/reports/deterministic_validation_report_fy2025_v2.json`, `l3_outcomes_report_fy2025_v2.json`, and `fy2025_validation_summary.json`. Requires `sp500_item1a.jsonl`, `sp500_outcomes.jsonl`, and `scores_sp500_matrix_fy2025_v2.jsonl` on disk.
 
 ## Related
 

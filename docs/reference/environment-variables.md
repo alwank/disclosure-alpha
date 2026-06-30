@@ -14,7 +14,7 @@
 | `PIPELINE_TIMING` | No | `1` when using `disclosure-alpha-api`; off elsewhere | Log per-stage seconds (`edgar`, `parse`, `parse_prior`, `metrics`, `diff`) on each `metrics_filing_ticker` run |
 | `OPENBB_API_URL` | No | OpenBB default | Base URL for optional post-filing outcome fetch (`[outcomes]` extra only — **not** the Workspace connect URL; set backend URL in the Workspace UI) |
 | `SPACY_MODEL` | No | `en_core_web_sm` | spaCy model for construct-validity harness (optional `[validation]` extra) |
-| `DISCLOSURE_ALPHA_VALIDATION_CACHE_DIR` | No | `data/validation/cache` | Cache directory for internal validation artifacts |
+| `DISCLOSURE_ALPHA_VALIDATION_CACHE_DIR` | No | `data/validation/cache` | Cache directory for optional validation harness runs |
 | `SEC_USER_AGENT_WORKER_0...N` | No | — | Optional per-worker SEC identities when running multi-process EDGAR builds |
 
 Set `SEC_USER_AGENT` in the shell or process environment before running ticker-based CLI, HTTP, or MCP commands. See {doc}`../getting-started/sec-edgar-setup`.

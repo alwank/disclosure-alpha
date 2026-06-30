@@ -6,6 +6,12 @@ Version history for parser, metrics engine, dictionary packs, and scoring model.
 
 OpenBB Workspace addon modernization plus API pipeline performance and EDGAR improvements.
 
+### Evidence correction (2026-06-29)
+
+| Area | Change |
+|------|--------|
+| **Boilerplate construct** | Public evidence updated to **ρ ≈ 0.92** (n=478) for `boilerplate_combined_ratio` vs LS proxy — full L2 re-run on EDGAR-built FY2025 corpus; prior **0.96** headline was overstated |
+
 ### OpenBB Workspace
 
 | Area | Change |
@@ -76,7 +82,7 @@ Package release consolidating artifact bumps and default-surface updates.
 |------|--------|
 | **Dictionaries / metrics** | `built_in_dictionaries_v3` and `text_metrics_v3` — dictionary package split, flag suppressions, legal phrases, modal tiers, topic tuning |
 | **Scoring default** | **`deterministic_scoring_v2` is now the default** on CLI, HTTP, MCP, and `score_filing_html()` / `score_for_model()`; legacy `deterministic_scoring_v1` remains opt-in |
-| **Validation data** | Reports and baselines removed from the public repo (see `INTERNAL_VALIDATION.md` on the internal branch) |
+| **Validation data** | Reports and baselines removed from the public repository |
 | **Docs** | Evidence, scope, HTTP/MCP guides, versioning pins, and glossary aligned to current artifact versions |
 | **Release tooling** | Version sync test, HTTP endpoints doc drift check, hardened PyPI publish workflow |
 

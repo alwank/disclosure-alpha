@@ -264,6 +264,32 @@ Disclosure Metrics
 curl "http://localhost:8000/v1/company/AAPL/disclosure-metrics?fiscal_year=2025&form_type=10-K"
 ```
 
+## `GET /v1/company/{ticker}/filing-review`
+
+Filing Review
+
+### Parameters
+
+| Name | In | Required | Type | Description |
+|------|-----|----------|------|-------------|
+| `ticker` | path | yes | string |  |
+| `fiscal_year` | query | yes | integer |  |
+| `form_type` | query | no | string |  |
+| `quarter` | query | no | object |  |
+| `compare` | query | no | string |  |
+| `scoring_model_version` | query | no | string |  |
+
+**Response (200):** `FilingReviewResponse`
+
+### Responses
+
+| Status | Description |
+|--------|-------------|
+| **200** | Successful Response |
+| **404** | Not Found |
+| **422** | Unprocessable Entity |
+| **502** | Bad Gateway |
+
 ## `GET /v1/company/{ticker}/filings`
 
 Company Filings

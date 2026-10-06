@@ -327,6 +327,8 @@ def score_filing_html(
 
 
 def _filing_meta(ref, *, prior_accession: str | None = None) -> dict[str, Any]:
+    from disclosure_alpha.edgar.client import filing_document_url
+
     return {
         "ticker": ref.ticker,
         "cik": ref.cik,
@@ -337,6 +339,7 @@ def _filing_meta(ref, *, prior_accession: str | None = None) -> dict[str, Any]:
         "filing_date": ref.filing_date,
         "report_date": ref.report_date,
         "prior_accession_number": prior_accession,
+        "source_url": filing_document_url(ref.cik, ref.accession_number, ref.primary_document),
     }
 
 

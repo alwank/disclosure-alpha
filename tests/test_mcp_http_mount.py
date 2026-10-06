@@ -16,6 +16,7 @@ from disclosure_alpha.mcp.analyst_server import (
     TOOL_SCORE,
     create_analyst_mcp,
 )
+from disclosure_alpha.mcp.http_mount import try_create_analyst_mcp
 
 
 def test_create_analyst_mcp_has_expected_tools():
@@ -42,3 +43,9 @@ def test_app_skips_mcp_without_extra():
         with TestClient(create_app()) as client:
             resp = client.get("/mcp")
             assert resp.status_code == 404
+
+
+@patch("disclosure_alpha.mcp.http_mount.find_spec", return_value=None)
+def test_optional_mcp_dependency_is_not_required_for_api(mock_find_spec):
+    assert try_create_analyst_mcp() is None
+    mock_find_spec.assert_called_once_with("mcp")

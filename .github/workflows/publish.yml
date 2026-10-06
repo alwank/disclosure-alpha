@@ -23,6 +23,16 @@ jobs:
           test "$TAG" = "$VER"
       - run: pip install -e ".[api,mcp,dev]"
       - run: pytest -q -m "not integration"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm run build
+        working-directory: web
       - run: pip install build
       - run: python -m build
+      - run: python scripts/check_ui_package.py
       - uses: pypa/gh-action-pypi-publish@release/v1

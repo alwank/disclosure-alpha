@@ -41,6 +41,7 @@ class ExtractedSection:
     start_offset: int | None = None
     end_offset: int | None = None
     warnings: list[str] = field(default_factory=list)
+    reading_blocks: list[dict[str, int | str]] = field(default_factory=list)
 
 
 @dataclass
@@ -430,9 +431,36 @@ def _build_extracted_section(
     parser_version: str,
     method: str,
     extra_warnings: list[str] | None = None,
+    title_blocks: set[str] | None = None,
 ) -> ExtractedSection:
     raw_slice = cleaned_full[start:end].strip()
     cleaned = normalize_whitespace(raw_slice)
+    reading_blocks: list[dict[str, int | str]] = []
+    cursor = 0
+    for raw_block in re.split(r"\n{2,}", raw_slice):
+        block_text = normalize_whitespace(raw_block)
+        if not block_text:
+            continue
+        if reading_blocks:
+            cursor += 1  # The canonical cleaned text has one space between source blocks.
+        block_start = cursor
+        cursor += len(block_text)
+        source_heading = (
+            not reading_blocks
+            and len(block_text) <= 140
+            and _section_pattern(section_name).match(block_text) is not None
+        )
+        reading_blocks.append(
+            {
+                "start": block_start,
+                "end": cursor,
+                "kind": "heading" if source_heading or block_text in (title_blocks or set()) else "paragraph",
+            }
+        )
+    if cursor != len(cleaned) or " ".join(
+        cleaned[int(block["start"]):int(block["end"])] for block in reading_blocks
+    ) != cleaned:
+        reading_blocks = [{"start": 0, "end": len(cleaned), "kind": "paragraph"}] if cleaned else []
     word_count = _count_words(cleaned)
     sentence_count = _count_sentences(cleaned)
     section_warnings = list(dict.fromkeys((candidate.warnings if candidate else []) + (extra_warnings or [])))
@@ -461,6 +489,7 @@ def _build_extracted_section(
         start_offset=start,
         end_offset=end,
         warnings=section_warnings,
+        reading_blocks=reading_blocks,
     )
 
 
@@ -703,6 +732,7 @@ def _extract_from_sec_parser(
         return []
 
     cleaned_full = _full_text(blocks)
+    title_blocks = {block.normalized_text for block in blocks if block.is_title}
 
     end_by_section = {c.section_name: len(cleaned_full) for c in ordered}
     for idx, candidate in enumerate(ordered):
@@ -724,6 +754,7 @@ def _extract_from_sec_parser(
             base_conf=0.75,
             parser_version=parser_version,
             method="sec_parser_sequence_v1",
+            title_blocks=title_blocks,
         )
 
         if section.word_count < 50:
@@ -741,6 +772,7 @@ def _extract_from_sec_parser(
                     parser_version=parser_version,
                     method="sec_parser_sequence_v1",
                     extra_warnings=["boundary_extended"],
+                    title_blocks=title_blocks,
                 )
 
         if section.word_count < ANALYSIS_MIN_WORDS and (
@@ -759,6 +791,7 @@ def _extract_from_sec_parser(
                     parser_version=parser_version,
                     method="sec_parser_sequence_v1",
                     extra_warnings=["alternate_candidate"],
+                    title_blocks=title_blocks,
                 )
                 if alt_section.word_count > section.word_count:
                     section = alt_section

@@ -1,6 +1,6 @@
 # Choose Your Surface
 
-Disclosure Alpha exposes the same deterministic pipeline through a CLI, Python SDK, focused HTTP endpoints, and two MCP bundles — pick the surface that matches your workflow.
+Disclosure Alpha exposes the same deterministic pipeline through a Filing Review UI, CLI, Python SDK, focused HTTP endpoints, OpenBB Workspace, and two MCP bundles — pick the surface that matches your workflow.
 
 ## Which surface?
 
@@ -18,6 +18,7 @@ flowchart TD
   start --> agent
 
   ticker --> cli_t["CLI or Python SDK"]
+  ticker --> review_ui["Filing Review UI"]
   ticker --> http_t["HTTP matrix GET"]
   ticker --> openbb_d["OpenBB Workspace"]
   ticker --> mcp_a["MCP Analyst"]
@@ -43,6 +44,7 @@ Need help reading the JSON? Start with {doc}`understanding-scores`.
 | Discovery / data engineer | List filings, extract sections | Filing Index + Section Extractor (HTTP) |
 | Quant / researcher | Raw metrics, flags, diffs | Disclosure Analytics, Flags, Changes (HTTP) |
 | Risk analyst | Filing-level scores | Disclosure Risk Score / matrix (HTTP) |
+| Filing reader | Scores with highlighted flag phrases | Filing Review UI |
 | Screener / index builder | Batch tickers | Panel POST (HTTP) |
 | OpenBB Workspace dashboard | Interactive disclosure app | OpenBB backend + {doc}`../guides/openbb/index` |
 | Agent builder | Low-level pipeline in MCP | Builder MCP bundle |
@@ -56,6 +58,7 @@ Need help reading the JSON? Start with {doc}`understanding-scores`.
 | CLI | Terminal workflows, local HTML | `disclosure-alpha` |
 | Python SDK | Custom pipelines, notebooks | `import disclosure_alpha` |
 | HTTP API | Services, dashboards, screeners | `disclosure-alpha-api` |
+| Filing Review UI | Read scores alongside marked filing language | `disclosure-alpha-api` → `/app/` |
 | OpenBB Workspace | Analyst dashboards in OpenBB | `disclosure-alpha-api` + {doc}`../guides/openbb/index` |
 | MCP Analyst | AI agent ticker tools | `disclosure-alpha-mcp-analyst` |
 | MCP Builder | Raw HTML agent workflows | `disclosure-alpha-mcp-builder` |

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import os
+from pathlib import Path
 
 # ponytail: API-only defaults; CLI/SDK callers keep model/timing defaults unless they set env
 os.environ.setdefault("EMBEDDING_BACKEND", "tfidf")
@@ -9,7 +10,9 @@ os.environ.setdefault("PIPELINE_TIMING", "1")
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
@@ -100,6 +103,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
         expose_headers=["Mcp-Session-Id"],
     )
+    app.add_middleware(GZipMiddleware, minimum_size=1000)
     # Outermost on response: patch CORS preflight after CORSMiddleware builds it.
     app.add_middleware(_PrivateNetworkAccessMiddleware)
 
@@ -127,5 +131,9 @@ def create_app() -> FastAPI:
     if analyst_mcp is not None:
         analyst_mcp.settings.streamable_http_path = "/"
         app.mount("/mcp", analyst_mcp.streamable_http_app())
+
+    assets_dir = Path(__file__).resolve().parent.parent / "web_assets"
+    if (assets_dir / "index.html").is_file():
+        app.mount("/app", StaticFiles(directory=assets_dir, html=True), name="filing-review-ui")
 
     return app

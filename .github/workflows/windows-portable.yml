@@ -1,0 +1,78 @@
+name: Build portable Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["codex/**"]
+    paths:
+      - ".github/workflows/windows-portable.yml"
+      - "packaging/**"
+      - "pyproject.toml"
+      - "src/disclosure_alpha/**"
+      - "web/**"
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-zip:
+    name: Build portable ZIP
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build filing-review assets
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+      - name: Install desktop packaging dependencies
+        run: pip install ".[api,desktop]"
+      - name: Freeze the portable application
+        run: >
+          pyinstaller --noconfirm --clean
+          --distpath release
+          --workpath build/pyinstaller
+          packaging/disclosure-alpha-desktop.spec
+      - name: Add portable-folder instructions
+        shell: pwsh
+        run: Copy-Item packaging/README-Windows.txt "release/Disclosure Alpha/README-Windows.txt"
+      - name: Smoke test frozen application
+        shell: pwsh
+        run: |
+          $app = Start-Process -FilePath "release/Disclosure Alpha/Disclosure Alpha.exe" -PassThru
+          try {
+            $deadline = (Get-Date).AddSeconds(30)
+            $healthy = $false
+            while ((Get-Date) -lt $deadline) {
+              try {
+                $instancePath = Join-Path $env:LOCALAPPDATA "Disclosure Alpha/instance.json"
+                $instance = Get-Content $instancePath -Raw | ConvertFrom-Json -ErrorAction Stop
+                $health = Invoke-RestMethod -Uri "http://127.0.0.1:$($instance.port)/health" -TimeoutSec 1
+                if ($health.status -eq "ok") { $healthy = $true; break }
+              } catch { Start-Sleep -Milliseconds 250 }
+            }
+            if (-not $healthy) {
+              $logPath = Join-Path $env:LOCALAPPDATA "Disclosure Alpha/launcher.log"
+              if (Test-Path $logPath) { Get-Content $logPath -Raw }
+              throw "Frozen application did not expose its health endpoint."
+            }
+          } finally {
+            if (-not $app.HasExited) { Stop-Process -Id $app.Id -Force }
+          }
+      - name: Create portable ZIP
+        shell: pwsh
+        run: Compress-Archive -Path "release/Disclosure Alpha" -DestinationPath "release/Disclosure-Alpha-Windows.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Disclosure-Alpha-Windows
+          path: release/Disclosure-Alpha-Windows.zip
+          if-no-files-found: error
+          retention-days: 14

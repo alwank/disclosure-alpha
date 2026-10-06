@@ -18,6 +18,8 @@ from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
 
 from disclosure_alpha import __version__
+from disclosure_alpha.desktop.settings import DesktopSession
+from disclosure_alpha.api.endpoints.desktop import create_router as create_desktop_router
 from disclosure_alpha.api.endpoints import ROUTERS
 from disclosure_alpha.mcp.http_mount import try_create_analyst_mcp
 
@@ -78,7 +80,7 @@ class _PrivateNetworkAccessMiddleware(BaseHTTPMiddleware):
         return response
 
 
-def create_app() -> FastAPI:
+def create_app(*, desktop_session: DesktopSession | None = None) -> FastAPI:
     analyst_mcp = try_create_analyst_mcp()
 
     @contextlib.asynccontextmanager
@@ -127,6 +129,11 @@ def create_app() -> FastAPI:
 
     for router in ROUTERS:
         app.include_router(router)
+
+    # These routes write local user settings and are never exposed by the
+    # ordinary self-hosted API. The desktop launcher also binds only to loopback.
+    if desktop_session is not None:
+        app.include_router(create_desktop_router(desktop_session))
 
     if analyst_mcp is not None:
         analyst_mcp.settings.streamable_http_path = "/"

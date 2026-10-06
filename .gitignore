@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 .venv/
 dist/
+release/
+build/pyinstaller/
 web/node_modules/
 web/test-results/
 web/playwright-report/

@@ -301,6 +301,15 @@ a { color: var(--accent); }
 .empty-state { margin: 35px auto; max-width: 390px; padding: 0 20px; text-align: center; color: var(--muted); }
 .empty-state p { font-size: 13px; line-height: 1.6; }
 .empty-icon { display: none; }
+.desktop-setup { display: grid; min-height: 100vh; place-items: center; padding: 24px; }
+.desktop-setup-card { width: min(100%, 510px); padding: 34px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); box-shadow: 0 12px 32px #1d35390f; }
+.desktop-setup-card h1 { margin: 0; font-size: 28px; letter-spacing: -.04em; }
+.desktop-setup-card > p:not(.eyebrow) { margin: 12px 0 24px; color: var(--muted); line-height: 1.55; }
+.desktop-setup-card form { display: grid; gap: 16px; }
+.desktop-setup-card label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 650; }
+.desktop-setup-card input { height: 42px; padding: 0 11px; border: 1px solid #bfcaca; border-radius: 5px; background: var(--paper); color: var(--ink); font-size: 14px; }
+.desktop-setup-card .run-button { justify-self: start; }
+.setup-error { margin: -4px 0 0; color: var(--critical); font-size: 13px; }
 .mobile-tabs { display: none; }
 @media (max-width: 1279px) and (min-width: 800px) {
   .workspace-header { align-items: start; flex-direction: column; gap: 18px; }

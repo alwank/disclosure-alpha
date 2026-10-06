@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { fetchReview } from "./api";
+import {
+  fetchDesktopSettings,
+  fetchReview,
+  sendDesktopHeartbeat,
+} from "./api";
+import { DesktopSetup } from "./DesktopSetup";
 import { buildSegments, searchRanges, type TextSegment } from "./highlights";
 import { groupEvidence, readingBlockViews } from "./reading";
 import type { Evidence, Provenance, Review, ReviewQuery } from "./types";
@@ -93,9 +98,29 @@ export function App() {
     "reader",
   );
   const [evidenceOpen, setEvidenceOpen] = useState(false);
+  const [desktopSetupRequired, setDesktopSetupRequired] = useState(false);
   const evidencePanelRef = useRef<HTMLElement>(null);
   const evidenceCloseRef = useRef<HTMLButtonElement>(null);
   const evidenceToggleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchDesktopSettings(controller.signal)
+      .then((status) => {
+        if (status && !status.configured) setDesktopSetupRequired(true);
+      })
+      .catch(() => {
+        // If this is an ordinary self-hosted deployment, preserve its UI.
+      });
+    void sendDesktopHeartbeat();
+    const heartbeatTimer = window.setInterval(() => {
+      void sendDesktopHeartbeat();
+    }, 20_000);
+    return () => {
+      controller.abort();
+      window.clearInterval(heartbeatTimer);
+    };
+  }, []);
 
   useEffect(() => {
     if (!submitted) return;
@@ -268,6 +293,10 @@ export function App() {
     ) : (
       <span key={segment.start}>{segment.text}</span>
     );
+  }
+
+  if (desktopSetupRequired) {
+    return <DesktopSetup onComplete={() => setDesktopSetupRequired(false)} />;
   }
 
   return (

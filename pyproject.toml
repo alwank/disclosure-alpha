@@ -35,6 +35,7 @@ Changelog = "https://github.com/alwank/disclosure-alpha/blob/main/docs/appendix/
 
 [project.optional-dependencies]
 api = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "pydantic>=2.5.0"]
+desktop = ["pyinstaller>=6.0"]
 mcp = ["mcp>=1.0.0,<2", "pydantic>=2.5.0"]
 semantic = ["sentence-transformers>=2.2.0"]
 validation = ["spacy>=3.7.0"]
@@ -44,6 +45,7 @@ dev = ["pytest>=7.4.0", "pytest-cov>=4.1.0", "httpx2>=2.13.0"]
 [project.scripts]
 disclosure-alpha = "disclosure_alpha.cli:main"
 disclosure-alpha-api = "disclosure_alpha.api.app:main"
+disclosure-alpha-desktop = "disclosure_alpha.desktop.launcher:main"
 disclosure-alpha-mcp = "disclosure_alpha.mcp.server:main"
 disclosure-alpha-mcp-analyst = "disclosure_alpha.mcp.analyst:main"
 disclosure-alpha-mcp-builder = "disclosure_alpha.mcp.builder:main"

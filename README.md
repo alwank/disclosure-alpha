@@ -23,6 +23,7 @@
 - [What it is](#what-it-is)
 - [Integration surfaces](#integration-surfaces)
 - [OpenBB Workspace](#openbb-workspace)
+- [Filing Review UI](#filing-review-ui)
 - [Capabilities](#capabilities)
 - [Example output](#example-output)
 - [Research-backed](#research-backed)
@@ -74,13 +75,14 @@ Full scope and limits: [Scope and claims](https://disclosure-alpha.readthedocs.i
 
 ## Integration surfaces
 
-Six entry points, one deterministic pipeline. Not sure which to pick? See [Choose your surface](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/choose-your-surface.html).
+Seven entry points, one deterministic pipeline. Not sure which to pick? See [Choose your surface](https://disclosure-alpha.readthedocs.io/en/latest/getting-started/choose-your-surface.html).
 
 | You are… | Entry | Install extra |
 |----------|-------|---------------|
 | Terminal / scripts | `disclosure-alpha` | *(base)* |
 | Notebooks / apps | `import disclosure_alpha` | *(base)* |
 | REST screener or dashboard | `disclosure-alpha-api` | `[api]` |
+| Filing review analyst | `disclosure-alpha-api` → `/app/` | `[api]` |
 | OpenBB Workspace analyst | `disclosure-alpha-api` + [OpenBB guide](https://disclosure-alpha.readthedocs.io/en/latest/guides/openbb/index.html) | `[api,mcp]` |
 | AI agent (ticker scoring) | `disclosure-alpha-mcp-analyst` | `[mcp]` |
 | Agent with raw HTML | `disclosure-alpha-mcp-builder` | `[mcp]` |
@@ -93,6 +95,18 @@ disclosure-alpha-mcp-analyst      # MCP analyst bundle
 ```
 
 Guides, [Postman collections](https://github.com/alwank/disclosure-alpha/tree/main/docs/postman), and MCP reference: **[Guides](https://disclosure-alpha.readthedocs.io/en/latest/guides/index.html)**.
+
+## Filing Review UI
+
+The self-hosted analyst view pairs the OpenBB-style scorecard with a filing reader. Selecting a detected flag highlights its exact phrase in the cleaned filing section used for analysis.
+
+```bash
+pip install "disclosure-alpha[api]"
+export SEC_USER_AGENT="YourName your@email.com"
+disclosure-alpha-api
+```
+
+Open `http://127.0.0.1:8000/app/`. The original SEC filing is linked from the review header. Development and API details: [Filing Review guide](https://disclosure-alpha.readthedocs.io/en/latest/guides/filing-review.html).
 
 ## OpenBB Workspace
 

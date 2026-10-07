@@ -43,6 +43,7 @@ With `tier=lite`, only the headline field is returned. With `tier=analyst`, add 
 | Section Extractor | `GET` | `/v1/company/{ticker}/sections` | …debugging extraction or fetching section text |
 | Disclosure Analytics | `GET` | `/v1/company/{ticker}/disclosure-metrics` | …you need raw metrics, flags, and diffs without aggregation |
 | Disclosure Risk Score | `GET` | `/v1/company/{ticker}/disclosure-matrix` | …you need filing-level component scores for one ticker |
+| Filing Review | `GET` | `/v1/company/{ticker}/filing-review` | …you need scores, cleaned text, and exact flag evidence in one response |
 | Risk Flags | `GET` | `/v1/company/{ticker}/disclosure-flags` | …boolean risk events only |
 | Filing Changes | `GET` | `/v1/company/{ticker}/disclosure-changes` | …year-over-year diff details without full scores |
 | Panel Screener | `POST` | `/v1/panel/disclosure-matrix` | …batch-screening up to 25 tickers |
@@ -61,6 +62,8 @@ disclosure-alpha-api
 :class: tip
 
 The same `disclosure-alpha-api` process also serves OpenBB discovery (`/widgets.json`, `/apps.json`) and the bundled Company widget at `GET /openbb/company`. See {doc}`../openbb/index`.
+
+The packaged Filing Review UI is available at `http://127.0.0.1:8000/app/`. See {doc}`../filing-review`.
 ```
 
 ## Response tiers (matrix only)

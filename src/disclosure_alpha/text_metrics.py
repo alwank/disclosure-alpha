@@ -30,6 +30,7 @@ from disclosure_alpha.text_matching import (
     boilerplate_hits,
     phrase_count,
     phrase_matches,
+    phrase_pattern,
     split_sentences,
     tokenize_words,
 )
@@ -42,6 +43,7 @@ __all__ = [
     "compute_text_metrics",
     "compute_metric_families",
     "detect_section_flags",
+    "detect_section_flags_with_evidence",
     "compute_density_metrics",
 ]
 
@@ -178,26 +180,76 @@ def compute_metric_families(inp: SectionTextInput) -> list[dict[str, float | str
     ]
 
 
-def detect_section_flags(text: str, section_name: str) -> dict[str, bool]:
-    """Return all v1 boolean flags for a section (False when out of scope)."""
-    sentences = split_sentences(text or "")
+def _sentence_spans(text: str) -> list[tuple[int, int]]:
+    """Use the same sentence boundaries as split_sentences, retaining text offsets."""
+    spans: list[tuple[int, int]] = []
+    start = 0
+    for boundary in re.finditer(r"[.!?]+\s+", text):
+        end = boundary.start()
+        if text[start:end].strip():
+            spans.append((start, end))
+        start = boundary.end()
+    if text[start:].strip():
+        spans.append((start, len(text)))
+    return spans
+
+
+def detect_section_flags_with_evidence(
+    text: str, section_name: str
+) -> tuple[dict[str, bool], list[dict[str, str | int]]]:
+    """Return flags and unsuppressed phrase spans in the same cleaned text."""
+    text = text or ""
+    sentences = _sentence_spans(text)
     flags: dict[str, bool] = {}
+    evidence: list[dict[str, str | int]] = []
     for flag_name, phrases in FLAG_PATTERNS.items():
         scope = FLAG_SECTION_SCOPE.get(flag_name, frozenset())
         if section_name not in scope:
             flags[flag_name] = False
             continue
         suppressions = FLAG_SUPPRESSIONS.get(flag_name, [])
-        matched = False
-        for sent in sentences:
-            lower = sent.lower()
-            if not any(phrase_matches(lower, phrase) for phrase in phrases):
+        for sentence_start, sentence_end in sentences:
+            sent = text[sentence_start:sentence_end]
+            if suppressions and any(
+                re.search(phrase_pattern(sup), sent, flags=re.IGNORECASE)
+                for sup in suppressions
+            ):
                 continue
-            if suppressions and any(phrase_matches(lower, sup) for sup in suppressions):
-                continue
-            matched = True
-            break
-        flags[flag_name] = matched
+            candidates: list[tuple[int, int, str]] = []
+            for phrase in phrases:
+                for match in re.finditer(phrase_pattern(phrase), sent, flags=re.IGNORECASE):
+                    candidates.append((match.start(), match.end(), phrase))
+            # Prefer the longest pattern, then retain distinct non-overlapping hits.
+            selected: list[tuple[int, int, str]] = []
+            for start, end, phrase in sorted(
+                candidates, key=lambda item: (-(item[1] - item[0]), item[0], item[2])
+            ):
+                if not any(start < prior_end and end > prior_start for prior_start, prior_end, _ in selected):
+                    selected.append((start, end, phrase))
+            for start, end, phrase in sorted(selected):
+                absolute_start = sentence_start + start
+                absolute_end = sentence_start + end
+                evidence.append(
+                    {
+                        "section": section_name,
+                        "flag": flag_name,
+                        "pattern": phrase,
+                        "matched_text": text[absolute_start:absolute_end],
+                        "start": absolute_start,
+                        "end": absolute_end,
+                        "sentence_start": sentence_start,
+                        "sentence_end": sentence_end,
+                        "sentence": sent.strip(),
+                    }
+                )
+        flags[flag_name] = any(item["flag"] == flag_name for item in evidence)
+    evidence.sort(key=lambda item: (str(item["section"]), int(item["start"]), str(item["flag"])))
+    return flags, evidence
+
+
+def detect_section_flags(text: str, section_name: str) -> dict[str, bool]:
+    """Return all v1 boolean flags for a section (False when out of scope)."""
+    flags, _ = detect_section_flags_with_evidence(text, section_name)
     return flags
 
 

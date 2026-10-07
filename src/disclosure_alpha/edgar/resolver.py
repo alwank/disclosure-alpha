@@ -497,12 +497,23 @@ def resolve_filing_with_prior(
         if prior_target:
             targets.append(prior_target)
 
-    resolved = resolve_filing_targets(
-        ticker,
-        targets,
-        use_cache=use_cache,
-        cache_dir=cache_dir,
-    )
+    try:
+        resolved = resolve_filing_targets(
+            ticker,
+            targets,
+            use_cache=use_cache,
+            cache_dir=cache_dir,
+        )
+    except FilingNotFoundError:
+        if prior_target is None:
+            raise
+        # The current filing remains scoreable when no comparable prior exists.
+        resolved = resolve_filing_targets(
+            ticker,
+            [primary],
+            use_cache=use_cache,
+            cache_dir=cache_dir,
+        )
     prior_ref = resolved.get(prior_target) if prior_target else None
     return resolved[primary], prior_ref
 

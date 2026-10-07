@@ -62,6 +62,7 @@ class MetricsResult:
     section_densities: dict[str, dict[str, float]]
     language_deltas: dict[str, dict[str, float]]
     section_diffs_v2: dict[str, float | None] = field(default_factory=dict)
+    section_change_drivers: dict[str, dict[str, Any]] = field(default_factory=dict)
     extraction_confs: dict[str, float] = field(default_factory=dict)
     diff_confs: list[float] = field(default_factory=list)
     extraction_warnings: list[str] = field(default_factory=list)
@@ -165,6 +166,7 @@ def compute_section_metrics(
     section_densities: dict[str, dict[str, float]] = {}
     language_deltas: dict[str, dict[str, float]] = {}
     section_diffs_v2: dict[str, float | None] = {}
+    section_change_drivers: dict[str, dict[str, Any]] = {}
     extraction_confs: dict[str, float] = {}
     diff_confs: list[float] = []
 
@@ -196,6 +198,17 @@ def compute_section_metrics(
             section_diffs_v2[section.section_name] = float(change_v2)
         if diff.language_deltas:
             language_deltas[section.section_name] = dict(diff.language_deltas)
+        if diff.disclosure_change_score is not None:
+            section_change_drivers[section.section_name] = {
+                "added_sentence_count": diff.added_sentence_count,
+                "removed_sentence_count": diff.removed_sentence_count,
+                "changed_numeric_count": diff.changed_numeric_count,
+                "new_topics": list(diff.new_topics),
+                "intensified_topics": list(diff.intensified_topics),
+                "removed_topics": list(diff.removed_topics),
+                "language_deltas": dict(diff.language_deltas),
+                "confidence_score": diff.confidence_score,
+            }
         if diff.confidence_score is not None:
             diff_confs.append(float(diff.confidence_score))
 
@@ -208,6 +221,7 @@ def compute_section_metrics(
         section_densities=section_densities,
         language_deltas=language_deltas,
         section_diffs_v2=section_diffs_v2,
+        section_change_drivers=section_change_drivers,
         extraction_confs=extraction_confs,
         diff_confs=diff_confs,
         extraction_warnings=extraction_warnings,
@@ -327,6 +341,8 @@ def score_filing_html(
 
 
 def _filing_meta(ref, *, prior_accession: str | None = None) -> dict[str, Any]:
+    from disclosure_alpha.edgar.client import filing_document_url
+
     return {
         "ticker": ref.ticker,
         "cik": ref.cik,
@@ -337,6 +353,7 @@ def _filing_meta(ref, *, prior_accession: str | None = None) -> dict[str, Any]:
         "filing_date": ref.filing_date,
         "report_date": ref.report_date,
         "prior_accession_number": prior_accession,
+        "source_url": filing_document_url(ref.cik, ref.accession_number, ref.primary_document),
     }
 
 
@@ -379,6 +396,7 @@ def filter_metrics_result(
         section_densities=_filter_section_dict(metrics.section_densities, section_names),
         language_deltas=_filter_section_dict(metrics.language_deltas, section_names),
         section_diffs_v2=_filter_section_dict(metrics.section_diffs_v2, section_names),
+        section_change_drivers=_filter_section_dict(metrics.section_change_drivers, section_names),
         extraction_confs=_filter_section_dict(metrics.extraction_confs, section_names),
         diff_confs=metrics.diff_confs,
         extraction_warnings=extraction_warnings,

@@ -13,6 +13,12 @@ jobs:
     environment: pypi
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify release tag is on main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -23,6 +29,22 @@ jobs:
           test "$TAG" = "$VER"
       - run: pip install -e ".[api,mcp,dev]"
       - run: pytest -q -m "not integration"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm run build
+        working-directory: web
       - run: pip install build
       - run: python -m build
+      - run: python scripts/check_ui_package.py
+      - name: Smoke installed wheel
+        run: |
+          WHEEL=$(find dist -maxdepth 1 -name 'disclosure_alpha-*.whl' -print -quit)
+          python -m venv "$RUNNER_TEMP/package-smoke"
+          "$RUNNER_TEMP/package-smoke/bin/python" -m pip install "${WHEEL}[api]" httpx
+          "$RUNNER_TEMP/package-smoke/bin/python" -I scripts/smoke_ui_package.py
       - uses: pypa/gh-action-pypi-publish@release/v1

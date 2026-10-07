@@ -34,3 +34,35 @@ jobs:
       - run: pytest -q -m "not integration" --cov=disclosure_alpha --cov-fail-under=75
         env:
           EMBEDDING_BACKEND: tfidf
+
+  filing-review-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm test
+        working-directory: web
+      - run: npm run build
+        working-directory: web
+      - run: npx playwright install --with-deps chromium
+        working-directory: web
+      - run: npm run test:e2e
+        working-directory: web
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install build
+      - run: python -m build
+      - run: python scripts/check_ui_package.py
+      - name: Smoke installed wheel
+        run: |
+          WHEEL=$(find dist -maxdepth 1 -name 'disclosure_alpha-*.whl' -print -quit)
+          python -m venv "$RUNNER_TEMP/package-smoke"
+          "$RUNNER_TEMP/package-smoke/bin/python" -m pip install "${WHEEL}[api]" httpx
+          "$RUNNER_TEMP/package-smoke/bin/python" -I scripts/smoke_ui_package.py

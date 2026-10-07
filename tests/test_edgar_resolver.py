@@ -286,6 +286,26 @@ def test_resolve_filing_with_prior_single_submissions_fetch(mock_tickers, mock_s
 
 @patch("disclosure_alpha.edgar.resolver.client.fetch_submissions")
 @patch("disclosure_alpha.edgar.resolver.client.fetch_company_tickers")
+def test_resolve_filing_with_missing_prior_keeps_current(mock_tickers, mock_submissions):
+    mock_tickers.return_value = {"AAPL": ("0000320193", "Apple Inc.")}
+    mock_submissions.return_value = _submissions_10k_rows(
+        {
+            "accessionNumber": "acc-2025",
+            "form": "10-K",
+            "filingDate": "2025-10-31",
+            "reportDate": "2025-09-27",
+            "primaryDocument": "a.htm",
+        }
+    )
+
+    current, prior = resolve_filing_with_prior("AAPL", 2025, "10-K", compare_prior=True, use_cache=False)
+
+    assert current.accession_number == "acc-2025"
+    assert prior is None
+
+
+@patch("disclosure_alpha.edgar.resolver.client.fetch_submissions")
+@patch("disclosure_alpha.edgar.resolver.client.fetch_company_tickers")
 def test_resolve_filing_targets_prior_10q_chain(mock_tickers, mock_submissions, tmp_path):
     mock_tickers.return_value = {"AAPL": ("0000320193", "Apple Inc.")}
     mock_submissions.return_value = {

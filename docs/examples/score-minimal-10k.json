@@ -18,6 +18,28 @@
         "open_ended_boundary",
         "item1a_resliced",
         "extraction_suspect"
+      ],
+      "reading_blocks": [
+        {
+          "start": 0,
+          "end": 21,
+          "kind": "heading"
+        },
+        {
+          "start": 22,
+          "end": 102,
+          "kind": "paragraph"
+        },
+        {
+          "start": 103,
+          "end": 147,
+          "kind": "paragraph"
+        },
+        {
+          "start": 148,
+          "end": 215,
+          "kind": "paragraph"
+        }
       ]
     },
     {
@@ -36,6 +58,13 @@
         "early_candidate",
         "short_section",
         "open_ended_boundary"
+      ],
+      "reading_blocks": [
+        {
+          "start": 0,
+          "end": 111,
+          "kind": "heading"
+        }
       ]
     }
   ],
@@ -125,6 +154,7 @@
     },
     "language_deltas": {},
     "section_diffs_v2": {},
+    "section_change_drivers": {},
     "extraction_confs": {
       "item_1a_risk_factors": 0.35,
       "item_7_mdna": 0.35

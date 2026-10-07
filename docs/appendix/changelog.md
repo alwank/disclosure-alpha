@@ -2,6 +2,17 @@
 
 Version history for parser, metrics engine, dictionary packs, and scoring model.
 
+## 1.6.0 (2026-10-08)
+
+Self-hosted Filing Review UI for 10-K and 10-Q ticker filings.
+
+| Area | Change |
+|------|--------|
+| **Web UI** | Packaged React reader at `/app/` with section navigation, score and flag evidence, search, and responsive layouts |
+| **Review API** | `GET /v1/company/{ticker}/filing-review` returns filing text, evidence spans, scores, and provenance from one pipeline result |
+| **Comparisons** | `changes.section_drivers` describes detected sentence, numeric, topic, and language changes when a comparable prior filing exists; change magnitude is not direction of risk |
+| **Packaging** | Build UI assets into the wheel and source archive; verify the installed UI before publishing |
+
 ## 1.5.1 (2026-06-26)
 
 OpenBB Workspace addon modernization plus API pipeline performance and EDGAR improvements.

@@ -333,3 +333,21 @@ def test_pick_best_extraction_prefers_longer_fallback():
     assert merged is not None
     assert merged.word_count >= 200
     assert merged.extraction_method == "heading_boundary_fallback_merged"
+
+
+def test_reading_blocks_preserve_canonical_unicode_offsets():
+    from disclosure_alpha.section_extractor import _build_extracted_section
+
+    source = "Item 1A. Risk Factors\n\n😀 First paragraph.\n\nSecond paragraph."
+    section = _build_extracted_section(
+        "item_1a_risk_factors", source, 0, len(source), candidate=None,
+        base_conf=0.8, parser_version="test", method="sec_parser_sequence_v1",
+    )
+    assert section.cleaned_text == "Item 1A. Risk Factors 😀 First paragraph. Second paragraph."
+    assert [block["kind"] for block in section.reading_blocks] == [
+        "heading", "paragraph", "paragraph",
+    ]
+    assert " ".join(
+        section.cleaned_text[block["start"]:block["end"]]
+        for block in section.reading_blocks
+    ) == section.cleaned_text

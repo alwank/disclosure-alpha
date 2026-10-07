@@ -2,6 +2,10 @@ __pycache__/
 *.py[cod]
 .venv/
 dist/
+web/node_modules/
+web/test-results/
+web/playwright-report/
+src/disclosure_alpha/web_assets/
 *.egg-info/
 .pytest_cache/
 .coverage

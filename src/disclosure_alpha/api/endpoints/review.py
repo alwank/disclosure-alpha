@@ -76,7 +76,10 @@ def filing_review(
             sections=sections,
             active_flags=active_flags,
             evidence=evidence,
-            changes=shape_changes_payload(result.metrics, scores if compare_prior else None),
+            changes={
+                **shape_changes_payload(result.metrics, scores if compare_prior else None),
+                "section_drivers": result.metrics.section_change_drivers if compare_prior else {},
+            },
             display={
                 "headline_rows": card["headline_rows"],
                 "section_labels": {

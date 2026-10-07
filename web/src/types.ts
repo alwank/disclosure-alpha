@@ -49,6 +49,17 @@ export interface Provenance {
   source: string;
 }
 
+export interface SectionChangeDrivers {
+  added_sentence_count: number;
+  removed_sentence_count: number;
+  changed_numeric_count: number;
+  new_topics: string[];
+  intensified_topics: string[];
+  removed_topics: string[];
+  language_deltas: Record<string, number>;
+  confidence_score: number;
+}
+
 export interface Review {
   filing: Filing;
   scores: {
@@ -64,6 +75,7 @@ export interface Review {
   evidence: Evidence[];
   changes: {
     change_score: { value: number | null; missing_reason: string | null };
+    section_drivers: Record<string, SectionChangeDrivers>;
   };
   display: {
     headline_rows: ComponentRow[];
